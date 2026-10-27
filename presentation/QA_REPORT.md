@@ -83,3 +83,6 @@ share one white background. Title and closing slides changed to white at the aut
 - Cover panel reworked after feedback (the motif lacked contrast on emerald): a near-white
   graph-paper panel with a vector drawing of the running example (admission table → RIGOR →
   Admission/PatientData with label, comment and provenance chips; BM_DEP and its label in gold).
+- Cover figure restored at the author's request: the original table-to-ontology figure,
+  recoloured for the light panel (charcoal table and nodes, emerald edges, amber mapped row and
+  node), with a RIGOR label above the mapping and alt text describing it.
