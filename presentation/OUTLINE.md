@@ -131,11 +131,11 @@ merging the pitfall commentary into the R1 line, and a tighter close.
 
 ### Deck-wide issues found while auditing
 
-1. **Fonts are a venue risk.** The deck uses IBM Plex Sans (1,695 runs) and IBM Plex
-   Mono (554), which are not installed on typical venue PCs, plus Aptos (44 runs),
-   which is missing from older Office versions. Without embedding they silently fall
-   back to other fonts and text reflows. Phase 2 swaps them for fonts that ship with
-   Office, or embeds them, and Phase 7 produces a PDF fallback.
+1. **Fonts (corrected in Phase 2).** IBM Plex Sans and Mono turned out to be embedded in
+   the original file, so the venue risk was smaller than first stated. Aptos (44 runs)
+   was not embedded. Phase 2 replaced all of them with Office fonts as part of the new
+   look: Calibri (body), Cambria (titles and hero numbers) and Consolas (labels and
+   code). The embedded Plex files were removed. Phase 7 still produces a PDF fallback.
 2. **Backgrounds alternate inside the method section.** Slide 5 is dark, 6–8 light,
    9 dark, 10–11 light, 12–17 dark. Phase 2 makes slides 5–17 one continuous background.
 3. **Colors are hard-coded**, not theme-based (about 25 distinct hex values, mainly the

@@ -117,7 +117,14 @@ Produce presentation/OUTLINE.md:
 Commit OUTLINE.md and report the slide list with timings.
 ```
 
-## Phase 2: Restyle the existing deck (new identity, same layouts)
+## Phase 2: Restyle the existing deck (new identity, same layouts) (DONE)
+
+Done via `presentation/tools/restyle.py` (rerunnable from the original deck) and
+`presentation/tools/qa_render.py` (QA render that emulates Consolas widths).
+Deviations from the prompt below: titles use **Cambria**, not Georgia (QA renders it with
+a metric-compatible substitute, and its numerals line up). The step tracker uses
+done = emerald tint, current = solid emerald, upcoming = hollow grey, so the current
+step is the strongest. Later phases edit `presentation/RIGOR_ISWC2026.pptx` directly.
 
 ```
 Read presentation/REVISION_PHASES.md (Shared context) and presentation/OUTLINE.md.
