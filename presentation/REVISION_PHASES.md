@@ -367,7 +367,10 @@ presentation/RIGOR_ISWC2026.pptx. Use OUTLINE.md §3's per-slide time and word b
 Commit and report the total word count and estimated duration.
 ```
 
-## Phase 7: Final QA and delivery package
+## Phase 7: Final QA and delivery package (DONE)
+
+See `presentation/QA_REPORT.md`. The PDF fallback is `presentation/RIGOR_ISWC2026.pdf`. At the author's request the
+title and closing slides are now white (`TITLE_STYLES` in `restyle.py`; other options: emerald, graphite, forest).
 
 ```
 Read presentation/REVISION_PHASES.md (Shared context). Do a final pass on

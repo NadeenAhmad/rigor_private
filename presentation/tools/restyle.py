@@ -8,9 +8,10 @@ Palette ("lab notebook / editorial light"):
   white FFFFFF background · panels F3F5F4 · hairlines D9DEDB
   ink 1F2328 · body 3A434C · secondary 5B6770
   emerald 0B6E4F (primary accent) · teal 2F6B78 / 3A7D8C (secondary) · vermilion B23A1E (errors)
-  Title and closing slides: emerald background, white text, gold F6CF6A highlight.
+  Title and closing slides: emerald background, white text, gold F6CF6A highlight (F9DD8F for text).
 """
 import copy
+import os
 import re
 import shutil
 import sys
@@ -74,7 +75,7 @@ def map_dark(c, role):
     if c in ORANGE:
         return EMERALD
     if c in MINT:
-        return "1E8A5E"
+        return "177A55"
     if c in BLUE:
         return TEAL if role == "text" else TEAL_LINE
     if role == "text":
@@ -106,28 +107,49 @@ def map_light(c, role):
 
 
 EMERALD_DEEP, EMERALD_PANEL, EMERALD_EDGE, GOLD = "095C42", "0D7A58", "4FAE88", "F6CF6A"
+GOLD_TEXT = "F9DD8F"  # lighter gold for text: 4.7:1 on emerald (F6CF6A is 4.2:1)
+
+
+# Title and closing slide treatments. Select with RIGOR_TITLE_STYLE (default below).
+#   bg, deep panel, panel, edge line, accent fill, accent text, primary text, soft text,
+#   secondary text, light line; motif: table ramp (lo, hi), edge colour, highlight colour.
+TITLE_STYLES = {
+    "emerald": dict(bg=EMERALD, deep="095C42", panel="0D7A58", edge="4FAE88", acc="F6CF6A", acc_text="F9DD8F",
+                    primary="FFFFFF", soft="BFE6D3", secondary="E8F6EF", light="8FD3B4",
+                    ramp=((0x05, 0x45, 0x31), (0x5F, 0xB5, 0x92)), motif_edge=(185, 228, 205), motif_hi=(0xF6, 0xCF, 0x6A)),
+    "white": dict(bg="FFFFFF", deep="F3F5F4", panel="FFFFFF", edge="D9DEDB", acc=EMERALD, acc_text=EMERALD,
+                  primary=INK, soft=TEAL, secondary=MUTED, light=TEAL_LINE,
+                  ramp=((0xE9, 0xEE, 0xEB), (0xA9, 0xB6, 0xB0)), motif_edge=(0x3A, 0x7D, 0x8C), motif_hi=(0x0B, 0x6E, 0x4F)),
+    "graphite": dict(bg="1F2328", deep="2A3038", panel="343B44", edge="4A525C", acc="F6CF6A", acc_text="F6CF6A",
+                     primary="FFFFFF", soft="C9D1D9", secondary="B1BAC4", light="7FC4A6",
+                     ramp=((0x2A, 0x30, 0x38), (0x6B, 0x74, 0x7B)), motif_edge=(0x7F, 0xC4, 0xA6), motif_hi=(0xF6, 0xCF, 0x6A)),
+    "forest": dict(bg="0F3D2E", deep="0B3226", panel="16503D", edge="3F7F68", acc="F6CF6A", acc_text="F6CF6A",
+                   primary="FFFFFF", soft="CFE8DC", secondary="E3F1EA", light="8FD3B4",
+                   ramp=((0x0A, 0x2E, 0x22), (0x4F, 0x9A, 0x7C)), motif_edge=(185, 228, 205), motif_hi=(0xF6, 0xCF, 0x6A)),
+}
+TS = TITLE_STYLES[os.environ.get("RIGOR_TITLE_STYLE", "white")]  # author chose white (Phase 7)
 
 
 def map_emerald(c, role):
-    """Dark slide -> emerald slide (title and closing)."""
+    """Dark slide -> title/closing treatment (TS)."""
     if role == "bg" or c == "0E1726":
-        return EMERALD
+        return TS["bg"]
     if c in ORANGE:
-        return GOLD
+        return TS["acc_text"] if role == "text" else TS["acc"]
     if role == "text":
         if c in ("F7F9FD", "EDF1F6", "EAF1FA", "EBF2FA", "EBEFF5", "FFFFFF"):
-            return "FFFFFF"
+            return TS["primary"]
         if c in BLUE:
-            return "BFE6D3"
-        return "D3EDE0"
+            return TS["soft"]
+        return TS["secondary"]
     if role == "line":
-        return "8FD3B4" if c in BLUE else EMERALD_EDGE
+        return TS["light"] if c in BLUE else TS["edge"]
     if c in {"1A2B45", "18273E"}:
-        return EMERALD_DEEP
+        return TS["deep"]
     if c in {"233754", "21314A", "263A56"}:
-        return EMERALD_PANEL
+        return TS["panel"]
     if c in BLUE:
-        return "8FD3B4"
+        return TS["light"]
     return None
 
 
@@ -148,7 +170,7 @@ TITLE_FONT, TITLE_MIN_SZ = "Cambria", 2600
 
 
 def restyle_fonts(tree):
-    for el in tree.iter(f"{{{A}}}latin", f"{{{A}}}ea", f"{{{A}}}cs", f"{{{A}}}sym"):
+    for el in tree.iter(f"{{{A}}}latin", f"{{{A}}}ea", f"{{{A}}}cs", f"{{{A}}}sym", f"{{{A}}}buFont"):
         tf = el.get("typeface")
         if tf in FONT_MAP:
             el.set("typeface", FONT_MAP[tf])
@@ -196,7 +218,7 @@ def restyle_tracker(tree, current):
         elif step == current:
             fill, line, text, bold = EMERALD, EMERALD, "FFFFFF", "1"
         else:
-            fill, line, text, bold = "FFFFFF", HAIRLINE, "8A949B", "1"
+            fill, line, text, bold = "FFFFFF", HAIRLINE, "6B747B", "1"
         sppr = box.find("p:spPr", NS)
         set_fill(sppr, fill)
         set_fill(sppr.find("a:ln", NS), line)
@@ -293,6 +315,11 @@ def restyle_slide(path, slide_no, unmapped):
             unmapped.add((slide_no, old, role))
         else:
             el.set("val", new)
+    if slide_no in EMERALD_SLIDES:  # theme-white text (schemeClr lt1) follows the title style's text colour
+        for sc in list(tree.iter(f"{{{A}}}schemeClr")):
+            if sc.get("val") == "lt1" and role_of(sc) == "text":
+                sc.addnext(etree.Element(f"{{{A}}}srgbClr", val=TS["primary"]))
+                sc.getparent().remove(sc)
     restyle_fonts(tree)
     if slide_no in TRACKER_SLIDES:
         restyle_tracker(tree, TRACKER_SLIDES[slide_no])
@@ -310,13 +337,12 @@ def recolor_motif(png):
             if a == 0:
                 continue
             if r > 180 and r > g > b:  # orange highlight
-                px[xx, yy] = (0xF6, 0xCF, 0x6A, a)
+                px[xx, yy] = TS["motif_hi"] + (a,)
             elif b > 200:  # light-blue edges and node rims
-                t = min(1.0, max(0.0, (b - 200) / 55))
-                px[xx, yy] = (int(150 + 50 * t), int(215 + 25 * t), int(185 + 30 * t), a)
-            else:  # navy table, nodes, placeholders: keep relative lightness on a deep-emerald ramp
+                px[xx, yy] = TS["motif_edge"] + (a,)
+            else:  # navy table, nodes, placeholders: keep relative lightness on the style's ramp
                 t = min(1.0, max(0.0, ((r + g + b) / 3 - 14) / 100))
-                lo, hi = (0x05, 0x45, 0x31), (0x5F, 0xB5, 0x92)
+                lo, hi = TS["ramp"]
                 px[xx, yy] = tuple(int(lo[i] + (hi[i] - lo[i]) * t) for i in range(3)) + (a,)
     im.save(png)
 

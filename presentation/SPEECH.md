@@ -225,7 +225,7 @@ A: Portability and privacy. Clinical data often cannot leave the hospital, while
 A: That is DeepSeek on eICU. The seed is complete by construction, but enrichment can drop columns, and coverage is an embedding-based proxy. Stronger per-fragment coverage checks are planned.
 
 **Q: Could the LLMs have seen these databases in training?**  
-A: eICU and Chinook are public. The liver-cancer registry is private, so no model saw it, and RIGOR still ranked first on all 16 of its tables.
+A: eICU and Chinook are public. The liver-cancer registry is private, so no model saw it, and the LLM judge still ranked RIGOR first on all 16 of its tables.
 
 **Q: Are the external ontologies actually used?**  
 A: Retrieved external concepts are passed as context, and alignment axioms are added only on a good match. In the ablation, full RIGOR has the highest external-ontology alignment (F1 0.059 vs 0.033 without retrieval), though absolute values are small.

@@ -28,7 +28,7 @@ EMU = 914400
 ADD_SLIDE = Path("/root/.claude/skills/synced/954bdbed-f7d8-4e99-9a67-2334e0f54e1f_96ca6ae3-be58-43c5-a447-6fed00e21488"
                  "/pptx/scripts/add_slide.py")
 
-EMERALD, TEAL, INK, BODY, MUTED, GREY, RED = "0B6E4F", "2F6B78", "1F2328", "3A434C", "5B6770", "8A949B", "B23A1E"
+EMERALD, TEAL, INK, BODY, MUTED, GREY, RED = "0B6E4F", "2F6B78", "1F2328", "3A434C", "5B6770", "6B747B", "B23A1E"
 
 # R1 matrix (methods x what their ontologies contain). Coverage = Table 9 column-coverage range
 # over the 3 databases x 3 LLMs; counts = runs with any annotations / SubClassOf + provenance (Table 8).

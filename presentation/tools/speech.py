@@ -278,6 +278,11 @@ def apply(src, dst):
         if n == 23:
             tree = etree.parse(str(slide))
             set_runs(tree, 1049, [(CLOSING_TAKEAWAYS, None, None)])
+            for pic in tree.iter(f"{{{NS['p']}}}pic"):  # QR alt text (targets decoded from the images)
+                cnv = pic.find(".//p:cNvPr", NS)
+                cnv.set("descr", {"Picture 1051": "QR code: https://arxiv.org/abs/2506.01232 (paper)",
+                                  "Picture 1053": "QR code: https://github.com/NadeenAhmad/RIGOR (code)"}
+                        .get(cnv.get("name"), cnv.get("descr")))
             tree.write(str(slide), xml_declaration=True, encoding="UTF-8", standalone=True)
     Path(dst).unlink(missing_ok=True)
     files = sorted(f for f in work.rglob("*") if f.is_file())
@@ -316,8 +321,8 @@ HARD_QUESTIONS = [
      "That is DeepSeek on eICU. The seed is complete by construction, but enrichment can drop columns, and "
      "coverage is an embedding-based proxy. Stronger per-fragment coverage checks are planned."),
     ("Could the LLMs have seen these databases in training?",
-     "eICU and Chinook are public. The liver-cancer registry is private, so no model saw it, and RIGOR still "
-     "ranked first on all 16 of its tables."),
+     "eICU and Chinook are public. The liver-cancer registry is private, so no model saw it, and the LLM judge "
+     "still ranked RIGOR first on all 16 of its tables."),
     ("Are the external ontologies actually used?",
      "Retrieved external concepts are passed as context, and alignment axioms are added only on a good match. "
      "In the ablation, full RIGOR has the highest external-ontology alignment (F1 0.059 vs 0.033 without "
