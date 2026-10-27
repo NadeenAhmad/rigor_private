@@ -1,0 +1,21 @@
+Prefix: : <http://example.org/rigor#>
+Prefix: rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+Prefix: xsd: <http://www.w3.org/2001/XMLSchema#>
+Prefix: prov: <http://www.w3.org/ns/prov#>
+Prefix: src: <http://example.org/provenance/admission/>
+Ontology: <http://example.org/rigor>
+AnnotationProperty: prov:wasDerivedFrom
+Class: PatientData
+Individual: src:ecog_stage
+Class: Admission
+ObjectProperty: hasPatientData
+  Domain: Admission  Range: PatientData
+DataProperty: BM_DEP
+  Annotations: rdfs:label "Bone Marrow Depression"@en
+DataProperty: ecog_stage
+  Annotations:
+    rdfs:comment "ECOG 0 = fully active,
+      1 = restricted, 2 = ambulatory,
+      3 = limited self-care,
+      4 = completely disabled, 5 = dead"@en,
+    prov:wasDerivedFrom src:ecog_stage

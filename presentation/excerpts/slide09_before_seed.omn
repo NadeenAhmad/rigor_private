@@ -1,0 +1,17 @@
+Prefix: : <http://example.org/rigor#>
+Prefix: rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+Prefix: xsd: <http://www.w3.org/2001/XMLSchema#>
+Prefix: prov: <http://www.w3.org/ns/prov#>
+Prefix: src: <http://example.org/provenance/admission/>
+Ontology: <http://example.org/rigor>
+AnnotationProperty: prov:wasDerivedFrom
+Class: PatientData
+Individual: src:ecog_stage
+ObjectProperty: patient_id
+DataProperty: BM_DEP
+DataProperty: ecog_stage
+Class: Admission
+  SubClassOf:
+    patient_id some PatientData,
+    BM_DEP only xsd:integer,
+    ecog_stage only xsd:integer

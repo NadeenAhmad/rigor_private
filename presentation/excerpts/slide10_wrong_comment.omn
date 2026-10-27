@@ -1,0 +1,11 @@
+Prefix: : <http://example.org/rigor#>
+Prefix: rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+Prefix: xsd: <http://www.w3.org/2001/XMLSchema#>
+Prefix: prov: <http://www.w3.org/ns/prov#>
+Prefix: src: <http://example.org/provenance/admission/>
+Ontology: <http://example.org/rigor>
+AnnotationProperty: prov:wasDerivedFrom
+Class: PatientData
+Individual: src:ecog_stage
+DataProperty: ecog_stage
+  Annotations: rdfs:comment "ECOG 0 = dead … 5 = fully active"@en

@@ -169,7 +169,15 @@ renders, and fix overflow, wrapping changes from the font swap, contrast and lef
 old colors. Commit restyle.py and the .pptx. Send me an old/new contact sheet.
 ```
 
-## Phase 3: Ontology excerpts as real OWL code
+## Phase 3: Ontology excerpts as real OWL code (DONE)
+
+Done via `presentation/tools/code_excerpts.py` (run by `presentation/tools/build.sh`).
+Every excerpt is parsed with the OWL API (`OwlCheck.java`) and checked for OWL 2 DL; the
+verified files are in `presentation/excerpts/`. Slides 3, 7, 9 and 10 now show real
+Manchester Syntax with plain-English glosses (slide 9 keeps its evidence tags instead).
+Slides 11 and 23 show class diagrams, not pseudo-syntax, so they were left as they are.
+Provenance uses `src:` = <http://example.org/provenance/admission/>, which expands to the
+paper's IRI pattern.
 
 ```
 Read presentation/REVISION_PHASES.md (Shared context) and presentation/OUTLINE.md, and
