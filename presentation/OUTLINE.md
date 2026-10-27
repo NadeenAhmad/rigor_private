@@ -84,7 +84,7 @@ Seconds include pauses (≈ 105 words/min effective, the current deck's own pace
 | 2 | A database can tell us how data is stored. Can it tell us what the data means? | Keep | BM_DEP, ECOG, FK: meaning is implicit | Restyle | §1, §3.2 | 0:45 | 85 | 1:10 |
 | 3 | Not just a cleaner schema. A usable semantic model. | Improve | The target: a linked, labelled, traceable ontology | Right panel becomes a real Manchester Syntax code panel with plain-English glosses (Phase 3) | §3 | 0:45 | 80 | 1:55 |
 | 4 | Two partial solutions. Neither solves the whole problem. | Keep | Rules keep structure; LLMs suggest meaning; we need both | Restyle; this question is answered by R1–R3 | §1–2 | 0:40 | 70 | 2:35 |
-| 5 | Build the ontology one table at a time. | Improve | Six moves, one table | Optional one-line teaser at the bottom: "Result: first in 70% of expert rankings · best F1 on BURR" | §3.1 | 0:25 | 45 | 3:00 |
+| 5 | Build the ontology one table at a time. | Improve | Six moves, one table | One-line teaser at the bottom (confirmed): "Result: first in 70% of expert rankings · best F1 on BURR" | §3.1 | 0:25 | 45 | 3:00 |
 | 6 | To understand this table, build its parent first. | Keep | FK order makes parents available | Restyle; same background as 5–17 | §3.1–3.2 | 0:35 | 60 | 3:35 |
 | 7 | Guarantee schema coverage before LLM enrichment. | Improve | Deterministic seed covers every cleaned column | Output panel becomes real code (class, data properties, FK object property, existential restriction) + glosses | §3.2 | 0:40 | 75 | 4:15 |
 | 8 | The draft is structurally faithful, but what does it mean? | Keep | Three retrieval sources | Restyle | §3.3 | 0:45 | 75 | 5:00 |
@@ -127,7 +127,7 @@ merging the pitfall commentary into the R1 line, and a tighter close.
 | 21 | F1 .73/.67/.52 etc.; 9 tables / 46 columns / 11 FKs; D2RQ export | ok | Add *what* is evaluated (R2) |
 | 21 | OntoGenix "LLM-based", RDB2Onto "rule-based" | ok | — |
 | 22 | Coverage 0.77–1.00; P19 3/9; disjointness rare | ok | Coverage moves into R1; P19 and disjointness move into future work / backup |
-| 23 | "ISWC 2026 · Bari" | check | Confirm the venue city from the conference website before the talk |
+| 23 | "ISWC 2026 · Bari" | ok | Confirmed by the author |
 
 ### Deck-wide issues found while auditing
 
@@ -153,8 +153,11 @@ merging the pitfall commentary into the R1 line, and a tighter close.
 - Pitfalls: no dedicated slide; results restructured as R1 → R2 → R3 (section 2).
 - Improve the existing deck; no rebuild from scratch.
 
-## 6. Open questions for the author
+## 6. Author's answers (resolved)
 
-1. Results order: R1 → R2 → R3 (recommended), or experts first?
-2. Slide 5 teaser line: yes or no?
-3. Venue city on slides 1 and 23: please confirm.
+1. Results order: **R1 → R2 → R3** (confirmed).
+2. Slide 5 teaser: **yes**, one quiet line under the six-step row, in the caption style:
+   "Result preview: ranked first in 70% of expert rankings · best F1 on BURR". It gives
+   the audience the payoff before the 5-minute method walkthrough. It is added to the
+   slide-5 budget (still 0:25 / 45 words; the script mentions it in one clause).
+3. Venue: **ISWC 2026, Bari, Italy** (confirmed); slides 1 and 23 stay as they are.

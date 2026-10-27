@@ -150,10 +150,12 @@ the current composition.
 4. Step tracker (the "1 ORDER … 6 MERGE" row on slides 5–11): restyle in place so
    completed steps are emerald-filled, the current step has an emerald outline, and
    future steps are grey outlines. Same position on every slide.
-5. Apply the claims-audit rewordings from OUTLINE.md §4 that are pure text edits:
+5. Slide 5: add the confirmed teaser line (OUTLINE.md §6) under the step row, in the
+   existing caption style.
+6. Apply the claims-audit rewordings from OUTLINE.md §4 that are pure text edits:
    slide 18 "independent LLM judge" → "independent evaluation judge (GPT-5.4)";
    slide 10 gets a small visible "illustrative" tag in the existing caption style.
-6. Do NOT yet touch code excerpts (Phase 3), results slides 19–21 (Phase 4), or the
+7. Do NOT yet touch code excerpts (Phase 3), results slides 19–21 (Phase 4), or the
    limitations slide 22 (Phase 5).
 Validate (with --original), render all slides, compare side by side with the original
 renders, and fix overflow, wrapping changes from the font swap, contrast and leftover
