@@ -277,6 +277,13 @@ def find_sp(tree, text_start):
     return next(sp for sp in tree.iter(f"{{{P}}}sp") if shape_text(sp).startswith(text_start))
 
 
+EM_DASH_FIXES = {
+    "OUTPUT  /  DMr (excerpt) \u2014 NO LLM": "OUTPUT  /  DMr (excerpt)  \u00b7  NO LLM",
+    "The draft is structurally faithful\u2014but what does it mean?":
+        "The draft is structurally faithful. But what does it mean?",
+}
+
+
 def text_edits(slide_no, tree):
     if slide_no == 5:  # Result preview under the step tracker
         src = find_sp(tree, "We need to preserve structure")
@@ -287,7 +294,10 @@ def text_edits(slide_no, tree):
     if slide_no == 10:  # Make the hypothetical status of the examples visible
         src = find_sp(tree, "STEP 5 / VALIDATE")
         clone_text_shape(tree, src, max_id(tree) + 1, 7.67, 0.49, 5.0, 0.34,
-                         [("ILLUSTRATIVE ERRORS, NOT OBSERVED OUTPUTS", MUTED, True, None)], align="r")
+                         [("ILLUSTRATIVE EXAMPLES", MUTED, True, None)], align="r")
+    for t in tree.iter(f"{{{A}}}t"):  # no em dashes anywhere (author's request)
+        if t.text and "\u2014" in t.text:
+            t.text = EM_DASH_FIXES.get(t.text, t.text.replace(" \u2014 ", ", ").replace("\u2014", ", "))
     if slide_no == 18:
         for t in tree.iter(f"{{{A}}}t"):
             if t.text and "independent LLM judge" in t.text:

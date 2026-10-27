@@ -1,6 +1,6 @@
 # Rehearsal card
 
-Target: finish by **13:30**. Planned end: **12:24** (1291 words).
+Target: finish by **13:30**. Planned end: **12:33** (1307 words).
 
 | Slide | Starts at | Ends at | Words |
 |---|---|---|---|
@@ -13,30 +13,30 @@ Target: finish by **13:30**. Planned end: **12:24** (1291 words).
 | 7. Step 2: seed | 3:22 | 3:59 | 66 |
 | 8. Step 3: retrieve | 3:59 | 4:41 | 73 |
 | 9. Step 4: generate | 4:41 | 5:22 | 72 |
-| 10. Step 5: validate | 5:22 | 6:16 | 94 |
-| 11. Step 6: merge | 6:16 | 6:44 | 49 |
-| 12. Architecture 1/6 | 6:44 | 6:54 | 18 |
-| 13. Architecture 2/6 | 6:54 | 7:02 | 14 |
-| 14. Architecture 3/6 | 7:02 | 7:11 | 15 |
-| 15. Architecture 4/6 | 7:11 | 7:17 | 10 |
-| 16. Architecture 5/6 | 7:17 | 7:23 | 12 |
-| 17. Architecture 6/6 | 7:23 | 7:35 | 20 |
-| 18. Experimental setup | 7:35 | 8:10 | 62 |
-| 19. Result 1: meaning and structure | 8:10 | 9:05 | 88 |
-| 20. Result 2: BURR | 9:05 | 10:09 | 112 |
-| 21. Result 3: experts | 10:09 | 10:56 | 80 |
-| 22. Future work | 10:56 | 11:51 | 96 |
-| 23. Thank you | 11:51 | 12:24 | 57 |
+| 10. Step 5: validate | 5:22 | 6:25 | 110 |
+| 11. Step 6: merge | 6:25 | 6:53 | 49 |
+| 12. Architecture 1/6 | 6:53 | 7:03 | 18 |
+| 13. Architecture 2/6 | 7:03 | 7:11 | 14 |
+| 14. Architecture 3/6 | 7:11 | 7:20 | 15 |
+| 15. Architecture 4/6 | 7:20 | 7:26 | 10 |
+| 16. Architecture 5/6 | 7:26 | 7:33 | 12 |
+| 17. Architecture 6/6 | 7:33 | 7:44 | 20 |
+| 18. Experimental setup | 7:44 | 8:19 | 62 |
+| 19. Result 1: meaning and structure | 8:19 | 9:14 | 88 |
+| 20. Result 2: BURR | 9:14 | 10:18 | 112 |
+| 21. Result 3: experts | 10:18 | 11:05 | 80 |
+| 22. Future work | 11:05 | 12:00 | 96 |
+| 23. Thank you | 12:00 | 12:33 | 57 |
 
 ## Checkpoints
 
 Glance at the clock when these slides come up. More than 30 s behind: apply the cuts below for the slides that follow.
 
 - **Slide 6** should come up at **2:50** (the method starts).
-- **Slide 12** should come up at **6:44** (the architecture recap starts).
-- **Slide 19** should come up at **8:10** (the results start).
-- **Slide 22** should come up at **10:56** (future work starts).
-- **Slide 23** should come up at **11:51** (the close starts).
+- **Slide 12** should come up at **6:53** (the architecture recap starts).
+- **Slide 19** should come up at **8:19** (the results start).
+- **Slide 22** should come up at **11:05** (future work starts).
+- **Slide 23** should come up at **12:00** (the close starts).
 
 ## Cuts if running late
 

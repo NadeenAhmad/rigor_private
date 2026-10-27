@@ -107,16 +107,20 @@ SLIDES = [
          takeaway="The LLM enriches a grounded draft, and every addition is traceable.",
          source="Paper Sections 3.3-3.4. Illustrative fragment, verified with the OWL API."),
     dict(title="Step 5: validate",
-         say="But LLMs make plausible mistakes, so step five validates every delta before it is merged. Here "
-             "are two illustrative errors. On the left, the ECOG scale is reversed. That is perfectly valid OWL, "
-             "so only a semantic check catches it: a Judge-LLM compares it with the retrieved documentation. On "
-             "the right, the foreign key became a data property. Merged with our seed, that is no longer valid "
-             "OWL 2 DL, because patient_id would be both kinds of property. Rule-based graph checks catch this. "
-             "Failed fragments go back for correction, with up to two retries.",
-         cue="Left error, right error, then the correction strip. Say 'illustrative'.",
-         takeaway="Semantic and structural checks are complementary.",
-         source="Paper Section 3.5. The OWL 2 DL claim is verified: "
-                "presentation/excerpts/slide10_wrong_fk_merged_with_seed.omn fails the DL profile check."),
+         say="A capable LLM rarely gets syntax wrong. The real risk is a fragment that looks right but clashes "
+             "with the ontology built so far. So step five validates every delta before it is merged. On the "
+             "left, the model names the target class Patient, although the core already has PatientData. That is "
+             "valid OWL, but now two classes mean the same thing. The Judge-LLM sees the core and asks to reuse "
+             "it. On the right, a later table reuses hasPatientData with a second domain. OWL then infers that "
+             "every lab result is an admission. Rule-based graph checks catch this. Failed fragments go back for "
+             "correction, with up to two retries.",
+         cue="Left, right, then the correction strip.",
+         takeaway="The Judge catches clashes in meaning; rules catch clashes in structure.",
+         source="Paper Section 3.5 (Judge criterion 9: core ontology consistency; graph check: domain/range "
+                "cardinality). Two domains = OOPS! pitfall P19, still reported in 3/9 RIGOR runs (Table 7). "
+                "Examples verified with the OWL API (presentation/excerpts/slide10_*.omn).",
+         extra=["IF ASKED: P19 is exactly the error that sometimes still slips through (3 of 9 runs); feeding "
+                "validator output back into generation is our next step (slide 22)."]),
     dict(title="Step 6: merge",
          say="Step six: merge. The validated delta joins the core ontology. Because RIGOR reuses identifiers, "
              "this is a simple union of axioms. And here is the loop. The expanded ontology becomes a retrieval "

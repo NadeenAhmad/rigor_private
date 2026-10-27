@@ -39,7 +39,6 @@ R1_CELLS = {
     "NI": ("0.06–0.78", (True, "9 / 9"), (False, "0 / 9")),
     "RI": ("0.77–1.00", (True, "9 / 9"), (True, "9 / 9")),
 }
-R1_ROW_CELL_IDS = {"DM": (963, 965, 967), "BL": (971, 973, 975), "NI": (979, 981, 983), "RI": (987, 989, 991)}
 
 
 # ---- helpers -----------------------------------------------------------------------------
@@ -163,38 +162,67 @@ def set_notes(path, paragraphs):
 # ---- R1: meaning without losing structure (rebuilt from the pitfalls slide) ------------------
 
 def edit_r1(tree):
+    """Open table: hairline rules, RIGOR band, coverage drawn as range bars on a 0-1 scale."""
     set_runs(tree, 946, [("RESULT 1  /  MEANING AND STRUCTURE", None, None)])
     set_runs(tree, 947, [("Only RIGOR adds meaning without losing structure.", None, None)])
     set_runs(tree, 948, [("What the generated ontologies contain  ·  3 databases × 3 LLMs  ·  "
                           "Direct Mapping: one ontology per database", None, None)])
-    set_runs(tree, 952, [("COLUMNS KEPT", None, None)])
-    set_runs(tree, 953, [("final schema coverage", None, None)])
-    set_runs(tree, 955, [("LABELS & COMMENTS", None, None)])
-    set_runs(tree, 956, [("runs that have them", None, None)])
-    set_runs(tree, 958, [("HIERARCHY + PROVENANCE", None, None)])
-    set_runs(tree, 959, [("runs that have them", None, None)])
-    for sid in (950, 952, 955, 958):
-        set_size(tree, sid, 1200)
+    delete(tree, *range(949, 993))  # the old boxed grid, cells and strip box
     ids = Ids(tree)
-    for row, (coverage, labels, hierarchy) in R1_CELLS.items():
-        cov_id, lab_id, hier_id = R1_ROW_CELL_IDS[row]
+    x0, x1 = 0.90, 12.43
+    cols = {"method": 1.05, "cov": 3.55, "bar": 4.75, "lab": 8.25, "hier": 10.45}
+    bar_w = 2.75
+    head_y, row_y, row_h = 2.08, 2.80, 0.62
+
+    def label(x, y, w, text, sub):
+        add(tree, shape(ids(), "Col head", x, y, w, 0.26, run(text, TEAL, 1150, True, "Consolas")))
+        add(tree, shape(ids(), "Col sub", x, y + 0.27, w, 0.22, run(sub, MUTED, 1050)))
+
+    label(cols["method"], head_y, 2.3, "METHOD", "")
+    label(cols["cov"], head_y, 4.3, "COLUMNS KEPT", "final schema coverage, range over the runs")
+    label(cols["lab"], head_y, 2.1, "LABELS & COMMENTS", "runs that have them")
+    label(cols["hier"], head_y, 2.1, "HIERARCHY + PROVENANCE", "runs that have them")
+    add(tree, shape(ids(), "Head rule", x0, row_y - 0.08, x1 - x0, 0.012, fill="9AA3A9"))
+
+    names = {"DM": "Direct Mapping", "BL": "LLM baseline", "NI": "Non-Iterative", "RI": "RIGOR"}
+    for r, (row, (coverage, labels, hierarchy)) in enumerate(R1_CELLS.items()):
+        y = row_y + r * row_h
         rigor = row == "RI"
-        cov_color = EMERALD if rigor else RED if row == "NI" else INK
-        set_runs(tree, cov_id, [(coverage, cov_color, rigor or row == "NI")])
-        for sid, (ok, count) in ((lab_id, labels), (hier_id, hierarchy)):
-            set_runs(tree, sid, [(count, EMERALD if rigor else INK if ok else GREY, rigor)])
-            # A drawn marker instead of a check/cross glyph (Calibri has none):
-            # filled emerald node = present, hollow grey node = absent.
-            off, ext = sp_by_id(tree, sid).find(".//a:off", NS), sp_by_id(tree, sid).find(".//a:ext", NS)
-            cx = (int(off.get("x")) + int(ext.get("cx")) / 2) / EMU
-            cy = (int(off.get("y")) + int(ext.get("cy")) / 2) / EMU
-            add(tree, shape(ids(), f"Marker {sid}", cx - 0.66, cy - 0.09, 0.18, 0.18, geom="ellipse",
+        if rigor:
+            add(tree, shape(ids(), "RIGOR band", x0, y + 0.04, x1 - x0, row_h - 0.08, geom="roundRect",
+                            fill="E6F2EC"))
+        elif r:
+            add(tree, shape(ids(), "Row rule", x0, y, x1 - x0, 0.01, fill="D9DEDB"))
+        mid = y + row_h / 2
+        add(tree, shape(ids(), "Method", cols["method"], mid - 0.17, 2.4, 0.34,
+                        run(names[row], EMERALD if rigor else INK, 1600, True), anchor="ctr"))
+        lo, hi = (float(v) for v in coverage.split("–"))
+        tone = EMERALD if rigor else RED if row == "NI" else "8E989E"
+        add(tree, shape(ids(), "Coverage", cols["cov"], mid - 0.17, 1.15, 0.34,
+                        run(coverage, EMERALD if rigor else RED if row == "NI" else INK, 1500, rigor or row == "NI"),
+                        anchor="ctr"))
+        add(tree, shape(ids(), "Bar track", cols["bar"], mid - 0.06, bar_w, 0.12, geom="roundRect", fill="EEF1EF"))
+        add(tree, shape(ids(), "Bar range", cols["bar"] + lo * bar_w, mid - 0.06, max(0.06, (hi - lo) * bar_w), 0.12,
+                        geom="roundRect", fill=tone, descr=f"coverage {coverage}"))
+        for key, (ok, count) in (("lab", labels), ("hier", hierarchy)):
+            add(tree, shape(ids(), "Marker", cols[key], mid - 0.09, 0.18, 0.18, geom="ellipse",
                             fill=EMERALD if ok else "FFFFFF", line=EMERALD if ok else GREY,
                             descr="present" if ok else "absent"))
+            add(tree, shape(ids(), "Count", cols[key] + 0.30, mid - 0.17, 1.4, 0.34,
+                            run(count, EMERALD if rigor else INK if ok else GREY, 1500, rigor), anchor="ctr"))
+    end = row_y + 4 * row_h
+    add(tree, shape(ids(), "End rule", x0, end + 0.02, x1 - x0, 0.012, fill="9AA3A9"))
+    for k, t in ((0, "0"), (0.5, "0.5"), (1, "1")):  # scale ticks under the bars, like a chart axis
+        add(tree, shape(ids(), "Bar tick", cols["bar"] + k * bar_w - 0.25, end + 0.05, 0.5, 0.2,
+                        run(t, MUTED, 1000), align="ctr"))
+
+    move(tree, 993, x=x0 + 0.15, y=end + 0.40, w=x1 - x0 - 0.3, h=0.36)
     set_runs(tree, 993, [("MODELING PITFALLS (OOPS!)   ", EMERALD, True),
                          ("Fewer than every other method in 9/9 like-for-like runs  ·  "
                           "zero on Chinook with all three LLMs", INK, False)])
     set_size(tree, 993, 1400)
+    move(tree, 994, y=6.45)
+    move(tree, 995, y=6.75)
     set_runs(tree, 994, [("Coverage = embedding-based proxy (cosine ≥ 0.55); Direct Mapping is complete by construction. "
                           "Like-for-like = same database and same LLM.", None, None)])
     set_runs(tree, 995, [("Sources: paper Tables 7 (pitfalls), 8 (labels, SubClassOf, provenance), 9 (coverage). "

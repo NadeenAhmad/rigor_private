@@ -7,4 +7,5 @@ Ontology: <http://example.org/rigor>
 AnnotationProperty: prov:wasDerivedFrom
 Class: PatientData
 Individual: src:ecog_stage
-DataProperty: patient_id  Range: xsd:integer
+Class: Patient
+ObjectProperty: hasPatient  Range: Patient

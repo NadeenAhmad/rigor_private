@@ -98,10 +98,14 @@ Individual: src:BM_DEP
 Individual: doc:cisplatin_label
 """
 
-WRONG_COMMENT = 'rdfs:comment "ECOG 0 = dead … 5 = fully active"@en'
-RIGHT_COMMENT = 'rdfs:comment "ECOG 0 = fully active … 5 = dead"@en'
-WRONG_FK = "DataProperty: patient_id  Range: xsd:integer"
-RIGHT_FK = "ObjectProperty: patient_id  Range: PatientData"
+# Slide 10: errors a capable LLM still makes, which the paper's checks target.
+# Semantic: a duplicate concept (Judge criterion 9, core consistency); valid OWL on its own.
+DUP_WRONG = "ObjectProperty: hasPatient  Range: Patient"
+DUP_RIGHT = "ObjectProperty: hasPatientData  Range: PatientData"
+# Structural: a reused property gets a second domain (OOPS! P19; graph check: one domain per property).
+CORE_LINK = "ObjectProperty: hasPatientData\n  Domain: Admission  Range: PatientData"
+DOMAIN_WRONG = "ObjectProperty: hasPatientData  Domain: LabResult"
+DOMAIN_RIGHT = "ObjectProperty: labResultOf  Domain: LabResult"
 
 
 def code_only(text):
@@ -120,12 +124,11 @@ CHECKS = {
     "slide09_before_seed": (HEADER + "ObjectProperty: patient_id\nDataProperty: BM_DEP\nDataProperty: ecog_stage\n"
                             + SEED_COMPACT, True),
     "slide09_after_delta": (HEADER + "Class: Admission\n" + DELTA, True),
-    "slide10_wrong_comment": (HEADER + annotated("ecog_stage", WRONG_COMMENT), True),
-    "slide10_wrong_fk": (HEADER + WRONG_FK, True),
-    "slide10_corrected": (HEADER + annotated("ecog_stage", RIGHT_COMMENT) + "\n" + RIGHT_FK, True),
-    # The structural error is valid OWL on its own; merged with the seed it puns
-    # patient_id as both an object and a data property, so OWL 2 DL rejects it.
-    "slide10_wrong_fk_merged_with_seed": (HEADER + code_only(SEED) + "\n" + WRONG_FK, False),
+    "slide10_duplicate_concept": (HEADER + "Class: Patient\n" + DUP_WRONG, True),
+    "slide10_second_domain_merged": (HEADER + "Class: Admission\nClass: LabResult\n" + CORE_LINK + "\n"
+                                     + DOMAIN_WRONG, True, {"hasPatientData": 2}),
+    "slide10_corrected_merged": (HEADER + "Class: Admission\nClass: LabResult\n" + CORE_LINK + "\n"
+                                 + DOMAIN_RIGHT + "  Range: PatientData", True, {"hasPatientData": 1, "labResultOf": 1}),
     "slide22_future_candidate": (HEADER.replace("Ontology:", "Prefix: doc: <http://example.org/docs/>\nOntology:")
                                  + FUTURE_SUPPORT + FUTURE, True),
 }
@@ -134,14 +137,20 @@ CHECKS = {
 def verify(classpath):
     EXCERPT_DIR.mkdir(exist_ok=True)
     ok = True
-    for name, (body, expect_dl) in CHECKS.items():
+    for old in EXCERPT_DIR.glob("slide10_*.omn"):
+        old.unlink()
+    for name, (body, expect_dl, *domains) in CHECKS.items():
         path = EXCERPT_DIR / f"{name}.omn"
         path.write_text(body + "\n", encoding="utf-8")
-        out = subprocess.run(["java", "-cp", f"{classpath}:{HERE}", "OwlCheck", str(path)],
+        out = subprocess.run(["java", "-cp", f"{classpath}:{HERE}", "OwlCheck", str(path), "axioms"],
                              capture_output=True, text=True).stdout
         parsed = "PARSED OK" in out
         is_dl = "OWL 2 DL: yes" in out
         good = parsed and is_dl == expect_dl
+        for prop, n in (domains[0] if domains else {}).items():  # expected number of domain axioms
+            found = len(re.findall(rf"ObjectPropertyDomain\(<http://example.org/rigor#{prop}>", out))
+            good &= found == n
+            print(f"      {prop}: {found} domain axiom(s), expected {n}")
         ok &= good
         print(f"{'PASS' if good else 'FAIL'}  {name}: parsed={parsed} dl={is_dl} (expected dl={expect_dl})")
     sys.exit(0 if ok else 1)
@@ -305,13 +314,22 @@ def edit_slide9(tree):
 
 
 def edit_slide10(tree):
+    set_text(tree, 340, "Why validate? Plausible fragments can still break the ontology.")
+    set_text(tree, 341, "A fluent LLM rarely gets syntax wrong. The risk is fragments that clash with the "
+                        "ontology built so far.")
+    set_text(tree, 379, "Generated link for admission:")
     move(tree, 381, x=1.25, w=4.85)
-    replace_runs(tree, 381, code_runs(WRONG_COMMENT, 1200, color="B23A1E"))
-    replace_runs(tree, 386, code_runs(WRONG_FK, 1200, color="B23A1E"))
+    replace_runs(tree, 381, code_runs(DUP_WRONG, 1200, color="B23A1E"))
+    set_text(tree, 382, "Valid OWL, but the core already has PatientData: now two classes mean the same "
+                        "thing. The Judge-LLM sees the core and asks to reuse it.")
+    set_text(tree, 384, "Later table lab_result reuses a core property:")
+    replace_runs(tree, 386, code_runs(DOMAIN_WRONG, 1200, color="B23A1E"))
+    set_text(tree, 387, "Merged with Domain: Admission, OWL infers that every lab result is an admission "
+                        "(pitfall P19). Graph checks allow one domain per property.")
     replace_runs(tree, 389, run_xml("CORRECTION   ", "0B6E4F", True, 1300, font="Calibri")
-                 + code_runs(RIGHT_COMMENT, 1200)
+                 + code_runs(DUP_RIGHT, 1200)
                  + run_xml("    |    ", "5B6770", False, 1300, font="Calibri")
-                 + code_runs(RIGHT_FK, 1200))
+                 + code_runs(DOMAIN_RIGHT, 1200))
 
 
 EDITS = {3: edit_slide3, 7: edit_slide7, 9: edit_slide9, 10: edit_slide10}

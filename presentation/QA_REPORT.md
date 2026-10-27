@@ -10,7 +10,7 @@ Rebuild everything from the original deck with `presentation/tools/build.sh`.
 |---|---|---|---|
 | 5 | First in 70% of expert rankings; highest BURR F1 among compared ontology-learning systems | Table 1; Table 13 | ok |
 | 8 | Top-3 per source; ICD-10, Disease, Cell, Nutrition ontologies | §3.3, §4.3 | ok |
-| 10 | Up to 2 retries, then fallback | §3.5 | ok |
+| 10 | Up to 2 retries, then fallback; examples: duplicate concept (Judge criterion 9) and a second domain on a reused property (P19, still in 3/9 runs) | §3.5; Table 7 | ok |
 | 18 | 16/350, 31/559, 11/67 tables/columns; 30 ontologies; GPT-5.4; 10 experts | §4.1, §4.4, §4.7 | ok |
 | 19 | Column coverage DM 0.78–0.99, Baseline 0.31–1.00, Non-It 0.06–0.78, RIGOR 0.77–1.00 | Table 9 (min/max of 3 DBs × 3 LLMs) | ok |
 | 19 | Labels & comments: 0/3, 0/9, 9/9, 9/9 | Table 8, AnnAx > 0 | ok |
@@ -68,3 +68,12 @@ share one white background. Title and closing slides changed to white at the aut
    BURR's results say otherwise. Slide 20's notes have the safe wording.
 4. Slide numbers were not added: the recap slides already show "1 / 6" … "6 / 6" bottom right
    and the closing slide shows the venue there. Ask if you want numbers on the other slides.
+
+## 6. Changes after Phase 7 (author feedback)
+
+- All em dashes removed from slides and notes (six titles and labels, rephrased).
+- Slide 10 now shows errors a capable LLM still makes: a duplicate concept (`Patient` next to
+  the core's `PatientData`) and a reused property with a second domain (P19). Both are verified
+  with the OWL API, including the domain-axiom count before and after the correction.
+- Slide 19 redrawn as an open table: hairline rules, a RIGOR band, and coverage as range bars
+  on a 0 to 1 axis.

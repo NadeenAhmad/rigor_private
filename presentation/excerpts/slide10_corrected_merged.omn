@@ -8,11 +8,7 @@ AnnotationProperty: prov:wasDerivedFrom
 Class: PatientData
 Individual: src:ecog_stage
 Class: Admission
-  SubClassOf:
-    patient_id some PatientData,
-    BM_DEP only xsd:integer,
-    ecog_stage only xsd:integer
-ObjectProperty: patient_id
-DataProperty: BM_DEP
-DataProperty: ecog_stage
-DataProperty: patient_id  Range: xsd:integer
+Class: LabResult
+ObjectProperty: hasPatientData
+  Domain: Admission  Range: PatientData
+ObjectProperty: labResultOf  Domain: LabResult  Range: PatientData

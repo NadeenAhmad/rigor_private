@@ -7,6 +7,8 @@ Ontology: <http://example.org/rigor>
 AnnotationProperty: prov:wasDerivedFrom
 Class: PatientData
 Individual: src:ecog_stage
-DataProperty: ecog_stage
-  Annotations: rdfs:comment "ECOG 0 = fully active … 5 = dead"@en
-ObjectProperty: patient_id  Range: PatientData
+Class: Admission
+Class: LabResult
+ObjectProperty: hasPatientData
+  Domain: Admission  Range: PatientData
+ObjectProperty: hasPatientData  Domain: LabResult
