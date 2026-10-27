@@ -337,8 +337,9 @@ def restyle_slide(path, slide_no, unmapped):
     tree.write(str(path), xml_declaration=True, encoding="UTF-8", standalone=True)
 
 
-def recolor_motif(png):
-    """Title-slide motif (navy table + graph, orange highlight) -> emerald + gold."""
+def recolor_motif(png, style=None):
+    """Title-slide motif (navy table + graph, orange highlight) -> the given title style's colours."""
+    style = style or TS
     im = Image.open(png).convert("RGBA")
     px = im.load()
     for yy in range(im.height):
@@ -347,12 +348,12 @@ def recolor_motif(png):
             if a == 0:
                 continue
             if r > 180 and r > g > b:  # orange highlight
-                px[xx, yy] = TS["motif_hi"] + (a,)
+                px[xx, yy] = style["motif_hi"] + (a,)
             elif b > 200:  # light-blue edges and node rims
-                px[xx, yy] = TS["motif_edge"] + (a,)
+                px[xx, yy] = style["motif_edge"] + (a,)
             else:  # navy table, nodes, placeholders: keep relative lightness on the style's ramp
                 t = min(1.0, max(0.0, ((r + g + b) / 3 - 14) / 100))
-                lo, hi = TS["ramp"]
+                lo, hi = style["ramp"]
                 px[xx, yy] = tuple(int(lo[i] + (hi[i] - lo[i]) * t) for i in range(3)) + (a,)
     im.save(png)
 

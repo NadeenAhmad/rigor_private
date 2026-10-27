@@ -77,3 +77,6 @@ share one white background. Title and closing slides changed to white at the aut
   with the OWL API, including the domain-axiom count before and after the correction.
 - Slide 19 redrawn as an open table: hairline rules, a RIGOR band, and coverage as range bars
   on a 0 to 1 axis.
+- Cover redesigned (`presentation/tools/cover.py`): RIGOR wordmark, authors on three balanced
+  lines with true superscripts (presenter in bold), one affiliation per line in full, a links
+  footer, and an emerald panel on the right third only, with the motif and the venue.
