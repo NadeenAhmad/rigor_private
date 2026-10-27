@@ -77,6 +77,27 @@ DataProperty: ecog_stage
       4 = completely disabled, 5 = dead"@en,
     prov:wasDerivedFrom src:ecog_stage"""
 
+# Future work (slide 22): instance pattern + drug label -> a reviewable candidate, no causal axiom.
+FUTURE = """Individual: cisplatin_bmdep
+  Types: CandidateAssociation
+  Facts:
+    hasDrug Cisplatin,
+    hasCondition BoneMarrowDepression,
+    status "needs expert review"
+  Annotations:
+    prov:wasDerivedFrom src:BM_DEP,
+    prov:wasDerivedFrom doc:cisplatin_label"""
+
+FUTURE_SUPPORT = """Class: CandidateAssociation
+ObjectProperty: hasDrug
+ObjectProperty: hasCondition
+DataProperty: status
+Individual: Cisplatin
+Individual: BoneMarrowDepression
+Individual: src:BM_DEP
+Individual: doc:cisplatin_label
+"""
+
 WRONG_COMMENT = 'rdfs:comment "ECOG 0 = dead … 5 = fully active"@en'
 RIGHT_COMMENT = 'rdfs:comment "ECOG 0 = fully active … 5 = dead"@en'
 WRONG_FK = "DataProperty: patient_id  Range: xsd:integer"
@@ -105,6 +126,8 @@ CHECKS = {
     # The structural error is valid OWL on its own; merged with the seed it puns
     # patient_id as both an object and a data property, so OWL 2 DL rejects it.
     "slide10_wrong_fk_merged_with_seed": (HEADER + code_only(SEED) + "\n" + WRONG_FK, False),
+    "slide22_future_candidate": (HEADER.replace("Ontology:", "Prefix: doc: <http://example.org/docs/>\nOntology:")
+                                 + FUTURE_SUPPORT + FUTURE, True),
 }
 
 
@@ -128,7 +151,7 @@ def verify(classpath):
 
 KW, NAME, LIT, XSD, ANN, IRI, GLOSS = "0B6E4F", "1F2328", "A3401E", "6F42C1", "5B6770", "2F6B78", "5B6770"
 KEYWORDS = {"Class:", "ObjectProperty:", "DataProperty:", "SubClassOf:", "Domain:", "Range:",
-            "Annotations:", "some", "only"}
+            "Annotations:", "some", "only", "Individual:", "Types:", "Facts:"}
 TOKEN = re.compile(r'"[^"]*"(?:@\w+)?|"[^"]*$|<[^>]*>|\s+|[\w:]+|.')
 
 
@@ -155,7 +178,7 @@ def tokens(line, in_string):
             out.append((tok, XSD, False))
         elif tok.startswith(("rdfs:", "prov:")):
             out.append((tok, ANN, False))
-        elif tok.startswith("src:"):
+        elif tok.startswith(("src:", "doc:")):
             out.append((tok, IRI, False))
         else:
             out.append((tok, NAME, False))

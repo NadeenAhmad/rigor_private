@@ -91,6 +91,12 @@ def set_runs(tree, sid, runs):
             p0.append(r)
 
 
+def delete(tree, *ids):
+    for sid in ids:
+        sp = sp_by_id(tree, sid)
+        sp.getparent().remove(sp)
+
+
 def set_size(tree, sid, size):
     for rpr in sp_by_id(tree, sid).iter(f"{{{A}}}rPr", f"{{{A}}}endParaRPr"):
         rpr.set("sz", str(size))
@@ -216,9 +222,9 @@ R1_NOTES = [
 def edit_r2(tree):
     ids = Ids(tree)
     set_runs(tree, 975, [("RESULT 2  /  EXTERNAL BENCHMARK", None, None)])
-    set_runs(tree, 976, [("RIGOR keeps the link to the data: best on BURR.", None, None)])
-    set_runs(tree, 977, [("BURR (Laskowski et al., 2025) scores ontology learning against a gold standard"
-                          "  ·  ISWC scenario", None, None)])
+    set_runs(tree, 976, [("RIGOR keeps the link to the data.", None, None)])
+    set_runs(tree, 977, [("BURR benchmark (Laskowski et al., 2025)  ·  ISWC scenario  ·  highest F1 among the "
+                          "compared ontology-learning systems", None, None)])
 
     # Left card: what BURR checks.
     x0, y0, w0, h0 = 0.92, 2.34, 5.30, 3.35
@@ -231,7 +237,7 @@ def edit_r2(tree):
             ("RELATIONS", "paper.author_id", "ObjectProperty: author"),
             ("ATTRIBUTES", "person.name", "DataProperty: name")]
     for i, (kind, db, onto) in enumerate(rows):
-        y = y0 + 1.08 + i * 0.50
+        y = y0 + 1.04 + i * 0.46
         add(tree, shape(ids(), f"BURR kind {i}", x0 + 0.25, y, 1.10, 0.36,
                         run(kind, TEAL, 1050, True, "Consolas"), anchor="ctr"))
         add(tree, shape(ids(), f"BURR db {i}", x0 + 1.35, y, 1.42, 0.36,
@@ -244,11 +250,13 @@ def edit_r2(tree):
                         run(keyword + " ", EMERALD, 1050, True, "Consolas") + run(name, INK, 1050, False, "Consolas"),
                         geom="roundRect", fill="FFFFFF", line="D0D7DE", anchor="ctr", inset=0.08,
                         descr="ontology element"))
-    add(tree, shape(ids(), "BURR card how", x0 + 0.25, y0 + 2.52, w0 - 0.5, 0.48,
-                    run("BURR compares each system's mapping with a gold-standard mapping and reports "
-                        "F1 per element type.", BODY, 1300)))
-    add(tree, shape(ids(), "BURR card note", x0 + 0.25, y0 + 3.06, w0 - 0.5, 0.20,
-                    run("Illustrative elements from the ISWC domain", MUTED, 1000)))
+    # Matching rule: BURR §4, Eq. 3 (elements match when their mappings are equal).
+    add(tree, shape(ids(), "BURR card how", x0 + 0.25, y0 + 2.42, w0 - 0.5, 0.64,
+                    run("Elements match when they map to the same database elements, whatever their "
+                        "names. F1 per element type.", BODY, 1300)))
+    add(tree, shape(ids(), "BURR card note", x0 + 0.25, y0 + 3.10, w0 - 0.5, 0.20,
+                    run("Illustrative elements  ·  ISWC gold mapping: D2RQ example by Bizer & Seaborne",
+                        MUTED, 1000)))
 
     # Right: the existing F1 table, compressed into the right half.
     tx, tw = 6.42, 5.98
@@ -268,9 +276,8 @@ def edit_r2(tree):
         move(tree, tag_id, x=tx + 0.27, y=name_y + 0.20, w=2.0, h=0.22)
         for sid, col in ((c_id, "C"), (r_id, "R"), (a_id, "A")):
             move(tree, sid, x=num_x[col], w=1.05)
-    set_runs(tree, 1006, [("BURR's own finding: LLM-based methods trail rule-based ones.   ", BODY, False),
-                          ("Here RIGOR leads both.", EMERALD, True)])
-    add(tree, shape(ids(), "BURR caption", 0.93, 6.50, 11.47, 0.27,
+    delete(tree, 1005, 1006)  # strip removed at the author's request
+    add(tree, shape(ids(), "BURR caption", 0.93, 5.92, 11.47, 0.27,
                     run("One scenario  ·  9 tables · 46 columns · 11 FKs  ·  RIGOR with Claude  ·  its "
                         "prov:wasDerivedFrom links exported as a D2RQ mapping  ·  Source: paper Table 13",
                         MUTED, 1050)))
@@ -282,14 +289,23 @@ R2_NOTES = [
     "A system must say which part of the database each ontology element comes from: which table becomes "
     "a class, which foreign key becomes a relation, which column becomes an attribute. BURR compares that "
     "mapping with a gold-standard mapping and reports F1 for each type. RIGOR's provenance annotations give "
-    "us this mapping directly; we export them as D2RQ. On the ISWC scenario, RIGOR has the best F1 for "
-    "classes, relations and attributes. BURR's authors found that LLM methods trail rule-based systems on "
-    "this task; here RIGOR leads both. It is one scenario, with Claude.",
+    "us this mapping directly; we export them as D2RQ. On the ISWC scenario, RIGOR has the highest F1 for "
+    "classes, relations and attributes among the compared ontology-learning systems, including both "
+    "rule-based ones. It is one scenario, with Claude.",
     "",
     "PRESENTER / POINTER: Walk the three mapping rows on the left first, then land on the RIGOR row.",
     "AUDIENCE TAKEAWAY: Semantic enrichment did not break the correspondence that OBDA and KG population need.",
-    "SOURCE AND SCOPE: Paper Table 13, Strategy 8. BURR = Laskowski et al., PACMMOD 2025. Left-card "
-    "elements are illustrative, not the gold standard's actual names.",
+    "SOURCE AND SCOPE: Paper Table 13, Strategy 8. BURR = Laskowski et al., PACMMOD 2025. Matching rule: "
+    "BURR Section 4, Eq. 3. Left-card elements are illustrative, not the gold standard's actual names.",
+    "",
+    "DO NOT SAY: 'BURR found LLMs trail rule-based systems'. BURR's results show Gemini 2.5 Pro ahead of "
+    "the rule-based systems overall (rule-based win only on NPD).",
+    "IF ASKED ABOUT GEMINI 2.5 PRO (BURR Table 3, ISWC .65 / .68 / .56): In BURR it is a general-purpose LLM "
+    "prompted with few-shot BURR-style examples and a checklist to write the D2RQ mapping directly. It is a "
+    "mapping generator, not an ontology-learning system that builds an enriched ontology, so we compare "
+    "with the ontology-learning systems. Against it, RIGOR's class F1 is higher, relations are on par, and "
+    "attributes are lower; RIGOR additionally produces labels, hierarchy and provenance. (It is prompted, "
+    "not fine-tuned.)",
 ]
 
 

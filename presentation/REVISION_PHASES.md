@@ -282,7 +282,11 @@ Update the speaker notes of the three slides to match (final wording comes in Ph
 Validate (--original), render, fix, commit, and show me the three slides plus B1.
 ```
 
-## Phase 5: Future work, from schemas to instances (cisplatin example)
+## Phase 5: Future work, from schemas to instances (cisplatin example) (DONE)
+
+Done via `presentation/tools/future_work.py` (run by `build.sh`). The OWL excerpt (`FUTURE` in
+`code_excerpts.py`) is verified like the others: `presentation/excerpts/slide22_future_candidate.omn`.
+Phase 5 also applied the BURR corrections recorded in OUTLINE.md §7 (slides 5 and 20).
 
 ```
 Read presentation/REVISION_PHASES.md (Shared context) and presentation/OUTLINE.md, and

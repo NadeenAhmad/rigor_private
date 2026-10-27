@@ -260,7 +260,7 @@ def text_edits(slide_no, tree):
         src = find_sp(tree, "We need to preserve structure")
         clone_text_shape(tree, src, max_id(tree) + 1, 0.94, 6.86, 11.44, 0.32, [
             ("RESULT PREVIEW   ", EMERALD, True, 1300),
-            ("Ranked first in 70% of expert rankings  ·  best F1 on the BURR benchmark", MUTED, False, 1300),
+            ("Ranked first in 70% of expert rankings  ·  highest BURR F1 among compared ontology-learning systems", MUTED, False, 1300),
         ])
     if slide_no == 10:  # Make the hypothetical status of the examples visible
         src = find_sp(tree, "STEP 5 / VALIDATE")

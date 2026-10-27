@@ -23,9 +23,9 @@ ontology gains real domain meaning without losing the link back to the data.
    enriches; it doesn't invent.
 2. **The ontology grows and checks itself.** Retrieval from the growing core plus a
    judge before every merge.
-3. **It works.** Experts ranked it first in 70% of rankings, it has the best F1 on the
-   BURR benchmark, and it is the only method that produces hierarchy and provenance
-   while keeping the schema.
+3. **It works.** Experts ranked it first in 70% of rankings, it has the highest BURR F1
+   among the compared ontology-learning systems, and it is the only method that produces
+   hierarchy and provenance while keeping the schema.
 
 ---
 
@@ -42,7 +42,7 @@ should answer that question in three steps, ending on the strongest evidence, pe
 | # | Slide (replaces) | Question it answers | Evidence | Why it convinces |
 |---|---|---|---|---|
 | R1 | **"Only RIGOR adds meaning without losing structure"** (replaces slide 20, pitfalls) | Does it add semantics *and* keep the schema? | One compact matrix, methods × what the ontology contains (Tables 8–9), plus one line on pitfalls | Shows things that *only* RIGOR produces, measured, not prompted |
-| R2 | **"RIGOR keeps the link back to the data: best on BURR"** (slide 21, reworked) | Is the fidelity real, by an external yardstick? | BURR, explained first and then scored (Table 13) | An outside benchmark with an expert gold standard; reverses the benchmark authors' own finding that LLMs trail rule-based systems |
+| R2 | **"RIGOR keeps the link to the data"** (slide 21, reworked) | Is the fidelity real, by an external yardstick? | BURR, explained first and then scored (Table 13) | An outside benchmark with a gold-standard mapping; highest F1 among the compared ontology-learning systems (see the Phase 5 correction below) |
 | R3 | **"Experts prefer RIGOR"** (slide 19, moved after BURR) | Is it actually better? | 28/40 first places (70%), Kendall's W; LLM judge 58/58 | Human judgment is the climax; the existing design stays |
 
 **R1 matrix content (all numbers measured in the paper):**
@@ -84,7 +84,7 @@ Seconds include pauses (≈ 105 words/min effective, the current deck's own pace
 | 2 | A database can tell us how data is stored. Can it tell us what the data means? | Keep | BM_DEP, ECOG, FK: meaning is implicit | Restyle | §1, §3.2 | 0:45 | 85 | 1:10 |
 | 3 | Not just a cleaner schema. A usable semantic model. | Improve | The target: a linked, labelled, traceable ontology | Right panel becomes a real Manchester Syntax code panel with plain-English glosses (Phase 3) | §3 | 0:45 | 80 | 1:55 |
 | 4 | Two partial solutions. Neither solves the whole problem. | Keep | Rules keep structure; LLMs suggest meaning; we need both | Restyle; this question is answered by R1–R3 | §1–2 | 0:40 | 70 | 2:35 |
-| 5 | Build the ontology one table at a time. | Improve | Six moves, one table | One-line teaser at the bottom (confirmed): "Result: first in 70% of expert rankings · best F1 on BURR" | §3.1 | 0:25 | 45 | 3:00 |
+| 5 | Build the ontology one table at a time. | Improve | Six moves, one table | One-line teaser at the bottom (confirmed): "Result preview: first in 70% of expert rankings · highest BURR F1 among compared ontology-learning systems" | §3.1 | 0:25 | 45 | 3:00 |
 | 6 | To understand this table, build its parent first. | Keep | FK order makes parents available | Restyle; same background as 5–17 | §3.1–3.2 | 0:35 | 60 | 3:35 |
 | 7 | Guarantee schema coverage before LLM enrichment. | Improve | Deterministic seed covers every cleaned column | Output panel becomes real code (class, data properties, FK object property, existential restriction) + glosses | §3.2 | 0:40 | 75 | 4:15 |
 | 8 | The draft is structurally faithful, but what does it mean? | Keep | Three retrieval sources | Restyle | §3.3 | 0:45 | 75 | 5:00 |
@@ -94,7 +94,7 @@ Seconds include pauses (≈ 105 words/min effective, the current deck's own pace
 | 12–17 | Reassembling the architecture (1/6 … 6/6) | Keep | Reconnect each step to paper Fig. 1 | Same background as 5–11 (no dark switch) | Fig. 1 | 1:20 total (12,12,14,12,12,18 s) | 130 | 8:30 |
 | 18 | Does the method work beyond our running example? | Improve | 3 DBs × 3 LLMs × 4 methods; 30 ontologies | "independent LLM judge" → "independent evaluation judge (GPT-5.4)" | §4.1–4.6 | 0:35 | 65 | 9:05 |
 | 19 → R1 | Only RIGOR adds meaning without losing structure | **Replace** (was pitfalls, slide 20) | Matrix from §2 + pitfall line | Matrix in the existing table style, RIGOR column highlighted | Tables 7–9 | 0:55 | 100 | 10:00 |
-| 20 → R2 | RIGOR keeps the link back to the data: best on BURR | **Improve** (was slide 21) | What BURR measures, then the scores | Left: mini worked example (table → class, FK → relation, column → attribute, compared with the gold mapping). Right: existing F1 table | Table 13, §4.6 | 1:05 | 115 | 11:05 |
+| 20 → R2 | RIGOR keeps the link to the data. | **Improve** (was slide 21) | What BURR measures, then the scores | Left: mini worked example (table → class, FK → relation, column → attribute, compared with the gold mapping). Right: existing F1 table | Table 13, §4.6 | 1:05 | 115 | 11:05 |
 | 21 → R3 | Experts prefer RIGOR | Keep (moved, was slide 19) | 70% first place; LLM judge 58/58 | Restyle only | Tables 1, 11, 12 | 0:50 | 85 | 11:55 |
 | 22 | Next: let the data speak, from schemas to instances | **Replace** (was limitations) | Instances + documentation → candidate knowledge (cisplatin / bone marrow depression), reviewed by experts | 3-stage flow + code panel (Phase 5); bottom line: tool feedback in the loop | §5 | 1:00 | 105 | 12:55 |
 | 23 | Thank you. Questions? | Improve | Restate the thesis + 3 takeaways | Keep QR codes; the three takeaways replace the tagline | — | 0:35 | 60 | 13:30 |
@@ -157,7 +157,23 @@ merging the pitfall commentary into the R1 line, and a tighter close.
 
 1. Results order: **R1 → R2 → R3** (confirmed).
 2. Slide 5 teaser: **yes**, one quiet line under the six-step row, in the caption style:
-   "Result preview: ranked first in 70% of expert rankings · best F1 on BURR". It gives
+   "Result preview: ranked first in 70% of expert rankings · highest BURR F1 among compared
+   ontology-learning systems". It gives
    the audience the payoff before the 5-minute method walkthrough. It is added to the
    slide-5 budget (still 0:25 / 45 words; the script mentions it in one clause).
 3. Venue: **ISWC 2026, Bari, Italy** (confirmed); slides 1 and 23 stay as they are.
+
+## 7. Correction after reading the BURR paper (Phase 5)
+
+- BURR's Table 3 also reports **Gemini 2.5 Pro** (checklist prompt) on ISWC: .65 / .68 / .56.
+  The author decided not to include it: in BURR it is a general-purpose LLM *prompted*
+  (not fine-tuned) to write D2RQ mappings directly, so it is a mapping generator rather than
+  an ontology-learning system. Slides therefore say "highest F1 among the compared
+  ontology-learning systems", not "best on BURR". A prepared Q&A answer is in slide 20's notes.
+- **Do not say "BURR found LLMs trail rule-based systems"** (paper §2.1 and §4.7). BURR's
+  results show Gemini 2.5 Pro ahead of the rule-based systems overall; rule-based systems
+  win only on NPD. The strip carrying that claim was removed at the author's request.
+- Confirmed metric (BURR §4, Eq. 3): two ontology elements match when their mappings refer to
+  the same database elements, regardless of names; precision, recall and F1 are reported
+  per concept, relationship and attribute. The ISWC gold mapping is the D2RQ example by Bizer
+  & Seaborne.

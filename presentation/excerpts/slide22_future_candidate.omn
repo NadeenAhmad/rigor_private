@@ -1,0 +1,27 @@
+Prefix: : <http://example.org/rigor#>
+Prefix: rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+Prefix: xsd: <http://www.w3.org/2001/XMLSchema#>
+Prefix: prov: <http://www.w3.org/ns/prov#>
+Prefix: src: <http://example.org/provenance/admission/>
+Prefix: doc: <http://example.org/docs/>
+Ontology: <http://example.org/rigor>
+AnnotationProperty: prov:wasDerivedFrom
+Class: PatientData
+Individual: src:ecog_stage
+Class: CandidateAssociation
+ObjectProperty: hasDrug
+ObjectProperty: hasCondition
+DataProperty: status
+Individual: Cisplatin
+Individual: BoneMarrowDepression
+Individual: src:BM_DEP
+Individual: doc:cisplatin_label
+Individual: cisplatin_bmdep
+  Types: CandidateAssociation
+  Facts:
+    hasDrug Cisplatin,
+    hasCondition BoneMarrowDepression,
+    status "needs expert review"
+  Annotations:
+    prov:wasDerivedFrom src:BM_DEP,
+    prov:wasDerivedFrom doc:cisplatin_label
