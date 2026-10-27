@@ -9,7 +9,10 @@ Source files in the repo:
 
 - Paper: `2506.01232v2 (1).pdf` (33 pages; the source of truth for every number)
 - Current deck: `RIGOR_ISWC2026_Slide20_Full_Comparison_23_Slides.pptx` (23 slides, with speaker notes)
-- From Phase 2 on: `presentation/build_deck.js` (generator) → `presentation/RIGOR_ISWC2026.pptx`
+- Phase 1 output: `presentation/OUTLINE.md` (slide list, timings, results structure, claims audit). **Done.**
+- From Phase 2 on, the working deck is `presentation/RIGOR_ISWC2026.pptx`, produced by
+  editing a copy of the current deck (never rebuilt from scratch), with repeatable
+  scripts in `presentation/tools/`.
 
 ---
 
@@ -17,6 +20,17 @@ Source files in the repo:
 
 **Goal.** A 15-minute ISWC 2026 research-track talk strong enough to compete for best
 paper. Spoken part ≤ 14:00 (aim for 13:30, leaving room for slower delivery). Q&A is separate.
+
+**Author's rule: improve, don't destroy.** The author likes the current deck. Keep its
+layouts, composition, running example, six-step build and the six cumulative
+architecture slides (12–17). Every phase makes targeted edits to the existing slides;
+none rebuilds the deck.
+
+**Decisions already made (Phase 1):** 15 min speaking, Q&A separate, spoken target
+13:30 · keep slides 12–17 · code excerpts use real Manchester Syntax **plus a
+plain-English gloss** beside the key lines · no dedicated pitfalls slide; results
+are restructured as R1 "meaning without losing structure" → R2 BURR → R3 experts
+(see OUTLINE.md §2).
 
 **What the deck does well (keep it).** The single running example (`admission` →
 `PatientData`, `BM_DEP`, `ecog_stage`) carried through all six steps. The honesty about
@@ -69,15 +83,17 @@ tables contradict, in particular:
   RIGOR .73/.67/.52. 9 tables, 46 columns, 11 FKs. RIGOR used Claude; its
   `prov:wasDerivedFrom` annotations were exported as a D2RQ mapping.
 
-**Tooling rules.** Use the `anthropic-skills:pptx` skill. Build the deck from a
-`pptxgenjs` generator script as a structured deck (theme, layouts, placeholders,
-sections), so later phases edit the script, not XML. After every build, run
-`validate.py`, render to images, and inspect every changed slide for overflow and
-overlap. Keep speaker notes in `slide.addNotes()`.
+**Tooling rules.** Use the `anthropic-skills:pptx` skill's editing workflow: unzip →
+edit `ppt/slides/slideN.xml` → zip. Use `add_slide.py` to duplicate slides and
+`defusedxml`/lxml-safe edits, never ElementTree round-trips. Keep changes repeatable
+as scripts in `presentation/tools/`. After every change run
+`validate.py --original RIGOR_ISWC2026_Slide20_Full_Comparison_23_Slides.pptx`, render
+to images, and inspect every changed slide for overflow and overlap. Speaker notes
+live in the slides' notes pages.
 
 ---
 
-## Phase 1: Storyline, slide list, 15-minute budget
+## Phase 1: Storyline, slide list, 15-minute budget (DONE → OUTLINE.md)
 
 ```
 Read presentation/REVISION_PHASES.md (Shared context) and the current deck's text and
@@ -101,57 +117,71 @@ Produce presentation/OUTLINE.md:
 Commit OUTLINE.md and report the slide list with timings.
 ```
 
-## Phase 2: New visual identity and deck rebuild
+## Phase 2: Restyle the existing deck (new identity, same layouts)
 
 ```
 Read presentation/REVISION_PHASES.md (Shared context) and presentation/OUTLINE.md.
-Rebuild the deck from scratch as presentation/build_deck.js (pptxgenjs, LAYOUT_WIDE,
-structured deck), following OUTLINE.md's slide list. Port the existing content and notes
-as they are; later phases rewrite specific slides.
+Copy RIGOR_ISWC2026_Slide20_Full_Comparison_23_Slides.pptx to
+presentation/RIGOR_ISWC2026.pptx and RESTYLE it in place. Do not move, resize or delete
+shapes, and do not change text, except where this prompt says so. The author likes
+the current composition.
 
-Visual identity, "Lab notebook / editorial light" (deliberately unlike the dark
-navy + orange template):
-- Background: white FFFFFF on every content slide. Panels and cards: F3F5F4. Hairline
-  borders: D9DEDB. No dark/light alternation. The ENTIRE method section (overview,
-  steps 1–6, architecture) shares one background and the same frame.
-- Ink: graphite 1F2328 for text, slate 5B6770 for secondary text.
-- One dominant accent: deep emerald 0B6E4F ("ontology green") for RIGOR, highlights and
-  the active step.
-- One sharp signal color, used rarely: vermilion D64C2B, only for errors, warnings and
-  the "what goes wrong" examples.
-- Title and closing slides may use a full emerald (0B6E4F) background with white text.
-  These are the only colored backgrounds.
-- Typography: headings in Georgia (editorial serif; leave about 10% width slack), body
-  in Calibri, code in Consolas (Courier New fallback). Title 36–40 pt, body ≥ 16 pt,
-  code ≥ 14 pt, captions 11–12 pt.
-- Motif, used everywhere: a growing graph. The step tracker on steps 1–6 is a row of six
-  nodes joined by edges; completed steps are filled emerald, the current step has an
-  emerald ring, future steps are hollow grey. It sits in the same position on every
-  method slide and replaces the current text-box tracker. Reuse the node glyph as the
-  section marker. No accent bars, no underline rules, no edge stripes.
-- Code panels (styling only here; content comes in Phase 3): background F6F8FA, 1 px
-  border D0D7DE, 8 px rounded corners, a small top-left tab label (e.g.
-  "admission.omn · Manchester Syntax"), Consolas 14–16 pt, line height 1.15. Syntax
-  colors: keywords (Class:, ObjectProperty:, SubClassOf:, Domain:, Range:,
-  Annotations:, some) in emerald bold; IRIs / prefixed names in graphite; string
-  literals and language tags in A3401E; datatypes (xsd:*) in 6F42C1; prov:* annotations
-  in slate.
-- Diagrams: hand-built shapes in the palette (tables as cards with header rows,
-  ontology classes as rounded nodes, properties as labelled arrows).
-- Reuse the two QR code images from the original deck (Picture 1051/1053 on slide 23).
-
-Then build, validate (validate.py), render every slide, and fix overflow, overlap and
-misalignment. Check that titles sit at the same position on every content slide and
-that the method section's background never changes. Commit build_deck.js and the
-.pptx, and send me a contact sheet of all slides.
+1. Palette, "lab notebook / editorial light", deliberately unlike the dark navy + orange
+   template. Write presentation/tools/restyle.py with an explicit old→new hex map
+   covering every srgbClr in the slides (inventory them first; there are about 25,
+   mainly 111A28/182740/21314A navy, 84ADF7/4D71DE/7799F0 blue, F9AB5E/F4A261 orange).
+   - Backgrounds: white FFFFFF. Panels/cards: F3F5F4. Hairlines: D9DEDB.
+   - Ink: graphite 1F2328 for text, slate 5B6770 for secondary text.
+   - Dominant accent: deep emerald 0B6E4F for RIGOR, highlights and the active step
+     (replaces the orange).
+   - Secondary accent: muted teal 3A7D8C for diagram strokes and links (replaces the
+     blues).
+   - Signal: vermilion D64C2B, only for errors and warnings (slide 10's wrong examples).
+   - Title (1) and closing (23) slides: full emerald background with white text. The
+     only colored backgrounds.
+   Map dark-slide colors to their light equivalents (dark text on light), keeping the
+   same visual hierarchy. Check contrast ≥ 4.5:1 for text.
+2. Constant background through the method: slides 5–17 all get the same white
+   background and identical frame. No dark/light switching anywhere between the
+   overview and architecture 6/6. Other content slides are white too.
+3. Fonts. Replace IBM Plex Sans and Aptos (not installed on venue PCs) with Calibri for
+   body text and Georgia for slide titles (allow ~10% width slack; check wraps). Replace
+   IBM Plex Mono with Consolas. Keep the sizes.
+4. Step tracker (the "1 ORDER … 6 MERGE" row on slides 5–11): restyle in place so
+   completed steps are emerald-filled, the current step has an emerald outline, and
+   future steps are grey outlines. Same position on every slide.
+5. Apply the claims-audit rewordings from OUTLINE.md §4 that are pure text edits:
+   slide 18 "independent LLM judge" → "independent evaluation judge (GPT-5.4)";
+   slide 10 gets a small visible "illustrative" tag in the existing caption style.
+6. Do NOT yet touch code excerpts (Phase 3), results slides 19–21 (Phase 4), or the
+   limitations slide 22 (Phase 5).
+Validate (with --original), render all slides, compare side by side with the original
+renders, and fix overflow, wrapping changes from the font swap, contrast and leftover
+old colors. Commit restyle.py and the .pptx. Send me an old/new contact sheet.
 ```
 
 ## Phase 3: Ontology excerpts as real OWL code
 
 ```
-Read presentation/REVISION_PHASES.md (Shared context) and presentation/build_deck.js.
-Replace every pseudo-notation ontology excerpt (target slide, SEED, GENERATE, VALIDATE,
-MERGE, closing slide) with real OWL 2 Manchester Syntax in the Phase 2 code-panel style.
+Read presentation/REVISION_PHASES.md (Shared context) and presentation/OUTLINE.md, and
+work on presentation/RIGOR_ISWC2026.pptx. Replace the pseudo-notation ontology excerpts
+(slides 3, 7, 9, 10, 11 and the closing slide 23) with real OWL 2 Manchester Syntax,
+INSIDE the existing panels (same position and size; the composition stays). The
+audience must still understand them at a glance.
+
+Code-panel style: background F6F8FA, 1 px border D0D7DE, rounded corners, a small tab
+label (e.g. "admission · OWL Manchester Syntax"), Consolas ≥ 14 pt. Colors: keywords
+(Class:, ObjectProperty:, DataProperty:, SubClassOf:, Domain:, Range:, Annotations:,
+some) emerald 0B6E4F bold; names graphite; string literals A3401E; xsd:* 6F42C1; prov:*
+slate.
+
+Plain-English glosses (author's requirement): beside each key line, a short gloss in
+the body font, slate, ≤ 6 words, aligned to that line with a thin leader, e.g.
+  SubClassOf: :hasPatientData some :PatientData   ← every admission has a patient
+  Range: xsd:integer                               ← stored as a number
+  rdfs:label "Bone Marrow Depression"@en           ← human-readable name
+At most 3–4 glosses per panel. Code lines without a gloss must be self-explanatory or
+dropped.
 
 Rules:
 - One consistent namespace for the whole talk: Prefix: : <http://example.org/rigor#>,
@@ -160,12 +190,12 @@ Rules:
 - Correct keywords with colons: Class:, ObjectProperty:, DataProperty:, Domain:,
   Range:, SubClassOf:, Annotations:. Language-tagged labels ("…"@en). Existential
   restriction for a NOT NULL FK: SubClassOf: :hasPatientData some :PatientData.
-- SEED slide shows DMᵣ exactly as the deterministic mapping produces it (class, data
+- SEED slide (7) shows DMᵣ exactly as the deterministic mapping produces it (class, data
   properties with xsd ranges, FK as object property, existential restriction), with no
-  labels or comments. GENERATE slide shows the same fragment after enrichment;
+  labels or comments. GENERATE slide (9) shows the same fragment after enrichment;
   highlight the added lines (emerald gutter mark or a faint emerald line background),
-  so the delta is visible at a glance. Keep each panel ≤ 12 lines, using
-  "…" (# other columns omitted) instead of cramming.
+  so the delta is visible at a glance, and keep the existing SCHEMA/DOCS evidence tags.
+  Keep each panel ≤ 10 lines, using "…" instead of cramming.
 - ECOG comment uses the standard scale: 0 fully active · 1 restricted in strenuous
   activity · 2 ambulatory, no work · 3 limited self-care · 4 completely disabled · 5 dead.
 - VALIDATE slide: show the wrong fragment (DataProperty: :patientId with Range:
@@ -179,61 +209,61 @@ Rules:
   show exactly the verified text (excerpted lines only).
 - Do NOT reproduce the paper's Appendix A.1 example format, which omits the colons
   after Domain/Range.
-Rebuild, validate, render, fix, commit. Show me before/after images of each changed slide.
+Validate (--original), render, fix, commit. Show me before/after images of each changed slide.
 ```
 
-## Phase 4: Results that persuade (experts, pitfalls, BURR)
+## Phase 4: Results that show RIGOR's real strength
 
 ```
-Read presentation/REVISION_PHASES.md (Shared context) and presentation/build_deck.js.
-Rework the three results slides. Every number cites its paper table on the slide.
+Read presentation/REVISION_PHASES.md (Shared context) and presentation/OUTLINE.md §2–3,
+and work on presentation/RIGOR_ISWC2026.pptx. Restructure the results into
+R1 → R2 → R3, reusing the existing slides' styling (table style, hero-number style,
+card style). Every number cites its paper table on the slide.
 
-A) Experts + LLM judge: keep the 70% (28/40) hero number. Show the 4-method first-place
-   counts as a native bar chart (DM 5, Baseline 5, Non-Iterative 2, RIGOR 28; RIGOR
-   emerald, others grey), with "Kendall's W 0.39–0.72, p < .01" as a caption. Put the
-   independent LLM judge as a second hero number, 58/58 tables. Say "Claude outputs;
-   5 CQs per table".
+Reorder: old slide 20 (pitfalls) → R1 (replaced content), old 21 (BURR) → R2, old 19
+(experts) → R3. Final order: 18 Setup, 19 R1, 20 R2, 21 R3, 22 Future work, 23 Close.
 
-B) Pitfalls (replaces slide 20). Message: "RIGOR removes almost all modeling pitfalls,
-   in every matched comparison." Recommended design: a native clustered bar chart,
-   one cluster per database, bars = method. Use pitfalls per 100 ontology entities
-   (Table 7 ÷ (classes + object + data properties) from Table 8), averaged over the
-   3 LLMs (DM has one run). Size-normalized counts pre-empt the "your ontologies are
-   just different sizes" objection, and RIGOR then wins all 9 matched pairs clearly:
-     per-100-entity values (Claude / Mistral / DeepSeek):
-     Liver:   DM 198.6 · Baseline 105.2/104.2/103.3 · Non-It 14.3/122.0/17.5 · RIGOR 6.2/6.1/1.0
-     eICU:    DM 200.3 · Baseline 112.4/115.5/108.2 · Non-It 40.6/123.6/17.9 · RIGOR 0.5/0.4/11.3
-     Chinook: DM 217.0 · Baseline 146.2/145.1/147.3 · Non-It 37.5/145.8/28.6 · RIGOR 0/0/0
-   Recompute these from the tables before use. Label the metric as derived ("computed
-   from paper Tables 7–8"). Next to the chart, two callouts: "9/9 matched wins" and
-   "Chinook: 0 pitfalls with all three LLMs". Footer (honest): "Most removed pitfalls
-   are missing annotations (P08); critical P19 remains in 3/9 runs." Raw counts move to
-   a backup slide. If the author prefers raw counts on the main slide, use a log-scale
-   axis, never a 12-cell number grid.
+R1 "Only RIGOR adds meaning without losing structure" (replaces the pitfalls content).
+  A 4×4 matrix (rows = what the ontology contains; columns = Direct Mapping, LLM
+  baseline, Non-Iterative, RIGOR; RIGOR column highlighted emerald), values exactly as
+  in OUTLINE.md §2:
+    Columns kept, final coverage (Table 9): 0.78–0.99 | 0.31–1.00 | 0.06–0.78 | 0.77–1.00
+    Labels & comments (Table 8):           0/3 | 0/9 | 9/9 | 9/9
+    Class hierarchy, SubClassOf (Table 8):  0/3 | 0/9 | 0/9 | 9/9
+    Provenance to source column (Table 8): 0/3 | 0/9 | 0/9 | 9/9
+  Recompute each cell from the paper tables before writing it. Emphasize Non-Iterative's
+  0.06 (single-pass RAG drops columns). One line below: "Modeling pitfalls (OOPS!): fewer
+  than every other method in 9/9 like-for-like comparisons (same database, same LLM);
+  zero on Chinook with all three LLMs." Caption: "coverage = embedding-based proxy;
+  runs = 3 databases × 3 LLMs".
 
-C) BURR (replaces slide 21). The audience must understand what is measured before
-   seeing numbers. Left half, "What BURR asks": a small worked diagram. An ISWC table
-   (e.g. `person`), one FK, and one column map to gold ontology elements (class,
-   object property, data property). The system's own mapping is compared with BURR's
-   expert gold mapping; F1 per element type (Classes, Relations, Attributes). One line
-   on why it matters: "Enrichment must not break the link back to the data; that link
-   is what OBDA and KG population run on." One line on how RIGOR is scored: its
-   prov:wasDerivedFrom provenance exported as a D2RQ mapping. Right half: the 4×3 F1
-   results as a native grouped bar chart (or a clean table), RIGOR emerald. Caption:
-   "BURR's authors found LLM methods trail rule-based ones on this task; here RIGOR
-   leads both. One scenario, Claude." Before writing the left half, check how BURR
-   actually matches elements (Laskowski et al., PACMMOD 2025, "BURR: A Benchmark for
-   Ontology Learning from Relational Databases"; fetch it if the network allows).
-   Describe only what you can confirm; otherwise keep the description at the level
-   above.
-Rebuild, validate, render, fix, commit, and show me the three slides.
+R2 "RIGOR keeps the link back to the data: best on BURR" (rework old slide 21; keep
+  its F1 table on the right). Add on the left "What BURR checks": a mini worked example
+  in the deck's table/class style. An ISWC table (e.g. person) maps to a class, a foreign
+  key to a relation, and a column to an attribute; the system's mapping is compared with
+  BURR's expert gold mapping, giving an F1 per element type. Add one line on why it
+  matters: "Enrichment must not break the link to the data; OBDA and KG population depend
+  on it." Add one line on how RIGOR is scored: its prov:wasDerivedFrom links are exported
+  as a D2RQ mapping. Caption: "BURR's authors found LLM methods trail rule-based ones;
+  here RIGOR leads both · one scenario, Claude." Before writing the left half, check
+  how BURR matches elements (Laskowski et al., PACMMOD 2025; fetch it if the network
+  allows). State only what you can confirm.
+
+R3 "Experts prefer RIGOR" (old slide 19 moved; content unchanged apart from the
+  restyle).
+
+Backup: move the raw OOPS! table (the old slide 20 grid, Table 7) after the closing
+slide as B1.
+Update the speaker notes of the three slides to match (final wording comes in Phase 6).
+Validate (--original), render, fix, commit, and show me the three slides plus B1.
 ```
 
 ## Phase 5: Future work, from schemas to instances (cisplatin example)
 
 ```
-Read presentation/REVISION_PHASES.md (Shared context) and presentation/build_deck.js.
-Replace the limitations slide with a future-work slide: "Next: let the data speak,
+Read presentation/REVISION_PHASES.md (Shared context) and presentation/OUTLINE.md, and
+work on presentation/RIGOR_ISWC2026.pptx. Replace the content of the limitations slide (22),
+keeping the deck's card/flow styling, with a future-work slide: "Next: let the data speak,
 from schemas to instances".
 
 Semantic-web framing (mandatory; already checked):
@@ -271,24 +301,25 @@ Bottom strip: the other two next steps in one line each: "OOPS!/reasoner feedbac
 inside the loop (agentic tool calls) → target the residual P19" and "aggregate-only
 instance statistics, so clinical data never leaves the hospital".
 Speaker note must say "may have contributed / candidate association", never "caused".
-Rebuild, validate, render, fix, commit, and show me the slide.
+Validate (--original), render, fix, commit, and show me the slide.
 ```
 
 ## Phase 6: The speech, timing, and Q&A backups
 
 ```
-Read presentation/REVISION_PHASES.md (Shared context), OUTLINE.md and build_deck.js.
+Read presentation/REVISION_PHASES.md (Shared context) and OUTLINE.md, and work on
+presentation/RIGOR_ISWC2026.pptx. Use OUTLINE.md §3's per-slide time and word budgets.
 1. Write the full spoken script, slide by slide, into presentation/SPEECH.md and into
    each slide's notes: first-person, conversational, short sentences, one idea per
-   sentence, no reading of slide text. At 130 words/min the whole script is ≤ 1,750
-   words (≈ 13:30). Per slide: [start–end] timestamp, word count, the script, one
+   sentence, no reading of slide text. At the deck's own pace (~105 words/min, pauses
+   included) the whole script is ≈ 1,420 words, ending by 13:30. Per slide: [start–end] timestamp, word count, the script, one
    pointer cue, one-line takeaway. Mark 2–3 deliberate pauses (after the 70%, after
    "0 pitfalls on Chinook").
 2. Opening hook in the first 20 s (the inherited clinical database with BM_DEP).
    Closing in 3 sentences that restate the thesis and the three takeaways.
 3. Use transitions that hand off between slides ("…which raises the question: which
    table first?").
-4. Add backup slides after the closing slide (not timed): raw OOPS! table; per-dimension
+4. Add backup slides after the closing slide (not timed), after B1 (raw OOPS! table): per-dimension
    expert and LLM-judge scores (Tables 10–11); cost/runtime (Table 15, quoting row
    values, not its printed totals, which do not add up); the retrieval ablation
    (Table 14); and a "Hard questions" slide with crisp, honest answers to:
