@@ -80,3 +80,6 @@ share one white background. Title and closing slides changed to white at the aut
 - Cover redesigned (`presentation/tools/cover.py`): RIGOR wordmark, authors on three balanced
   lines with true superscripts (presenter in bold), one affiliation per line in full, a links
   footer, and an emerald panel on the right third only, with the motif and the venue.
+- Cover panel reworked after feedback (the motif lacked contrast on emerald): a near-white
+  graph-paper panel with a vector drawing of the running example (admission table → RIGOR →
+  Admission/PatientData with label, comment and provenance chips; BM_DEP and its label in gold).
