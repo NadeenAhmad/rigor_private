@@ -229,7 +229,14 @@ Rules:
 Validate (--original), render, fix, commit. Show me before/after images of each changed slide.
 ```
 
-## Phase 4: Results that show RIGOR's real strength
+## Phase 4: Results that show RIGOR's real strength (DONE)
+
+Done via `presentation/tools/results.py` (run by `build.sh`). Final order: 18 Setup ·
+19 R1 · 20 R2 · 21 R3 · 22 Limitations (Phase 5) · 23 Close · 24 B1 (raw OOPS! table).
+Notes on R1/R2 are interim; Phase 6 writes the final script. BURR's metric description is
+limited to what could be confirmed: systems output a database-to-ontology mapping, which
+is compared with a gold-standard mapping, with F1 per class/relation/attribute. The full
+BURR paper was not reachable from this environment.
 
 ```
 Read presentation/REVISION_PHASES.md (Shared context) and presentation/OUTLINE.md §2–3,
