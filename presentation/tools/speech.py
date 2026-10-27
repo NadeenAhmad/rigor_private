@@ -1,0 +1,392 @@
+#!/usr/bin/env python3
+"""Phase 6: the spoken script, as the single source for speaker notes, SPEECH.md and the
+rehearsal card.
+
+Timing model (the original deck's own pace): 105 spoken words per minute, which already
+includes normal clicks and visual pauses, plus 2 s for every explicit [pause].
+
+Usage:
+  python3 speech.py apply <in.pptx> <out.pptx>   # write notes for slides 1-23, closing takeaways
+  python3 speech.py docs                         # write presentation/SPEECH.md and REHEARSAL_CARD.md
+"""
+import re
+import shutil
+import sys
+import tempfile
+import zipfile
+from pathlib import Path
+
+from lxml import etree
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from results import NS, R, set_notes, set_runs  # noqa: E402
+
+WPM, PAUSE_S = 105, 2
+OUT_DIR = Path(__file__).resolve().parent.parent
+
+# One entry per slide, in presentation order.
+#   say: the spoken script   cue: pointer / delivery   takeaway   source
+#   cut: an optional sentence (must appear verbatim in `say`) to drop if running late
+SLIDES = [
+    dict(title="Title",
+         say="Good morning. I'm Nadeen Fathallah, from the University of Stuttgart. Relational databases run "
+             "hospitals, banks and governments. But their schemas tell us how data is stored, not what it "
+             "means. This talk is about RIGOR: turning those schemas into rich OWL ontologies, automatically.",
+         cue="Calm, slow start. Do not read the author list.",
+         takeaway="Schemas store data, not meaning.",
+         source="Paper Section 1."),
+    dict(title="Motivation",
+         say="Imagine you inherit this clinical database. Admission points to PatientData through a foreign "
+             "key. That link is clear. But look at the columns. What is BM_DEP? What does an ECOG stage of three "
+             "mean? The schema cannot tell you. Yet these meanings are exactly what ontology-based access, "
+             "knowledge graphs and data integration need. So our problem is not reading the SQL. It is "
+             "recovering the domain meaning, while keeping the structure we can trust.",
+         cue="Point at the FK arrow, then BM_DEP, then ecog_stage. Let the questions hang for a second.",
+         takeaway="The schema knows storage and links, not clinical meaning.",
+         source="Illustrative table assembled from examples in paper Sections 3.2 and 3.4."),
+    dict(title="What we want to build",
+         say="Here is what we want. Admission and PatientData become classes, and the foreign key becomes a "
+             "real relation between them. Now look at the code. BM_DEP gets a human-readable label: Bone Marrow "
+             "Depression. ECOG gets a comment that explains its codes. And every element records where it came "
+             "from, with prov:wasDerivedFrom. That is a usable semantic model. The challenge is to add all this "
+             "meaning without losing a single column or link.",
+         cue="Diagram first, then read the three code glosses on the right.",
+         takeaway="Target: linked, labelled, traceable, and nothing lost.",
+         source="Illustrative OWL fragment, verified with the OWL API (presentation/excerpts/slide03_target.omn)."),
+    dict(title="Research gap",
+         say="Existing work solves half of this. Schema-first rules, like direct mapping, preserve the "
+             "structure: every table, column and foreign key. But they add no domain meaning. LLMs can suggest "
+             "meaning: labels, concepts, relations. But they omit columns, or model keys wrongly. So our question "
+             "is: can we keep schema fidelity and add domain semantics, across a whole database, with no expert "
+             "in the loop during generation?",
+         cue="Left card, right card, then land on the question.",
+         takeaway="Rules keep structure; LLMs suggest meaning; we need both.",
+         source="Paper Sections 1-2."),
+    dict(title="Our answer: RIGOR",
+         say="Our answer is RIGOR. It builds the ontology one table at a time, in six steps: order, seed, "
+             "retrieve, generate, validate, merge. And as a preview: experts ranked it first in seventy percent "
+             "of their rankings. Let's build it on our example.",
+         cue="Sweep along the six steps. Point at the result preview once.",
+         takeaway="Six steps, one table at a time.",
+         source="Paper Section 3.1, Fig. 1; preview from Table 1."),
+    dict(title="Step 1: order",
+         say="Step one: order. Admission points to PatientData, so we build PatientData first. In general, "
+             "RIGOR follows the foreign keys breadth-first: a table is processed once the tables it references "
+             "are done. Why? By the time we reach Admission, PatientData already exists in our ontology. So we "
+             "reuse that class, instead of inventing a second, incompatible one.",
+         cue="Follow the FK arrow, then the processing order.",
+         takeaway="Parents first, so later tables reuse known classes.",
+         source="Paper Sections 3.1-3.2 (FK-guided breadth-first order)."),
+    dict(title="Step 2: seed",
+         say="Step two: seed. Before any LLM is involved, a deterministic direct mapping turns the table into "
+             "OWL. Admission becomes a class. The foreign key becomes an object property, and every admission "
+             "must have a patient. Each column becomes a data property with its XSD type. This seed covers every "
+             "column of the cleaned table, by construction. So the LLM's job is to enrich, not to invent.",
+         cue="Read the glosses: 'each has a patient', 'the FK becomes a link'.",
+         takeaway="A deterministic seed guarantees coverage before the LLM starts.",
+         source="Paper Section 3.2. The guarantee holds for the seed; final coverage is reported later.",
+         cut="So the LLM's job is to enrich, not to invent."),
+    dict(title="Step 3: retrieve",
+         say="The seed is faithful, but it still doesn't say what BM_DEP means. So step three retrieves context "
+             "from three sources. Documentation explains cryptic names and codes. External domain ontologies "
+             "suggest established concepts. And the third source is the distinctive one: the ontology we have "
+             "built so far. Earlier tables become evidence for the next. One query per table, built from its "
+             "name, columns and foreign keys, retrieves the top three matches per source.",
+         cue="Walk the three cards; slow down on the growing core.",
+         takeaway="Three sources supply meaning; the growing core is unique to RIGOR.",
+         source="Paper Section 3.3 (all-MiniLM-L6-v2, Faiss, k = 3 per source).",
+         cut="One query per table, built from its name, columns and foreign keys, retrieves the top three "
+             "matches per source."),
+    dict(title="Step 4: generate",
+         say="Step four: generate. One prompt combines the seed, the retrieved context and our enrichment "
+             "instructions. The Gen-LLM returns a delta ontology. Read the code from top to bottom. The foreign "
+             "key is now a named relation, hasPatientData, from the schema. BM_DEP gets its label, and ECOG its "
+             "scale, both from the documentation. And provenance links ecog_stage back to its source column. The "
+             "tags on the right show which evidence informed each part.",
+         cue="Top to bottom through the code; touch each evidence tag.",
+         takeaway="The LLM enriches a grounded draft, and every addition is traceable.",
+         source="Paper Sections 3.3-3.4. Illustrative fragment, verified with the OWL API."),
+    dict(title="Step 5: validate",
+         say="But LLMs make plausible mistakes, so step five validates every delta before it is merged. Here "
+             "are two illustrative errors. On the left, the ECOG scale is reversed. That is perfectly valid OWL, "
+             "so only a semantic check catches it: a Judge-LLM compares it with the retrieved documentation. On "
+             "the right, the foreign key became a data property. Merged with our seed, that is no longer valid "
+             "OWL 2 DL, because patient_id would be both kinds of property. Rule-based graph checks catch this. "
+             "Failed fragments go back for correction, with up to two retries.",
+         cue="Left error, right error, then the correction strip. Say 'illustrative'.",
+         takeaway="Semantic and structural checks are complementary.",
+         source="Paper Section 3.5. The OWL 2 DL claim is verified: "
+                "presentation/excerpts/slide10_wrong_fk_merged_with_seed.omn fails the DL profile check."),
+    dict(title="Step 6: merge",
+         say="Step six: merge. The validated delta joins the core ontology. Because RIGOR reuses identifiers, "
+             "this is a simple union of axioms. And here is the loop. The expanded ontology becomes a retrieval "
+             "source for the next table. RIGOR never starts from scratch: each table builds on the ones before.",
+         cue="Core plus delta, then the arrow back to retrieval.",
+         takeaway="The ontology is both the output and the next input.",
+         source="Paper Section 3.6."),
+    dict(title="Architecture 1/6",
+         say="Let me put the pieces together, as in the paper's Figure 1. First, the schema decides the order.",
+         cue="Quick click. Reconnect, do not re-explain.", takeaway="Order.", source="Paper Fig. 1(a)."),
+    dict(title="Architecture 2/6",
+         say="Each table then gets its deterministic seed: the structural anchor for everything that follows.",
+         cue="Quick click.", takeaway="Seed.", source="Paper Fig. 1(b)."),
+    dict(title="Architecture 3/6",
+         say="Three retrieval channels add meaning: external ontologies, documentation, and the core ontology "
+             "built so far.",
+         cue="Quick click.", takeaway="Retrieve.", source="Paper Fig. 1(c-e)."),
+    dict(title="Architecture 4/6",
+         say="The Gen-LLM combines seed and context into a delta ontology.",
+         cue="Quick click.", takeaway="Generate.", source="Paper Fig. 1(f-g)."),
+    dict(title="Architecture 5/6",
+         say="A Judge-LLM and rule-based checks validate the delta before it can join.",
+         cue="Quick click.", takeaway="Validate.", source="Paper Fig. 1(h)."),
+    dict(title="Architecture 6/6",
+         say="And the validated delta is merged into the core, which feeds retrieval for the next table. That "
+             "loop is RIGOR.",
+         cue="Trace the green return arrow from (i) back to (e).", takeaway="Merge, and loop.",
+         source="Paper Fig. 1(i)."),
+    dict(title="Experimental setup",
+         say="Does this work beyond one example? We tested three databases: a private liver-cancer registry, the "
+             "large eICU intensive-care schema, and Chinook, a music store, as a second domain. Three generator "
+             "LLMs. And four methods: direct mapping, a zero-shot LLM, single-pass retrieval, and RIGOR. That "
+             "gives thirty ontologies, judged by quality checks, an independent evaluation judge, ten human "
+             "experts, and the BURR benchmark.",
+         cue="Datasets, then the four methods. Do not read every number.",
+         takeaway="Three databases, three LLMs, four methods, four kinds of evidence.",
+         source="Paper Sections 4.1-4.6. 30 ontologies = 3 LLMs x 3 methods x 3 databases + 3 direct mappings."),
+    dict(title="Result 1: meaning and structure",
+         say="First result: does RIGOR add meaning without losing structure? This table shows what each method's "
+             "ontologies contain. Direct mapping keeps the columns, but adds no labels, no hierarchy, no "
+             "provenance. Single-pass retrieval adds labels, but it drops columns: in one run it kept only six "
+             "percent. [pause] RIGOR is the only method with class hierarchies and provenance in all nine runs, "
+             "while keeping seventy-seven to one hundred percent of the columns. And it has the fewest modeling "
+             "pitfalls in every like-for-like comparison: zero on Chinook, with all three LLMs. [pause]",
+         cue="Point at Non-Iterative's 0.06 first; read the RIGOR row last.",
+         takeaway="Only RIGOR adds hierarchy and provenance and still keeps the schema.",
+         source="Paper Tables 7, 8, 9. Coverage is an embedding-based proxy; Direct Mapping is complete by "
+                "construction. Like-for-like = same database and same LLM. Disjointness (1/9 runs) is left for Q&A."),
+    dict(title="Result 2: BURR",
+         say="Second: is the link back to the data real? We checked with BURR, an external benchmark for ontology "
+             "learning from relational databases. BURR asks every system for a mapping: which table becomes a "
+             "class, which foreign key a relation, which column an attribute. Two elements match when they map to "
+             "the same database elements, whatever they are called. BURR scores this against a gold mapping, with "
+             "F1 per element type. RIGOR's provenance gives us this mapping directly; we export it as D2RQ. On "
+             "BURR's ISWC scenario, RIGOR has the highest F1 for classes, relations and attributes among the "
+             "compared ontology-learning systems, including both rule-based ones. So enrichment did not cost us "
+             "fidelity.",
+         cue="Left card first, then land on the RIGOR row.",
+         takeaway="Semantic enrichment did not break the correspondence that OBDA and KG population need.",
+         source="Paper Table 13. BURR = Laskowski et al., PACMMOD 2025; matching rule from BURR Section 4, Eq. 3. "
+                "Left-card element names are illustrative.",
+         cut="Two elements match when they map to the same database elements, whatever they are called.",
+         extra=["DO NOT SAY: 'BURR found LLMs trail rule-based systems'. BURR's results show Gemini 2.5 Pro ahead "
+                "of the rule-based systems overall (rule-based systems win only on NPD).",
+                "IF ASKED ABOUT GEMINI 2.5 PRO (BURR Table 3, ISWC .65 / .68 / .56): in BURR it is a "
+                "general-purpose LLM prompted with few-shot examples and a checklist to write the D2RQ mapping "
+                "directly. It is a mapping generator, not an ontology-learning system that builds an enriched "
+                "ontology, so we compare with ontology-learning systems. Against it, RIGOR's class F1 is higher, "
+                "relations are on par, attributes lower, and RIGOR also produces labels, hierarchy and "
+                "provenance. It is prompted, not fine-tuned."]),
+    dict(title="Result 3: experts",
+         say="Finally, the most important question: do people prefer it? Ten ontology experts compared anonymized "
+             "fragments for four medical tables, and ranked them. RIGOR came first in twenty-eight of forty "
+             "rankings. [pause] That is seventy percent. Their agreement was statistically significant, with "
+             "Kendall's W between 0.39 and 0.72. An independent LLM judge, GPT-5.4, then ranked Claude's fragments "
+             "for all fifty-eight tables, against five competency questions each. It put RIGOR first on every "
+             "table. The expert sample is small, but both signals agree.",
+         cue="Pause on 70%. Then the bars, then the LLM-judge strip.",
+         takeaway="Human experts and an independent LLM judge both prefer RIGOR.",
+         source="Paper Tables 1 and 12. LLM judge: Claude outputs only, 290 competency questions.",
+         cut="Their agreement was statistically significant, with Kendall's W between 0.39 and 0.72."),
+    dict(title="Future work",
+         say="Where next? Today RIGOR reads schemas and documentation. The next step is to let the data speak. "
+             "Imagine several patients whose records show bone marrow depression after cisplatin cycles. The rows "
+             "alone show a pattern. The drug label adds that bone-marrow suppression is a known adverse reaction "
+             "of cisplatin. Together, they let RIGOR propose new knowledge: a candidate association between "
+             "cisplatin and bone marrow depression, with provenance to both sources. Candidate, not cause. "
+             "Gemcitabine, radiotherapy or cirrhosis could also explain it. So an expert reviews it. We also want "
+             "validator and reasoner feedback inside the loop.",
+         cue="Rows, label, code, left to right. Say 'candidate' or 'may have contributed', never 'caused'.",
+         takeaway="Instances plus documentation can propose knowledge; experts confirm it.",
+         source="Paper Section 5. Rows are synthetic. OWL verified "
+                "(presentation/excerpts/slide22_future_candidate.omn): a typed individual with provenance, no "
+                "causal axiom.",
+         cut="We also want validator and reasoner feedback inside the loop.",
+         extra=["IF ASKED WHY NOT AN OWL CAUSAL AXIOM: OWL reasoning is deductive and open-world; it cannot derive "
+                "causation from statistics, and 'Cisplatin SubClassOf causes some BoneMarrowDepression' would "
+                "wrongly claim it for every case."]),
+    dict(title="Thank you",
+         say="To conclude. RIGOR anchors LLM generation in the database itself, grounds it in retrieved knowledge, "
+             "and checks every step before the ontology grows. The result: meaning without losing structure, the "
+             "link to the data intact, and ontologies that experts prefer. The paper and code are behind these QR "
+             "codes. Thank you. I'm happy to take your questions.",
+         cue="Finish speaking by 13:30. Leave this slide up during questions; backups follow it.",
+         takeaway="Grounded, retrieved, validated.",
+         source="Recap of the paper; contact address on the slide."),
+]
+
+CLOSING_TAKEAWAYS = "Meaning without losing structure · link to the data intact · preferred by experts"
+
+
+def words(text):
+    return len(re.sub(r"\[pause\]", "", text).split())
+
+
+def seconds(text):
+    return words(text) / WPM * 60 + text.count("[pause]") * PAUSE_S
+
+
+def timeline():
+    t, rows = 0.0, []
+    for n, s in enumerate(SLIDES, 1):
+        d = seconds(s["say"])
+        rows.append((n, s, t, t + d, d))
+        t += d
+    return rows
+
+
+def mmss(sec):
+    sec = int(round(sec))
+    return f"{sec // 60}:{sec % 60:02d}"
+
+
+def notes_for(n, s, start, end):
+    paras = [f"[{mmss(start)}–{mmss(end)}]  SPOKEN SCRIPT ({words(s['say'])} words)", s["say"], "",
+             f"PRESENTER / POINTER: {s['cue']}", f"AUDIENCE TAKEAWAY: {s['takeaway']}",
+             f"SOURCE AND SCOPE: {s['source']}"]
+    if s.get("cut"):
+        paras.append(f"IF RUNNING LATE, DROP: \"{s['cut']}\"")
+    for extra in s.get("extra", []):
+        paras += ["", extra]
+    return paras
+
+
+def apply(src, dst):
+    for s in SLIDES:
+        assert not s.get("cut") or s["cut"] in s["say"], s["title"]
+    work = Path(tempfile.mkdtemp())
+    with zipfile.ZipFile(src) as z:
+        z.extractall(work)
+    pres = etree.parse(str(work / "ppt/presentation.xml"))
+    rels = {r.get("Id"): r.get("Target") for r in etree.parse(str(work / "ppt/_rels/presentation.xml.rels")).getroot()}
+    order = [rels[s.get(f"{{{R}}}id")] for s in pres.find("p:sldIdLst", NS)]
+    for (n, s, start, end, _), target in zip(timeline(), order):
+        slide = work / "ppt" / target
+        srels = etree.parse(str(slide.parent / "_rels" / f"{slide.name}.rels")).getroot()
+        notes = next(r.get("Target") for r in srels if r.get("Type").endswith("/notesSlide"))
+        set_notes(slide.parent / notes, notes_for(n, s, start, end))
+        if n == 23:
+            tree = etree.parse(str(slide))
+            set_runs(tree, 1049, [(CLOSING_TAKEAWAYS, None, None)])
+            tree.write(str(slide), xml_declaration=True, encoding="UTF-8", standalone=True)
+    Path(dst).unlink(missing_ok=True)
+    files = sorted(f for f in work.rglob("*") if f.is_file())
+    files.sort(key=lambda f: f.name != "[Content_Types].xml")
+    with zipfile.ZipFile(dst, "w", zipfile.ZIP_DEFLATED) as z:
+        for f in files:
+            z.write(f, f.relative_to(work).as_posix())
+    shutil.rmtree(work)
+    total = timeline()[-1][3]
+    print(f"wrote {dst}  ({sum(words(s['say']) for s in SLIDES)} words, ends at {mmss(total)})")
+
+
+# ---- Documents ------------------------------------------------------------------------------
+
+HARD_QUESTIONS = [
+    ("The Judge-LLM is the same model as the generator. Isn't that self-evaluation?",
+     "Inside the loop, yes: the same model generates and judges, so RIGOR needs no second model. Two things "
+     "do not depend on it. The rule-based graph checks are deterministic. And the evaluation used a different "
+     "model family, GPT-5.4, plus ten human experts, who ranked RIGOR first in 70% of cases."),
+    ("Is the Non-Iterative baseline a strawman?",
+     "It receives the same retrieved context, but its prompt asks for less (labels and comments). Its biggest "
+     "failure is dropping columns, down to 6%, which RIGOR prevents by construction with the seed. A "
+     "prompt-matched ablation is a fair next experiment."),
+    ("Could the LLM judge have position bias?",
+     "Fragments were anonymized, but the order was fixed (paper Fig. 7), so we do not rely on the LLM judge "
+     "alone. The human study points the same way: 28 of 40 first places, with significant agreement. Future "
+     "runs should randomize the order."),
+    ("Why do critical P19 pitfalls remain (multiple domains or ranges)?",
+     "They appear in 3 of 9 runs. A likely source is the union merge: when a property such as a patient link "
+     "is reused across tables, each table adds its own domain. Merge-time checks and validator feedback inside "
+     "the loop are the planned fix."),
+    ("Why only schemas and documentation, not the data?",
+     "Portability and privacy. Clinical data often cannot leave the hospital, while schemas and documentation "
+     "can. Instance-level signals, computed as aggregates, are our next step."),
+    ("Column coverage drops to 0.77. Why?",
+     "That is DeepSeek on eICU. The seed is complete by construction, but enrichment can drop columns, and "
+     "coverage is an embedding-based proxy. Stronger per-fragment coverage checks are planned."),
+    ("Could the LLMs have seen these databases in training?",
+     "eICU and Chinook are public. The liver-cancer registry is private, so no model saw it, and RIGOR still "
+     "ranked first on all 16 of its tables."),
+    ("Are the external ontologies actually used?",
+     "Retrieved external concepts are passed as context, and alignment axioms are added only on a good match. "
+     "In the ablation, full RIGOR has the highest external-ontology alignment (F1 0.059 vs 0.033 without "
+     "retrieval), though absolute values are small."),
+    ("How does the traversal handle self-referencing foreign keys (Chinook Employee.ReportsTo)?",
+     "VERIFY IN THE CODE BEFORE THE TALK. Expected answer: a self-reference does not wait on another table, so "
+     "it does not affect the order; it becomes an object property from the class to itself, which the prompt "
+     "allows for meaningful recursive relations."),
+    ("Why not compare with Gemini 2.5 Pro on BURR?",
+     "In BURR it is a general-purpose LLM prompted to write the mapping directly: a mapping generator, not an "
+     "ontology-learning system. Against it, RIGOR's class F1 is higher (.73 vs .65), relations are on par (.67 "
+     "vs .68), attributes lower (.52 vs .56), and RIGOR also produces labels, hierarchy and provenance."),
+]
+
+
+def docs():
+    rows = timeline()
+    total_words = sum(words(s["say"]) for s in SLIDES)
+    end = rows[-1][3]
+    out = [
+        "# RIGOR @ ISWC 2026: speech",
+        "",
+        f"Spoken script for the 23 main slides: **{total_words} words**, ending at **{mmss(end)}** at "
+        f"{WPM} words per minute (the original deck's pace, clicks included) plus {PAUSE_S} s per marked "
+        "[pause]. The slot is 15 minutes with Q&A separate, so this leaves a margin for a slower delivery.",
+        "",
+        "The same text is in each slide's speaker notes. This file is generated by "
+        "`presentation/tools/speech.py`; edit the script there, not here.",
+        "",
+    ]
+    for n, s, start, stop, dur in rows:
+        out += [f"## {n}. {s['title']}  ·  {mmss(start)}–{mmss(stop)}  ·  {words(s['say'])} words", "",
+                s["say"].replace("[pause]", "**[pause]**"), "",
+                f"*Pointer:* {s['cue']}  ", f"*Takeaway:* {s['takeaway']}  ", f"*Source:* {s['source']}"]
+        if s.get("cut"):
+            out.append(f"  \n*If late, drop:* \"{s['cut']}\"")
+        for extra in s.get("extra", []):
+            out += ["", f"> {extra}"]
+        out.append("")
+    out += ["## Hard questions (backup slides B5–B6)", ""]
+    for q, a in HARD_QUESTIONS:
+        out += [f"**Q: {q}**  ", f"A: {a}", ""]
+    (OUT_DIR / "SPEECH.md").write_text("\n".join(out), encoding="utf-8")
+
+    checkpoints = [(6, "the method starts"), (12, "the architecture recap starts"), (19, "the results start"),
+                   (22, "future work starts"), (23, "the close starts")]
+    card = ["# Rehearsal card", "",
+            f"Target: finish by **13:30**. Planned end: **{mmss(end)}** ({total_words} words).", "",
+            "| Slide | Starts at | Ends at | Words |", "|---|---|---|---|"]
+    for n, s, start, stop, _ in rows:
+        card.append(f"| {n}. {s['title']} | {mmss(start)} | {mmss(stop)} | {words(s['say'])} |")
+    card += ["", "## Checkpoints", "",
+             "Glance at the clock when these slides come up. More than 30 s behind: apply the cuts below for "
+             "the slides that follow.", ""]
+    for n, label in checkpoints:
+        card.append(f"- **Slide {n}** should come up at **{mmss(rows[n - 1][2])}** ({label}).")
+    saved = 0
+    card += ["", "## Cuts if running late", ""]
+    for n, s, *_ in rows:
+        if s.get("cut"):
+            sec = seconds(s["cut"])
+            saved += sec
+            card.append(f"- Slide {n} ({s['title']}): drop \"{s['cut']}\" (saves ~{round(sec)} s)")
+    card += ["", f"All cuts together save about {round(saved)} s.", "",
+             "Slides 12–17 are quick clicks (about 5–10 s each). If very late, say only the first and last "
+             "sentences and click through the middle four."]
+    (OUT_DIR / "REHEARSAL_CARD.md").write_text("\n".join(card) + "\n", encoding="utf-8")
+    print(f"wrote SPEECH.md and REHEARSAL_CARD.md ({total_words} words, ends at {mmss(end)})")
+
+
+if __name__ == "__main__":
+    {"apply": lambda: apply(sys.argv[2], sys.argv[3]), "docs": docs}[sys.argv[1]]()

@@ -332,7 +332,14 @@ Speaker note must say "may have contributed / candidate association", never "cau
 Validate (--original), render, fix, commit, and show me the slide.
 ```
 
-## Phase 6: The speech, timing, and Q&A backups
+## Phase 6: The speech, timing, and Q&A backups (DONE)
+
+Done via `presentation/tools/speech.py` (the script is the single source for the speaker
+notes, `presentation/SPEECH.md` and `presentation/REHEARSAL_CARD.md`) and
+`presentation/tools/backups.py` (B2 expert dimensions, B3 ablation, B4 cost, B5–B6 hard
+questions). The script has 1,291 words and ends at 12:24 at 105 words per minute, under the 13:30
+target. One hard-question answer (self-referencing FKs) is marked VERIFY: check it against
+the RIGOR code before the talk.
 
 ```
 Read presentation/REVISION_PHASES.md (Shared context) and OUTLINE.md, and work on
