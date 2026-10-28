@@ -34,7 +34,7 @@ Existing work solves half of this. Schema-first rules, like direct mapping, pres
 
 *Pointer:* Left card, right card, then land on the question.  
 *Takeaway:* Rules keep structure; LLMs suggest meaning; we need both.  
-*Source:* Paper Sections 1-2.
+*Source:* Paper Sections 1-2. References on the slide (all cited in paper Section 2): Direct Mapping [Arenas 2012; Sequeda 2012], BootOX [ISWC 2015], Ben Mahria et al. 2021, RODI [SWJ 2017]; LLMs4OL [ISWC 2023], Mateiu & Groza 2023, OntoGenix 2025, LLM4VKG [IJCAI 2025]. BURR deliberately not cited here: its results do not show LLMs trailing rule-based systems.
 
 ## 5. Our answer: RIGOR  ·  2:37–3:01  ·  42 words
 

@@ -90,3 +90,6 @@ share one white background. Title and closing slides changed to white at the aut
   schema, documentation, Disease Ontology (obo:DOID_4961, skos:relatedMatch), LLM knowledge, then
   "What this enables". Every reveal state is verified with the OWL API. Standalone copy:
   `presentation/RIGOR_slide3_target.pptx`; frame-by-frame preview: `presentation/slide3_reveal_steps.jpg`.
+- Slide 4 now cites the approaches it calls limited (all from paper Section 2), author-year, under
+  each card (`presentation/tools/references.py`). BURR is deliberately not cited there. Standalone
+  copy: `presentation/RIGOR_slide4_gap.pptx`.

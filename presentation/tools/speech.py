@@ -66,7 +66,10 @@ SLIDES = [
              "in the loop during generation?",
          cue="Left card, right card, then land on the question.",
          takeaway="Rules keep structure; LLMs suggest meaning; we need both.",
-         source="Paper Sections 1-2."),
+         source="Paper Sections 1-2. References on the slide (all cited in paper Section 2): Direct Mapping "
+                "[Arenas 2012; Sequeda 2012], BootOX [ISWC 2015], Ben Mahria et al. 2021, RODI [SWJ 2017]; LLMs4OL "
+                "[ISWC 2023], Mateiu & Groza 2023, OntoGenix 2025, LLM4VKG [IJCAI 2025]. BURR deliberately not cited "
+                "here: its results do not show LLMs trailing rule-based systems."),
     dict(title="Our answer: RIGOR",
          say="Our answer is RIGOR. It builds the ontology one table at a time, in six steps: order, seed, "
              "retrieve, generate, validate, merge. And as a preview: experts ranked it first in seventy percent "
