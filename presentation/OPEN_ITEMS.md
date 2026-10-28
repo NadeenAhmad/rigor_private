@@ -51,6 +51,12 @@ author's edits.
   five slides inserted before 6/6: `RIGOR_ISWC2026_author_v3_arch.pptx`; the six slides alone:
   `RIGOR_architecture_steps.pptx`.
 
+- Results rebuilt on the author's deck (`tools/results_v3.py`, output `RIGOR_results_R1_R3.pptx`):
+  R1 = what each method adds (Table 8) + OOPS! errors for Claude (Table 7); R2 = BURR unchanged;
+  R3 = LLM judge 58/58 tables + experts 28/40 (Tables 1, 12). Coverage moved out of the main
+  talk (backup/Q&A). Not yet done: one clause on the setup slide, "All 30 ontologies are valid
+  OWL 2 DL and logically consistent."
+
 ## Author's decisions to carry into the next revision
 
 - **`DisjointWith: PatientData` removed** from the running example (the author: it does not make

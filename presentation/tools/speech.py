@@ -168,17 +168,18 @@ SLIDES = [
          cue="Datasets, then the four methods. Do not read every number.",
          takeaway="Three databases, three LLMs, four methods, four kinds of evidence.",
          source="Paper Sections 4.1-4.6. 30 ontologies = 3 LLMs x 3 methods x 3 databases + 3 direct mappings."),
-    dict(title="Result 1: meaning and structure",
-         say="First result: does RIGOR add meaning without losing structure? This table shows what each method's "
-             "ontologies contain. Direct mapping keeps the columns, but adds no labels, no hierarchy, no "
-             "provenance. Single-pass retrieval adds labels, but it drops columns: in one run it kept only six "
-             "percent. [pause] RIGOR is the only method with class hierarchies and provenance in all nine runs, "
-             "while keeping seventy-seven to one hundred percent of the columns. And it has the fewest modeling "
-             "pitfalls in every like-for-like comparison: zero on Chinook, with all three LLMs. [pause]",
-         cue="Point at Non-Iterative's 0.06 first; read the RIGOR row last.",
-         takeaway="Only RIGOR adds hierarchy and provenance and still keeps the schema.",
-         source="Paper Tables 7, 8, 9. Coverage is an embedding-based proxy; Direct Mapping is complete by "
-                "construction. Like-for-like = same database and same LLM. Disjointness (1/9 runs) is left for Q&A."),
+    dict(title="Result 1: meaning and modeling errors",
+         say="First result: what do the ontologies contain, and how many modeling errors do they have? On the "
+             "left, what each method adds. Direct mapping and the LLM baseline add no labels, no provenance and "
+             "no hierarchy. Single-pass retrieval adds labels, nothing more. Only RIGOR adds all three. [pause] On "
+             "the right, the modeling errors that OOPS! finds, for the ontologies generated with Claude. On eICU, "
+             "direct mapping has six hundred sixty-five, RIGOR has two. On Chinook, RIGOR has none. Mistral and "
+             "DeepSeek show the same pattern. [pause]",
+         cue="Left table top to bottom, land on the RIGOR row; then the eICU bars, then Chinook's zero.",
+         takeaway="Only RIGOR adds labels, provenance and hierarchy, with far fewer modeling errors.",
+         source="Paper Tables 7 (OOPS! totals, Claude) and 8 (annotations, provenance, SubClassOf; all 9 runs per "
+                "method).",
+         cut="Mistral and DeepSeek show the same pattern."),
     dict(title="Result 2: BURR",
          say="Second: is the link back to the data real? We checked with BURR, an external benchmark for ontology "
              "learning from relational databases. BURR asks every system for a mapping: which table becomes a "
@@ -201,17 +202,17 @@ SLIDES = [
                 "ontology, so we compare with ontology-learning systems. Against it, RIGOR's class F1 is higher, "
                 "relations are on par, attributes lower, and RIGOR also produces labels, hierarchy and "
                 "provenance. It is prompted, not fine-tuned."]),
-    dict(title="Result 3: experts",
-         say="Finally, the most important question: do people prefer it? Ten ontology experts compared anonymized "
-             "fragments for four medical tables, and ranked them. RIGOR came first in twenty-eight of forty "
-             "rankings. [pause] That is seventy percent. Their agreement was statistically significant, with "
-             "Kendall's W between 0.39 and 0.72. An independent LLM judge, GPT-5.4, then ranked Claude's fragments "
-             "for all fifty-eight tables, against five competency questions each. It put RIGOR first on every "
-             "table. The expert sample is small, but both signals agree.",
-         cue="Pause on 70%. Then the bars, then the LLM-judge strip.",
-         takeaway="Human experts and an independent LLM judge both prefer RIGOR.",
-         source="Paper Tables 1 and 12. LLM judge: Claude outputs only, 290 competency questions.",
-         cut="Their agreement was statistically significant, with Kendall's W between 0.39 and 0.72."),
+    dict(title="Result 3: LLM judge and experts",
+         say="Finally: do evaluators prefer RIGOR? Both evaluations were blind: four anonymized ontologies per "
+             "table, ranked first to fourth. An LLM judge, GPT-5.4, ranked RIGOR first on all fifty-eight "
+             "tables, across the three databases. [pause] Ten ontology experts ranked RIGOR first in twenty-eight "
+             "of forty rankings, seventy percent, and they agreed significantly with each other. Machine and human "
+             "evaluators reach the same verdict.",
+         cue="Left number first, then the right number and its bars.",
+         takeaway="An independent LLM judge and human experts both rank RIGOR first.",
+         source="Paper Table 1 (rankings) and Table 12 (Kendall's W 0.39-0.72). LLM judge: Claude outputs, 290 "
+                "competency questions. Experts: 4 tables from the two medical databases.",
+         cut="and they agreed significantly with each other"),
     dict(title="Future work",
          say="Where next? Today RIGOR reads schemas and documentation. The next step is to let the data speak. "
              "Imagine several patients whose records show bone marrow depression after cisplatin cycles. The rows "

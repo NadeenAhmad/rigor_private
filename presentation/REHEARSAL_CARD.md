@@ -1,6 +1,6 @@
 # Rehearsal card
 
-Target: finish by **13:30**. Planned end: **12:59** (1352 words).
+Target: finish by **13:30**. Planned end: **12:46** (1330 words).
 
 | Slide | Starts at | Ends at | Words |
 |---|---|---|---|
@@ -22,11 +22,11 @@ Target: finish by **13:30**. Planned end: **12:59** (1352 words).
 | 16. Architecture 5/6 | 7:51 | 7:58 | 12 |
 | 17. Architecture 6/6 | 7:58 | 8:10 | 20 |
 | 18. Experimental setup | 8:10 | 8:45 | 62 |
-| 19. Result 1: meaning and structure | 8:45 | 9:39 | 88 |
-| 20. Result 2: BURR | 9:39 | 10:43 | 112 |
-| 21. Result 3: experts | 10:43 | 11:31 | 80 |
-| 22. Future work | 11:31 | 12:26 | 96 |
-| 23. Thank you | 12:26 | 12:59 | 57 |
+| 19. Result 1: meaning and modeling errors | 8:45 | 9:38 | 85 |
+| 20. Result 2: BURR | 9:38 | 10:42 | 112 |
+| 21. Result 3: LLM judge and experts | 10:42 | 11:19 | 61 |
+| 22. Future work | 11:19 | 12:13 | 96 |
+| 23. Thank you | 12:13 | 12:46 | 57 |
 
 ## Checkpoints
 
@@ -35,17 +35,18 @@ Glance at the clock when these slides come up. More than 30 s behind: apply the 
 - **Slide 6** should come up at **3:01** (the method starts).
 - **Slide 12** should come up at **7:19** (the architecture recap starts).
 - **Slide 19** should come up at **8:45** (the results start).
-- **Slide 22** should come up at **11:31** (future work starts).
-- **Slide 23** should come up at **12:26** (the close starts).
+- **Slide 22** should come up at **11:19** (future work starts).
+- **Slide 23** should come up at **12:13** (the close starts).
 
 ## Cuts if running late
 
 - Slide 7 (Step 2: seed): drop "So the LLM's job is to enrich, not to invent." (saves ~6 s)
 - Slide 8 (Step 3: retrieve): drop "One query per table, built from its name, columns and foreign keys, retrieves the top three matches per source." (saves ~11 s)
+- Slide 19 (Result 1: meaning and modeling errors): drop "Mistral and DeepSeek show the same pattern." (saves ~4 s)
 - Slide 20 (Result 2: BURR): drop "Two elements match when they map to the same database elements, whatever they are called." (saves ~9 s)
-- Slide 21 (Result 3: experts): drop "Their agreement was statistically significant, with Kendall's W between 0.39 and 0.72." (saves ~7 s)
+- Slide 21 (Result 3: LLM judge and experts): drop "and they agreed significantly with each other" (saves ~4 s)
 - Slide 22 (Future work): drop "We also want validator and reasoner feedback inside the loop." (saves ~6 s)
 
-All cuts together save about 38 s.
+All cuts together save about 39 s.
 
 Slides 12–17 are quick clicks (about 5–10 s each). If very late, say only the first and last sentences and click through the middle four.
