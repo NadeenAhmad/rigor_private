@@ -139,7 +139,7 @@ FUTURE = """Individual: cisplatin_bmdep
     hasCondition BoneMarrowDepression,
     status "needs expert review"
   Annotations:
-    prov:wasDerivedFrom src:BM_DEP,
+    prov:wasDerivedFrom admission:BM_DEP,
     prov:wasDerivedFrom doc:cisplatin_label"""
 
 FUTURE_SUPPORT = """Class: CandidateAssociation
@@ -148,7 +148,6 @@ ObjectProperty: hasCondition
 DataProperty: status
 Individual: Cisplatin
 Individual: BoneMarrowDepression
-Individual: src:BM_DEP
 Individual: doc:cisplatin_label
 """
 
@@ -187,7 +186,7 @@ CHECKS = {
                                      + DOMAIN_WRONG, True, {"hasPatientData": 2}),
     "slide10_corrected_merged": (HEADER + "Class: Admission\nClass: LabResult\n" + CORE_LINK + "\n"
                                  + DOMAIN_RIGHT + "  Range: PatientData", True, {"hasPatientData": 1, "labResultOf": 1}),
-    "slide22_future_candidate": (HEADER.replace("Ontology:", "Prefix: doc: <http://example.org/docs/>\nOntology:")
+    "slide22_future_candidate": (TARGET_HEADER.replace("Ontology:", "Prefix: doc: <http://example.org/docs/>\nOntology:")
                                  + FUTURE_SUPPORT + FUTURE, True),
 }
 
