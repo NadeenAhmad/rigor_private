@@ -181,7 +181,7 @@ def build_b(tree):
                        name="Method"))
         for cx, label in zip(col_x, cols):
             v = ADDED[label][k]
-            color = EMERALD if rigor else (INK if v else "9AA3A9")
+            color = EMERALD if rigor else (INK if v else "6B747B")
             add(tree, text(ids, cx, ry, 1.30, 0.34, r(f"{v:,}", color, 1600 if rigor else 1450, rigor or bool(v)),
                            align="ctr", anchor="ctr", name="Value"))
     x2, w2 = 7.63, 4.82
