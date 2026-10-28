@@ -38,6 +38,13 @@ author's edits.
   "BEFORE / DIRECT MAPPING" replaces the caption "Structure only. Meaning remains implicit.";
   speaker notes updated. Output: `RIGOR_slide9_generate.pptx`.
 
+- Slide 3 reveal (author's version: six separate slides for the PDF) rebuilt with
+  `tools/slide3_steps.py`: the target shows the final slide-9 fragment (19 rows, fixed grid,
+  later-step rows left empty), yellow highlight on what each step adds, glosses in their own
+  boxes (Google Slides drops tab stops), `admission_id PK` added to the input table. All four
+  reveal states verified with the OWL API. Output: `RIGOR_slide3_steps.pptx`. Still to do on the
+  other slides that show the table (2, 5, 6, 7 and the slide 7 seed): the PK row.
+
 ## Decided: keep as is
 
 - Slide 7 seed restrictions (`some` / `only`), and their glosses.

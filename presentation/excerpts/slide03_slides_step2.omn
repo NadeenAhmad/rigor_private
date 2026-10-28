@@ -1,0 +1,33 @@
+Prefix: : <http://example.org/rigor#>
+Prefix: rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+Prefix: xsd: <http://www.w3.org/2001/XMLSchema#>
+Prefix: prov: <http://www.w3.org/ns/prov#>
+Prefix: src: <http://example.org/provenance/admission/>
+Prefix: skos: <http://www.w3.org/2004/02/skos/core#>
+Prefix: obo: <http://purl.obolibrary.org/obo/>
+Prefix: admission: <http://example.org/provenance/admission/>
+Ontology: <http://example.org/rigor>
+AnnotationProperty: prov:wasDerivedFrom
+Class: PatientData
+Individual: src:ecog_stage
+AnnotationProperty: skos:relatedMatch
+ObjectProperty: hasPatientData
+Individual: admission:BM_DEP
+Individual: admission:ecog_stage
+Individual: obo:DOID_4961
+Class: Admission
+  SubClassOf:
+    admission_id some xsd:integer,
+    hasPatientData some PatientData,
+    BM_DEP only xsd:integer,
+    ecog_stage only xsd:integer
+DataProperty: admission_id
+ObjectProperty: hasPatientData
+DataProperty: BM_DEP
+  Annotations:
+    rdfs:label "Bone Marrow Depression"@en,
+    prov:wasDerivedFrom admission:BM_DEP
+DataProperty: ecog_stage
+  Annotations:
+    rdfs:label "ECOG Performance Status"@en,
+    prov:wasDerivedFrom admission:ecog_stage

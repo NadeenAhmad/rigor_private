@@ -102,3 +102,7 @@ share one white background. Title and closing slides changed to white at the aut
   11 pt Consolas); the AFTER side fills the empty rows with the Gen-LLM's insertions (highlighted,
   tagged) and highlights the renamed hasPatientData. `tools/slide9_diff.py`; excerpts
   `slide09_diff_before/after` pass the OWL API; contrast 0 pairs below 4.5:1.
+- Slide 3 reveal as six static slides (author's edited file, for a PDF without animations):
+  target code = final slide-9 fragment on a fixed 19-row grid, so lines never move between
+  slides; glosses right-aligned in separate boxes; PK row in the input table. Reveal states
+  `slide03_slides_step1-4` pass the OWL API; contrast 0 pairs below 4.5:1; package validates.

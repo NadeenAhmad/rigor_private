@@ -103,6 +103,16 @@ DIFF_ROWS = [
 ]
 DIFF_LEFT = "\n".join(l for l, _, _, _ in DIFF_ROWS if l)
 DIFF_RIGHT = "\n".join(r for _, r, _, _ in DIFF_ROWS)
+# Slide 3 shows the same final fragment as separate reveal slides, one evidence source per step.
+DIFF_STEP = {None: 1, "schema": 1, "docs": 2, "vocab": 3, "llm": 4}
+
+
+def row_step(row):
+    return DIFF_STEP[row[3]]
+
+
+def diff_state(step):
+    return "\n".join(r for _, r, _, g in DIFF_ROWS if DIFF_STEP[g] <= step)
 TARGET_HEADER = (HEADER.replace("Ontology:", "Prefix: skos: <http://www.w3.org/2004/02/skos/core#>\n"
                                 "Prefix: obo: <http://purl.obolibrary.org/obo/>\n"
                                 "Prefix: admission: <http://example.org/provenance/admission/>\nOntology:")
@@ -171,6 +181,7 @@ CHECKS = {
     "slide09_after_delta": (TARGET_HEADER + TARGET, True),  # slide 9 shows the slide-3 fragment
     "slide09_diff_before": (HEADER + DIFF_LEFT, True),
     "slide09_diff_after": (TARGET_HEADER + DIFF_RIGHT, True),
+    **{f"slide03_slides_step{k}": (TARGET_HEADER + diff_state(k), True) for k in (1, 2, 3, 4)},
     "slide10_duplicate_concept": (HEADER + "Class: Patient\n" + DUP_WRONG, True),
     "slide10_second_domain_merged": (HEADER + "Class: Admission\nClass: LabResult\n" + CORE_LINK + "\n"
                                      + DOMAIN_WRONG, True, {"hasPatientData": 2}),
