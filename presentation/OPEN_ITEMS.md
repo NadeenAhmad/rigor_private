@@ -45,6 +45,16 @@ author's edits.
   reveal states verified with the OWL API. Output: `RIGOR_slide3_steps.pptx`. Still to do on the
   other slides that show the table (2, 5, 6, 7 and the slide 7 seed): the PK row.
 
+## Author's decisions to carry into the next revision
+
+- **`DisjointWith: PatientData` removed** from the running example (the author: it does not make
+  sense for this domain). Remove it everywhere the example appears: slide 9 AFTER panel and
+  `code_excerpts.DIFF_ROWS` (slide 3 steps and slide 9 are generated from it), then re-verify.
+  Without it, slide 3's LLM step adds only the ECOG comment line.
+- **No "LLM knowledge" gloss on slide 3**: LLMs have not been introduced at that point in the talk.
+  Slide 9 (after the Gen-LLM is introduced) can keep its LLM tag on the ECOG comment.
+  Open point: what slide 3 says, if anything, beside the ECOG comment line instead.
+
 ## Decided: keep as is
 
 - Slide 7 seed restrictions (`some` / `only`), and their glosses.
