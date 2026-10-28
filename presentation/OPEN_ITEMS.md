@@ -45,6 +45,12 @@ author's edits.
   reveal states verified with the OWL API. Output: `RIGOR_slide3_steps.pptx`. Still to do on the
   other slides that show the table (2, 5, 6, 7 and the slide 7 seed): the PK row.
 
+- Architecture build-up 1/6 to 5/6 regenerated from the author's re-aligned 6/6 slide
+  (`tools/arch_steps.py`): copies of 6/6 with later parts removed, current step highlighted in
+  the author's 6/6 style, titles/subtitles/dashes/page numbers/notes per step. Full deck with the
+  five slides inserted before 6/6: `RIGOR_ISWC2026_author_v3_arch.pptx`; the six slides alone:
+  `RIGOR_architecture_steps.pptx`.
+
 ## Author's decisions to carry into the next revision
 
 - **`DisjointWith: PatientData` removed** from the running example (the author: it does not make
