@@ -23,9 +23,16 @@ from code_excerpts import FUTURE, NS, P, code_line, move, run_xml, simple_box  #
 from results import BODY, EMERALD, INK, MUTED, RED, Ids, add, shape  # noqa: E402
 from slide9_diff import geometry, shape_id, text  # noqa: E402
 
-CARD_TOP, CARD_BOTTOM = 2.40, 5.82
-ROWS = [("P01", "yes", "1"), ("P02", "yes", "1"), ("P03", "no", "0"), ("P04", "yes", "1"), ("P05", "no", "0")]
-BAND = "E6F2EC"
+CARD_TOP, CARD_BOTTOM = 2.40, 5.92
+# Synthetic rows over two tables joined by admission_id (no names; patients P1-P3, admissions A1-A3).
+TABLES = [
+    ("treatment", ("admission_id", "drug"), (1.15, 1.65),
+     [("A1", "cisplatin"), ("A2", "nivolumab"), ("A3", "cisplatin")], "admission_id"),
+    ("admission", ("admission_id", "patient_id", "BM_DEP"), (1.15, 0.95, 0.70),
+     [("A1", "P1", "1"), ("A2", "P2", "0"), ("A3", "P3", "1")], None),
+]
+JOINED = {"A1", "A3"}  # cisplatin admissions, highlighted in both tables
+BAND, TABLE_FILL = "D7EDE2", "E9EEEB"
 
 
 def r(t, color=INK, size=1200, bold=False, font="Calibri", italic=False):
@@ -71,8 +78,8 @@ def edit(tree):
         move(tree, shape_id(card), y=CARD_TOP, h=CARD_BOTTOM - CARD_TOP)
     for arrow in arrows:
         move(tree, shape_id(arrow), y=(CARD_TOP + CARD_BOTTOM) / 2 - geometry(arrow)[3] / 2)
-    move(tree, shape_id(strip), y=6.00)
-    move(tree, shape_id(footer), y=6.62)
+    move(tree, shape_id(strip), y=6.08)
+    move(tree, shape_id(footer), y=6.68)
 
     # Subtitle as the author edited it: key terms in bold, RIGOR bold italic.
     subtitle = by_text(shapes, "Today RIGOR")
@@ -82,22 +89,32 @@ def edit(tree):
         ("Instance data", True, False), (" could propose ", False, False), ("new knowledge", True, False),
         (".", False, False))))
 
-    # Card 1: instance table, one text box per cell.
+    # Card 1: the instance data spans two tables, drawn like admission / PatientData on slide 2.
     cx, _, cw, _ = geometry(cards[0])
-    cols = [cx + 0.22, cx + 1.20, cx + 2.30]
-    y = 3.32
-    for col, label in zip(cols, ("PATIENT", "CISPLATIN", "BM_DEP")):
-        add(tree, shape(ids(), "Table header", col, y, 1.0, 0.26, r(label, MUTED, 950, True, "Consolas"),
+    set_runs(by_text(shapes, "What patient rows show"), r("What the rows show, across two tables", MUTED, 1300))
+    root.remove(caption1)  # the footer already says the rows are synthetic
+    bx, bw = cx + 0.18, cw - 0.36
+    y = 3.22
+    for name, cols, widths, rows, fk in TABLES:
+        h = 0.32 + 0.22 + len(rows) * 0.205 + 0.07
+        add(tree, simple_box(ids(), f"Table {name}", bx, y, bw, h, fill=TABLE_FILL, geom="roundRect", shadow=True))
+        add(tree, shape(ids(), "Table name", bx + 0.15, y + 0.03, bw - 0.3, 0.27, r(name, INK, 1450, True),
                         anchor="ctr"))
-    for k, row in enumerate(ROWS):
-        ry = 3.64 + k * 0.32
-        if row[1] == "yes":
-            add(tree, shape(ids(), "Row band", cx + 0.15, ry, cw - 0.30, 0.28, fill=BAND))
-        for col, cell in zip(cols, row):
-            add(tree, shape(ids(), "Cell", col, ry, 1.0, 0.28, r(cell, INK, 1150, False, "Consolas"), anchor="ctr"))
-    move(tree, shape_id(caption1), y=5.30, h=0.42)
-    set_runs(caption1, r("Synthetic rows: patients given cisplatin show bone marrow depression (BM_DEP = 1).",
-                         MUTED, 1100))
+        add(tree, shape(ids(), "Rule", bx + 0.15, y + 0.32, bw - 0.30, 0.012, fill="9AA3A9"))
+        x = bx + 0.15
+        for col, w in zip(cols, widths):
+            label = r(col, EMERALD, 1050, True) + (r("  FK", MUTED, 900) if col == fk else "")
+            add(tree, shape(ids(), "Column", x, y + 0.35, w, 0.20, label, anchor="ctr"))
+            x += w
+        for k, row in enumerate(rows):
+            ry = y + 0.56 + k * 0.205
+            if row[0] in JOINED:
+                add(tree, shape(ids(), "Row band", bx + 0.08, ry, bw - 0.16, 0.19, fill=BAND))
+            x = bx + 0.15
+            for cell, w in zip(row, widths):
+                add(tree, shape(ids(), "Cell", x, ry, w, 0.19, r(cell, INK, 1050, False, "Consolas"), anchor="ctr"))
+                x += w
+        y += h + 0.10
 
     # Card 2: one bridging line where the timing note was.
     x2, _, w2, _ = geometry(cards[1])
@@ -108,7 +125,7 @@ def edit(tree):
     x3, _, w3, _ = geometry(cards[2])
     px, py, pw = x3 + 0.15, 3.28, w3 - 0.30
     lines = FUTURE.splitlines()
-    pitch = 0.205
+    pitch = 0.19
     ph = len(lines) * pitch + 0.16
     add(tree, simple_box(ids(), "Code panel", px, py, pw, ph, fill="F6F8FA", line="D0D7DE", geom="roundRect"))
     for k, line in enumerate(lines):

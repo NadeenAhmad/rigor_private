@@ -1,6 +1,6 @@
 # Rehearsal card
 
-Target: finish by **13:30**. Planned end: **12:46** (1330 words).
+Target: finish by **13:30**. Planned end: **12:53** (1343 words).
 
 | Slide | Starts at | Ends at | Words |
 |---|---|---|---|
@@ -25,8 +25,8 @@ Target: finish by **13:30**. Planned end: **12:46** (1330 words).
 | 19. Result 1: meaning and modeling errors | 8:45 | 9:38 | 85 |
 | 20. Result 2: BURR | 9:38 | 10:42 | 112 |
 | 21. Result 3: LLM judge and experts | 10:42 | 11:19 | 61 |
-| 22. Future work | 11:19 | 12:13 | 96 |
-| 23. Thank you | 12:13 | 12:46 | 57 |
+| 22. Future work | 11:19 | 12:21 | 109 |
+| 23. Thank you | 12:21 | 12:53 | 57 |
 
 ## Checkpoints
 
@@ -36,7 +36,7 @@ Glance at the clock when these slides come up. More than 30 s behind: apply the 
 - **Slide 12** should come up at **7:19** (the architecture recap starts).
 - **Slide 19** should come up at **8:45** (the results start).
 - **Slide 22** should come up at **11:19** (future work starts).
-- **Slide 23** should come up at **12:13** (the close starts).
+- **Slide 23** should come up at **12:21** (the close starts).
 
 ## Cuts if running late
 

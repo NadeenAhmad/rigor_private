@@ -140,6 +140,7 @@ FUTURE = """Individual: cisplatin_bmdep
     status "needs expert review"
   Annotations:
     prov:wasDerivedFrom admission:BM_DEP,
+    prov:wasDerivedFrom treatment:drug,
     prov:wasDerivedFrom doc:cisplatin_label"""
 
 FUTURE_SUPPORT = """Class: CandidateAssociation
@@ -149,6 +150,7 @@ DataProperty: status
 Individual: Cisplatin
 Individual: BoneMarrowDepression
 Individual: doc:cisplatin_label
+Individual: treatment:drug
 """
 
 # Slide 10: errors a capable LLM still makes, which the paper's checks target.
@@ -186,7 +188,9 @@ CHECKS = {
                                      + DOMAIN_WRONG, True, {"hasPatientData": 2}),
     "slide10_corrected_merged": (HEADER + "Class: Admission\nClass: LabResult\n" + CORE_LINK + "\n"
                                  + DOMAIN_RIGHT + "  Range: PatientData", True, {"hasPatientData": 1, "labResultOf": 1}),
-    "slide22_future_candidate": (TARGET_HEADER.replace("Ontology:", "Prefix: doc: <http://example.org/docs/>\nOntology:")
+    "slide22_future_candidate": (TARGET_HEADER.replace("Ontology:", "Prefix: doc: <http://example.org/docs/>\n"
+                                                       "Prefix: treatment: <http://example.org/provenance/treatment/>\n"
+                                                       "Ontology:")
                                  + FUTURE_SUPPORT + FUTURE, True),
 }
 
@@ -244,7 +248,7 @@ def tokens(line, in_string):
             out.append((tok, XSD, False))
         elif tok.startswith(("rdfs:", "prov:", "skos:")):
             out.append((tok, ANN, False))
-        elif tok.startswith(("src:", "doc:", "obo:", "admission:")):
+        elif tok.startswith(("src:", "doc:", "obo:", "admission:", "treatment:")):
             out.append((tok, IRI, False))
         else:
             out.append((tok, NAME, False))

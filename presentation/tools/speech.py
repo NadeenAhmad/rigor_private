@@ -215,13 +215,13 @@ SLIDES = [
          cut="and they agreed significantly with each other"),
     dict(title="Future work",
          say="Where next? Today RIGOR reads schemas and documentation. The next step is to let the data speak. "
-             "Imagine several patients whose records show bone marrow depression after cisplatin cycles. The rows "
-             "alone show a pattern. The drug label adds that bone-marrow suppression is a known adverse reaction "
+             "Here the data sits in two tables: treatment says which admissions received cisplatin, admission "
+             "records bone marrow depression. Joined on the admission id, the rows show a pattern. The drug label adds that bone-marrow suppression is a known adverse reaction "
              "of cisplatin. Together, they let RIGOR propose new knowledge: a candidate association between "
-             "cisplatin and bone marrow depression, with provenance to both sources. Candidate, not cause. "
+             "cisplatin and bone marrow depression, with provenance to both tables and the label. Candidate, not cause. "
              "Gemcitabine, radiotherapy or cirrhosis could also explain it. So an expert reviews it. We also want "
              "validator and reasoner feedback inside the loop.",
-         cue="Rows, label, code, left to right. Say 'candidate' or 'may have contributed', never 'caused'.",
+         cue="Point at A1 and A3 in both tables, then the label, then the code. Say 'candidate', never 'caused'.",
          takeaway="Instances plus documentation can propose knowledge; experts confirm it.",
          source="Paper Section 5. Rows are synthetic. OWL verified "
                 "(presentation/excerpts/slide22_future_candidate.omn): a typed individual with provenance, no "

@@ -7,6 +7,7 @@ Prefix: skos: <http://www.w3.org/2004/02/skos/core#>
 Prefix: obo: <http://purl.obolibrary.org/obo/>
 Prefix: admission: <http://example.org/provenance/admission/>
 Prefix: doc: <http://example.org/docs/>
+Prefix: treatment: <http://example.org/provenance/treatment/>
 Ontology: <http://example.org/rigor>
 AnnotationProperty: prov:wasDerivedFrom
 Class: PatientData
@@ -23,6 +24,7 @@ DataProperty: status
 Individual: Cisplatin
 Individual: BoneMarrowDepression
 Individual: doc:cisplatin_label
+Individual: treatment:drug
 Individual: cisplatin_bmdep
   Types: CandidateAssociation
   Facts:
@@ -31,4 +33,5 @@ Individual: cisplatin_bmdep
     status "needs expert review"
   Annotations:
     prov:wasDerivedFrom admission:BM_DEP,
+    prov:wasDerivedFrom treatment:drug,
     prov:wasDerivedFrom doc:cisplatin_label
