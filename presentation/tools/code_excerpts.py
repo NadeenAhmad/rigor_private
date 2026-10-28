@@ -77,6 +77,32 @@ TARGET_LINES = [
 TARGET_GROUP_BREAKS = (2, 7)  # a little extra space after these line indices
 REVEAL_ORDER = ("schema", "docs", "vocab", "llm")
 TARGET = "\n".join(code for code, _, _ in TARGET_LINES)
+# Slide 9 (author's layout): the direct mapping on the left, the enriched delta on the right, row for
+# row. Each row: (left code or None for an empty row, right code, kind, evidence group).
+# kind: "same" = unchanged, "changed" = renamed by the Gen-LLM, "added" = inserted into an empty row.
+DIFF_ROWS = [
+    ("Class: Admission", "Class: Admission", "same", None),
+    ("  SubClassOf:", "  SubClassOf:", "same", None),
+    ("    admission_id some xsd:integer,", "    admission_id some xsd:integer,", "same", None),
+    ("    patient_id some PatientData,", "    hasPatientData some PatientData,", "changed", "schema"),
+    ("    BM_DEP only xsd:integer,", "    BM_DEP only xsd:integer,", "same", None),
+    ("    ecog_stage only xsd:integer", "    ecog_stage only xsd:integer", "same", None),
+    (None, "  DisjointWith: PatientData", "added", "llm"),
+    ("DataProperty: admission_id", "DataProperty: admission_id", "same", None),
+    ("ObjectProperty: patient_id", "ObjectProperty: hasPatientData", "changed", "schema"),
+    ("DataProperty: BM_DEP", "DataProperty: BM_DEP", "same", None),
+    (None, "  Annotations:", "added", None),
+    (None, '    rdfs:label "Bone Marrow Depression"@en,', "added", "docs"),
+    (None, "    skos:relatedMatch obo:DOID_4961,", "added", "vocab"),
+    (None, "    prov:wasDerivedFrom admission:BM_DEP", "added", "schema"),
+    ("DataProperty: ecog_stage", "DataProperty: ecog_stage", "same", None),
+    (None, "  Annotations:", "added", None),
+    (None, '    rdfs:label "ECOG Performance Status"@en,', "added", "docs"),
+    (None, '    rdfs:comment "0 = fully active … 5 = dead"@en,', "added", "llm"),
+    (None, "    prov:wasDerivedFrom admission:ecog_stage", "added", "schema"),
+]
+DIFF_LEFT = "\n".join(l for l, _, _, _ in DIFF_ROWS if l)
+DIFF_RIGHT = "\n".join(r for _, r, _, _ in DIFF_ROWS)
 TARGET_HEADER = (HEADER.replace("Ontology:", "Prefix: skos: <http://www.w3.org/2004/02/skos/core#>\n"
                                 "Prefix: obo: <http://purl.obolibrary.org/obo/>\n"
                                 "Prefix: admission: <http://example.org/provenance/admission/>\nOntology:")
@@ -143,6 +169,8 @@ CHECKS = {
     "slide09_before_seed": (HEADER + "ObjectProperty: patient_id\nDataProperty: BM_DEP\nDataProperty: ecog_stage\n"
                             + SEED_COMPACT, True),
     "slide09_after_delta": (TARGET_HEADER + TARGET, True),  # slide 9 shows the slide-3 fragment
+    "slide09_diff_before": (HEADER + DIFF_LEFT, True),
+    "slide09_diff_after": (TARGET_HEADER + DIFF_RIGHT, True),
     "slide10_duplicate_concept": (HEADER + "Class: Patient\n" + DUP_WRONG, True),
     "slide10_second_domain_merged": (HEADER + "Class: Admission\nClass: LabResult\n" + CORE_LINK + "\n"
                                      + DOMAIN_WRONG, True, {"hasPatientData": 2}),

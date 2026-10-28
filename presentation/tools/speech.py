@@ -106,15 +106,16 @@ SLIDES = [
          cut="One query per table, built from its name, columns and foreign keys, retrieves the top three "
              "matches per source."),
     dict(title="Step 4: generate",
-         say="Step four: generate. We prompt the Gen-LLM with the seed, the retrieved context and our "
-             "enrichment instructions. What comes back is the fragment we set as our target on slide three. The "
-             "tags on the right show where each part came from. The relation hasPatientData and the provenance "
-             "links come from the schema. The labels come from the documentation. The link to bone marrow "
-             "disease comes from the Disease Ontology. And the disjointness and the ECOG scale come from the "
-             "model's own knowledge.",
-         cue="Point at the tags from top to bottom: schema, docs, ontology, LLM.",
+         say="Step four: generate. We prompt the Gen-LLM with the direct mapping from step two, the retrieved "
+             "context and our enrichment instructions. What comes back is a delta ontology: the same lines as on "
+             "the left, with new ones inserted into the gaps. The tags show where each change came from. The "
+             "foreign key becomes the named relation hasPatientData, and provenance links each property to its "
+             "column: both from the schema. The labels come from the documentation, the link to bone marrow "
+             "disease from the Disease Ontology, and the disjointness and the ECOG scale from the model's own "
+             "knowledge.",
+         cue="Left to right on one row, then down the highlighted lines and their tags.",
          takeaway="The LLM enriches a grounded draft, and every addition is traceable.",
-         source="Paper Sections 3.3-3.4. Same fragment as slide 3, verified with the OWL API."),
+         source="Paper Sections 3.2-3.4. Row-aligned BEFORE/AFTER, both verified with the OWL API."),
     dict(title="Step 5: validate",
          say="A capable LLM rarely gets syntax wrong. The real risk is a fragment that looks right but clashes "
              "with the ontology built so far. So step five validates every delta before it is merged. On the "

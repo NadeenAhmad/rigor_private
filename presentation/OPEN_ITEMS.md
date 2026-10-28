@@ -31,9 +31,12 @@ author's edits.
 
 ## Resolved
 
-- Slide 9 AFTER panel matches the slide 3 example, with `admission:` provenance
-  (`RIGOR_slide9_generate.pptx`; paste it over the author's slide 9). When the PK fix (item 1)
-  is applied, add the `admission_id` line to slide 9's BEFORE seed too.
+- Slide 9 rebuilt on the author's edited slide (`tools/slide9_diff.py`, applied directly, not via
+  `build.sh`): BEFORE (direct mapping, with `admission_id` PK) and AFTER (delta ontology) share one
+  row grid; insertions fill the empty rows (mint band, emerald mark, evidence tag), renamed names
+  are highlighted, unchanged lines are plain. Both sides verified with the OWL API. Header
+  "BEFORE / DIRECT MAPPING" replaces the caption "Structure only. Meaning remains implicit.";
+  speaker notes updated. Output: `RIGOR_slide9_generate.pptx`.
 
 ## Decided: keep as is
 

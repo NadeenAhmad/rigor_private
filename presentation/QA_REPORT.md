@@ -98,3 +98,7 @@ share one white background. Title and closing slides changed to white at the aut
   ONTOLOGY, LLM; slide-3 colours). Header and labels follow the author's edits; the old caption is
   gone; provenance uses `admission:`. Verified with the OWL API; contrast 0 pairs below 4.5:1.
   Standalone copy: `presentation/RIGOR_slide9_generate.pptx`; preview: `presentation/slide9_preview.jpg`.
+- Slide 9 reworked on the author's edited slide: BEFORE and AFTER are row-aligned (19 rows,
+  11 pt Consolas); the AFTER side fills the empty rows with the Gen-LLM's insertions (highlighted,
+  tagged) and highlights the renamed hasPatientData. `tools/slide9_diff.py`; excerpts
+  `slide09_diff_before/after` pass the OWL API; contrast 0 pairs below 4.5:1.
