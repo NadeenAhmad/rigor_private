@@ -1,6 +1,6 @@
 # Rehearsal card
 
-Target: finish by **13:30**. Planned end: **12:53** (1343 words).
+Target: finish by **13:30**. Planned end: **13:23** (1392 words).
 
 | Slide | Starts at | Ends at | Words |
 |---|---|---|---|
@@ -22,11 +22,12 @@ Target: finish by **13:30**. Planned end: **12:53** (1343 words).
 | 16. Architecture 5/6 | 7:51 | 7:58 | 12 |
 | 17. Architecture 6/6 | 7:58 | 8:10 | 20 |
 | 18. Experimental setup | 8:10 | 8:45 | 62 |
-| 19. Result 1: meaning and modeling errors | 8:45 | 9:38 | 85 |
-| 20. Result 2: BURR | 9:38 | 10:42 | 112 |
-| 21. Result 3: LLM judge and experts | 10:42 | 11:19 | 61 |
-| 22. Future work | 11:19 | 12:21 | 109 |
-| 23. Thank you | 12:21 | 12:53 | 57 |
+| 19. Result 1: nothing is lost | 8:45 | 9:23 | 63 |
+| 20. Result 2: meaning and errors | 9:23 | 10:14 | 86 |
+| 21. Result 3: BURR | 10:14 | 11:05 | 88 |
+| 22. Result 4: LLM judge and experts | 11:05 | 11:49 | 70 |
+| 23. Future work | 11:49 | 12:51 | 109 |
+| 24. Thank you | 12:51 | 13:23 | 57 |
 
 ## Checkpoints
 
@@ -35,18 +36,19 @@ Glance at the clock when these slides come up. More than 30 s behind: apply the 
 - **Slide 6** should come up at **3:01** (the method starts).
 - **Slide 12** should come up at **7:19** (the architecture recap starts).
 - **Slide 19** should come up at **8:45** (the results start).
-- **Slide 22** should come up at **11:19** (future work starts).
-- **Slide 23** should come up at **12:21** (the close starts).
+- **Slide 22** should come up at **11:05** (future work starts).
+- **Slide 23** should come up at **11:49** (the close starts).
 
 ## Cuts if running late
 
 - Slide 7 (Step 2: seed): drop "So the LLM's job is to enrich, not to invent." (saves ~6 s)
 - Slide 8 (Step 3: retrieve): drop "One query per table, built from its name, columns and foreign keys, retrieves the top three matches per source." (saves ~11 s)
-- Slide 19 (Result 1: meaning and modeling errors): drop "Mistral and DeepSeek show the same pattern." (saves ~4 s)
-- Slide 20 (Result 2: BURR): drop "Two elements match when they map to the same database elements, whatever they are called." (saves ~9 s)
-- Slide 21 (Result 3: LLM judge and experts): drop "and they agreed significantly with each other" (saves ~4 s)
-- Slide 22 (Future work): drop "We also want validator and reasoner feedback inside the loop." (saves ~6 s)
+- Slide 19 (Result 1: nothing is lost): drop "So context alone loses structure; the direct-mapping seed keeps it." (saves ~6 s)
+- Slide 20 (Result 2: meaning and errors): drop "Most of the others' pitfalls are simply missing annotations." (saves ~5 s)
+- Slide 21 (Result 3: BURR): drop "Two elements match when they map to the same database elements, whatever they are called." (saves ~9 s)
+- Slide 22 (Result 4: LLM judge and experts): drop "with the largest gains in clarity and domain enrichment" (saves ~5 s)
+- Slide 23 (Future work): drop "We also want validator and reasoner feedback inside the loop." (saves ~6 s)
 
-All cuts together save about 39 s.
+All cuts together save about 47 s.
 
 Slides 12–17 are quick clicks (about 5–10 s each). If very late, say only the first and last sentences and click through the middle four.
