@@ -45,14 +45,19 @@ SLIDES = [
          takeaway="The schema knows storage and links, not clinical meaning.",
          source="Illustrative table assembled from examples in paper Sections 3.2 and 3.4."),
     dict(title="What we want to build",
-         say="Here is what we want. Admission and PatientData become classes, and the foreign key becomes a "
-             "real relation between them. Now look at the code. BM_DEP gets a human-readable label: Bone Marrow "
-             "Depression. ECOG gets a comment that explains its codes. And every element records where it came "
-             "from, with prov:wasDerivedFrom. That is a usable semantic model. The challenge is to add all this "
-             "meaning without losing a single column or link.",
-         cue="Diagram first, then read the three code glosses on the right.",
-         takeaway="Target: linked, labelled, traceable, and nothing lost.",
-         source="Illustrative OWL fragment, verified with the OWL API (presentation/excerpts/slide03_target.omn)."),
+         say="Here is what we want. [click] First, what the schema alone gives us: Admission becomes a class "
+             "with a real relation to PatientData, and every property points back to its source column. [click] "
+             "The documentation adds human-readable labels: Bone Marrow Depression, ECOG Performance Status. "
+             "[click] A standard vocabulary adds a link to the Disease Ontology. [click] And the LLM's own "
+             "knowledge adds what the ECOG codes mean, and that an admission is not a patient. [click] That is a "
+             "usable semantic model. The challenge is to add all this without losing a single column or link.",
+         cue="Five clicks, one per knowledge source: schema, documentation, Disease Ontology, LLM knowledge, "
+             "then 'What this enables'. The gloss colours match the sources.",
+         takeaway="A usable model combines schema, documentation, standard vocabularies and LLM knowledge.",
+         source="Illustrative fragment, verified with the OWL API at every reveal step "
+                "(presentation/excerpts/slide03_*.omn). obo:DOID_4961 = Disease Ontology 'bone marrow disease'; "
+                "skos:relatedMatch, not exactMatch, because BM_DEP is a yes/no column, not the disease. "
+                "Provenance is column-level, as defined in paper Section 3.2."),
     dict(title="Research gap",
          say="Existing work solves half of this. Schema-first rules, like direct mapping, preserve the "
              "structure: every table, column and foreign key. But they add no domain meaning. LLMs can suggest "
@@ -233,7 +238,7 @@ CLOSING_TAKEAWAYS = "Meaning without losing structure · link to the data intact
 
 
 def words(text):
-    return len(re.sub(r"\[pause\]", "", text).split())
+    return len(re.sub(r"\[(pause|click)\]", "", text).split())
 
 
 def seconds(text):
@@ -359,7 +364,7 @@ def docs():
     ]
     for n, s, start, stop, dur in rows:
         out += [f"## {n}. {s['title']}  ·  {mmss(start)}–{mmss(stop)}  ·  {words(s['say'])} words", "",
-                s["say"].replace("[pause]", "**[pause]**"), "",
+                s["say"].replace("[pause]", "**[pause]**").replace("[click]", "*[click]*"), "",
                 f"*Pointer:* {s['cue']}  ", f"*Takeaway:* {s['takeaway']}  ", f"*Source:* {s['source']}"]
         if s.get("cut"):
             out.append(f"  \n*If late, drop:* \"{s['cut']}\"")

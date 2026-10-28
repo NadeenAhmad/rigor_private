@@ -86,3 +86,7 @@ share one white background. Title and closing slides changed to white at the aut
 - Cover figure restored at the author's request: the original table-to-ontology figure,
   recoloured for the light panel (charcoal table and nodes, emerald edges, amber mapped row and
   node), with a RIGOR label above the mapping and alt text describing it.
+- Slide 3 now shows the full target example (13 lines) with a five-click reveal by knowledge source:
+  schema, documentation, Disease Ontology (obo:DOID_4961, skos:relatedMatch), LLM knowledge, then
+  "What this enables". Every reveal state is verified with the OWL API. Standalone copy:
+  `presentation/RIGOR_slide3_target.pptx`; frame-by-frame preview: `presentation/slide3_reveal_steps.jpg`.

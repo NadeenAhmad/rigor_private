@@ -57,13 +57,43 @@ SEED_COMPACT = """Class: Admission
     BM_DEP only xsd:integer,
     ecog_stage only xsd:integer"""
 
-TARGET = """DataProperty: BM_DEP
-  Annotations: rdfs:label
-    "Bone Marrow Depression"@en\t← human-readable name
-DataProperty: ecog_stage
-  Annotations: rdfs:comment
-    "ECOG 0 = fully active … 5 = dead"@en,\t← what the codes mean
-    prov:wasDerivedFrom src:ecog_stage\t← where it came from"""
+# Slide 3 target: one line per entry (code, gloss, knowledge source). The reveal adds one
+# source per click: schema, documentation, standard vocabulary, LLM knowledge.
+TARGET_LINES = [
+    ("Class: Admission", "", "schema"),
+    ("  SubClassOf: hasPatientData some PatientData", "schema (foreign key)", "schema"),
+    ("  DisjointWith: PatientData", "LLM knowledge", "llm"),
+    ("DataProperty: BM_DEP", "", "schema"),
+    ("  Annotations:", "", "schema"),
+    ('    rdfs:label "Bone Marrow Depression"@en,', "documentation", "docs"),
+    ("    skos:relatedMatch obo:DOID_4961,", "Disease Ontology", "vocab"),
+    ("    prov:wasDerivedFrom admission:BM_DEP", "source column", "schema"),
+    ("DataProperty: ecog_stage", "", "schema"),
+    ("  Annotations:", "", "schema"),
+    ('    rdfs:label "ECOG Performance Status"@en,', "documentation", "docs"),
+    ('    rdfs:comment "0 = fully active … 5 = dead"@en,', "LLM knowledge", "llm"),
+    ("    prov:wasDerivedFrom admission:ecog_stage", "source column", "schema"),
+]
+TARGET_GROUP_BREAKS = (2, 7)  # a little extra space after these line indices
+REVEAL_ORDER = ("schema", "docs", "vocab", "llm")
+TARGET = "\n".join(code for code, _, _ in TARGET_LINES)
+TARGET_HEADER = (HEADER.replace("Ontology:", "Prefix: skos: <http://www.w3.org/2004/02/skos/core#>\n"
+                                "Prefix: obo: <http://purl.obolibrary.org/obo/>\n"
+                                "Prefix: admission: <http://example.org/provenance/admission/>\nOntology:")
+                 + "AnnotationProperty: skos:relatedMatch\nObjectProperty: hasPatientData\n"
+                   "Individual: admission:BM_DEP\nIndividual: admission:ecog_stage\nIndividual: obo:DOID_4961\n")
+
+
+def target_state(upto):
+    """The fragment as shown after the first `upto` reveal steps. Commas are fixed so that every
+    intermediate state is itself valid Manchester Syntax."""
+    shown = [code for code, _, g in TARGET_LINES if g in REVEAL_ORDER[:upto]]
+    out = []
+    for k, line in enumerate(shown):
+        nxt = shown[k + 1] if k + 1 < len(shown) else ""
+        continues = nxt.startswith("    ") and not nxt.lstrip().startswith(("Class:", "DataProperty:"))
+        out.append(line.rstrip(",") + ("," if line.startswith("    ") and continues else ""))
+    return "\n".join(out)
 
 DELTA = """ObjectProperty: hasPatientData
   Domain: Admission  Range: PatientData
@@ -118,7 +148,8 @@ def annotated(subject, ann):
 
 # name -> (file body, expect OWL 2 DL)
 CHECKS = {
-    "slide03_target": (HEADER + code_only(TARGET), True),
+    "slide03_target": (TARGET_HEADER + TARGET, True),
+    **{f"slide03_reveal_step{k}": (TARGET_HEADER + target_state(k), True) for k in (1, 2, 3)},
     "slide07_seed": (HEADER + "ObjectProperty: patient_id\nDataProperty: BM_DEP\nDataProperty: ecog_stage\n"
                      + code_only(SEED), True),
     "slide09_before_seed": (HEADER + "ObjectProperty: patient_id\nDataProperty: BM_DEP\nDataProperty: ecog_stage\n"
@@ -160,7 +191,7 @@ def verify(classpath):
 
 KW, NAME, LIT, XSD, ANN, IRI, GLOSS = "0B6E4F", "1F2328", "A3401E", "6F42C1", "5B6770", "2F6B78", "5B6770"
 KEYWORDS = {"Class:", "ObjectProperty:", "DataProperty:", "SubClassOf:", "Domain:", "Range:",
-            "Annotations:", "some", "only", "Individual:", "Types:", "Facts:"}
+            "Annotations:", "some", "only", "Individual:", "Types:", "Facts:", "DisjointWith:"}
 TOKEN = re.compile(r'"[^"]*"(?:@\w+)?|"[^"]*$|<[^>]*>|\s+|[\w:]+|.')
 
 
@@ -185,9 +216,9 @@ def tokens(line, in_string):
             out.append((tok, KW, True))
         elif tok.startswith("xsd:"):
             out.append((tok, XSD, False))
-        elif tok.startswith(("rdfs:", "prov:")):
+        elif tok.startswith(("rdfs:", "prov:", "skos:")):
             out.append((tok, ANN, False))
-        elif tok.startswith(("src:", "doc:")):
+        elif tok.startswith(("src:", "doc:", "obo:", "admission:")):
             out.append((tok, IRI, False))
         else:
             out.append((tok, NAME, False))
@@ -233,7 +264,8 @@ def code_block(shape_id, x, y, w, h, text, size, line_pts, tab_in=None, inset=0.
 # ---- Slide edits ---------------------------------------------------------------------------
 
 def sp_by_id(tree, sid):
-    return next(sp for sp in tree.iter(f"{{{P}}}sp") if sp.find(".//p:cNvPr", NS).get("id") == str(sid))
+    return next(sp for sp in tree.iter(f"{{{P}}}sp", f"{{{P}}}cxnSp")
+                if sp.find(".//p:cNvPr", NS).get("id") == str(sid))
 
 
 def delete(tree, *ids):
@@ -286,10 +318,155 @@ def code_runs(text, size, color=None):
     return "".join(run_xml(t, color or c, b, size) for t, c, b in toks)
 
 
+GLOSS_COLORS = {"schema": "5B6770", "docs": "2F6B78", "vocab": "0B6E4F", "llm": "6F42C1"}
+
+
+def code_line(sid, x, y, w, h, code, gloss, group, size=1150, gloss_size=1100, tab_in=4.62):
+    toks, _ = tokens(code, False)
+    runs = "".join(run_xml(t, c, b, size) for t, c, b in toks)
+    if gloss:
+        runs += run_xml("\t\u2190 " + gloss, GLOSS_COLORS[group], False, gloss_size, font="Calibri", italic=True)
+    return etree.fromstring(
+        f'<p:sp xmlns:p="{P}" xmlns:a="{A}"><p:nvSpPr><p:cNvPr id="{sid}" name="Code line {sid}"/>'
+        f'<p:cNvSpPr txBox="1"/><p:nvPr/></p:nvSpPr><p:spPr><a:xfrm><a:off x="{int(x * EMU)}" y="{int(y * EMU)}"/>'
+        f'<a:ext cx="{int(w * EMU)}" cy="{int(h * EMU)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom>'
+        f'<a:noFill/></p:spPr><p:txBody><a:bodyPr wrap="none" lIns="{int(0.16 * EMU)}" tIns="0" rIns="0" bIns="0" '
+        f'anchor="ctr"><a:noAutofit/></a:bodyPr><a:lstStyle/><a:p><a:pPr><a:tabLst><a:tab pos="{int(tab_in * EMU)}" '
+        f'algn="l"/></a:tabLst></a:pPr>{runs}<a:endParaRPr lang="en-US" sz="{size}"/></a:p></p:txBody></p:sp>')
+
+
+def simple_box(sid, name, x, y, w, h, fill=None, line=None, paras="", geom="rect", shadow=False, inset=0.0):
+    fill_xml = f'<a:solidFill><a:srgbClr val="{fill}"/></a:solidFill>' if fill else "<a:noFill/>"
+    line_xml = (f'<a:ln w="9525"><a:solidFill><a:srgbClr val="{line}"/></a:solidFill></a:ln>' if line
+                else "<a:ln><a:noFill/></a:ln>")
+    shadow_xml = ('<a:effectLst><a:outerShdw blurRad="76200" dist="25400" dir="5400000" algn="t" rotWithShape="0">'
+                  '<a:srgbClr val="000000"><a:alpha val="16000"/></a:srgbClr></a:outerShdw></a:effectLst>'
+                  if shadow else "")
+    adj = '<a:avLst><a:gd name="adj" fmla="val 9000"/></a:avLst>' if geom == "roundRect" else "<a:avLst/>"
+    ins = int(inset * EMU)
+    body = paras or '<a:p><a:endParaRPr lang="en-US"/></a:p>'
+    return etree.fromstring(
+        f'<p:sp xmlns:p="{P}" xmlns:a="{A}"><p:nvSpPr><p:cNvPr id="{sid}" name="{name}"/><p:cNvSpPr/><p:nvPr/>'
+        f'</p:nvSpPr><p:spPr><a:xfrm><a:off x="{int(x * EMU)}" y="{int(y * EMU)}"/><a:ext cx="{int(w * EMU)}" '
+        f'cy="{int(h * EMU)}"/></a:xfrm><a:prstGeom prst="{geom}">{adj}</a:prstGeom>{fill_xml}{line_xml}{shadow_xml}'
+        f'</p:spPr><p:txBody><a:bodyPr wrap="square" lIns="{ins}" tIns="0" rIns="{ins}" bIns="0" anchor="ctr">'
+        f'<a:noAutofit/></a:bodyPr><a:lstStyle/>{body}</p:txBody></p:sp>')
+
+
+def para(runs, algn="l", space_after=0):
+    return (f'<a:p><a:pPr algn="{algn}"><a:spcAft><a:spcPts val="{space_after}"/></a:spcAft></a:pPr>{runs}'
+            f'</a:p>')
+
+
+def reveal_timing(steps, text_ids):
+    """PowerPoint build: each step is a list of shape ids that fade in together on one click."""
+    n = [2]
+
+    def nid():
+        n[0] += 1
+        return n[0]
+
+    clicks = []
+    for step in steps:
+        effects = []
+        for k, spid in enumerate(step):
+            node = "clickEffect" if k == 0 else "withEffect"
+            effects.append(
+                f'<p:par><p:cTn id="{nid()}" presetID="10" presetClass="entr" presetSubtype="0" fill="hold" '
+                f'grpId="0" nodeType="{node}"><p:stCondLst><p:cond delay="0"/></p:stCondLst><p:childTnLst>'
+                f'<p:set><p:cBhvr><p:cTn id="{nid()}" dur="1" fill="hold"><p:stCondLst><p:cond delay="0"/>'
+                f'</p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid="{spid}"/></p:tgtEl><p:attrNameLst>'
+                f'<p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val="visible"/>'
+                f'</p:to></p:set><p:animEffect transition="in" filter="fade"><p:cBhvr><p:cTn id="{nid()}" dur="250"/>'
+                f'<p:tgtEl><p:spTgt spid="{spid}"/></p:tgtEl></p:cBhvr></p:animEffect></p:childTnLst></p:cTn></p:par>')
+        outer, inner = nid(), nid()
+        clicks.append(f'<p:par><p:cTn id="{outer}" fill="hold"><p:stCondLst><p:cond delay="indefinite"/></p:stCondLst>'
+                      f'<p:childTnLst><p:par><p:cTn id="{inner}" fill="hold"><p:stCondLst><p:cond delay="0"/>'
+                      f'</p:stCondLst><p:childTnLst>{"".join(effects)}</p:childTnLst></p:cTn></p:par></p:childTnLst>'
+                      f'</p:cTn></p:par>')
+    blds = "".join(f'<p:bldP spid="{spid}" grpId="0" animBg="1"/>' for step in steps for spid in step
+                   if spid in text_ids)
+    return etree.fromstring(
+        f'<p:timing xmlns:p="{P}"><p:tnLst><p:par><p:cTn id="1" dur="indefinite" restart="never" nodeType="tmRoot">'
+        f'<p:childTnLst><p:seq concurrent="1" nextAc="seek"><p:cTn id="2" dur="indefinite" nodeType="mainSeq">'
+        f'<p:childTnLst>{"".join(clicks)}</p:childTnLst></p:cTn><p:prevCondLst><p:cond evt="onPrev" delay="0">'
+        f'<p:tgtEl><p:sldTgt/></p:tgtEl></p:cond></p:prevCondLst><p:nextCondLst><p:cond evt="onNext" delay="0">'
+        f'<p:tgtEl><p:sldTgt/></p:tgtEl></p:cond></p:nextCondLst></p:seq></p:childTnLst></p:cTn></p:par></p:tnLst>'
+        f'<p:bldLst>{blds}</p:bldLst></p:timing>')
+
+
 def edit_slide3(tree):
-    # The link Admission -hasPatientData-> PatientData stays as the diagram above the code.
+    """Full target example with a reveal: input -> schema -> documentation -> vocabulary -> LLM -> uses."""
+    sid = [next_id(tree) - 1]
+
+    def new_id():
+        sid[0] += 1
+        return sid[0]
+
+    # Left column: input card (labelled INPUT, table as a card with green column names).
+    move(tree, 77, y=2.25, h=2.77)
+    set_text(tree, 78, "INPUT")
+    move(tree, 78, y=2.42)
+    add(tree, simple_box(new_id(), "Table card", 1.06, 2.86, 2.89, 1.96, fill="E9EEEB", geom="roundRect",
+                         shadow=True))
+    for mid in (79, 80):  # bring the table name and its rule in front of the new card
+        el = sp_by_id(tree, mid)
+        el.getparent().append(el)
+    move(tree, 79, x=1.24, y=2.98, w=2.55, h=0.40)
+    move(tree, 80, x=1.24, y=3.44, w=2.53)
+    delete(tree, 81, 82, 83, 84)
+    for k, (name, typ) in enumerate((("patient_id", "FK"), ("BM_DEP", "INT"), ("ecog_stage", "INT"))):
+        y = 3.58 + k * 0.38
+        add(tree, simple_box(new_id(), "Column", 1.24, y, 1.75, 0.32,
+                             paras=para(run_xml(name, "0B6E4F", True, 1500, font="Calibri"))))
+        add(tree, simple_box(new_id(), "Type", 2.95, y, 0.82, 0.32,
+                             paras=para(run_xml(typ, "5B6770", False, 1400, font="Calibri"), algn="r")))
+    move(tree, 85, y=3.60)
+
+    # Target panel: taller, compact class diagram.
+    move(tree, 86, y=2.25, h=4.77)
+    set_text(tree, 87, "TARGET")
+    move(tree, 87, y=2.42)
+    for box, text in ((88, 89), (90, 91)):
+        move(tree, box, y=2.88, h=0.52)
+        move(tree, text, y=3.00)
+    move(tree, 92, y=3.14)
+    move(tree, 93, y=2.72, h=0.30)
+    move(tree, 94, y=2.75)
+
+    # Code panel and one text box per line, so the reveal can add them by knowledge source.
     delete(tree, 95, 96, 97, 98, 99, 100, 101)
-    add(tree, code_block(next_id(tree), 5.57, 3.86, 6.55, 7 * 1500 / 100 / 72 + 0.18, TARGET, 1300, 1500, tab_in=4.35))
+    px, py, pw, ph = 5.45, 3.62, 6.80, 3.24
+    add(tree, simple_box(new_id(), "Code panel", px, py, pw, ph, fill="F6F8FA", line="D0D7DE", geom="roundRect"))
+    gap, pad = 0.10, 0.13
+    pitch = (ph - 2 * pad - gap * len(TARGET_GROUP_BREAKS)) / len(TARGET_LINES)
+    y, groups = py + pad, {g: [] for g in REVEAL_ORDER}
+    for k, (code, gloss, group) in enumerate(TARGET_LINES):
+        lid = new_id()
+        add(tree, code_line(lid, px, y, pw, pitch, code, gloss, group))
+        groups[group].append(lid)
+        y += pitch + (gap if k in TARGET_GROUP_BREAKS else 0)
+
+    # What this enables: its own card under the input.
+    delete(tree, 103)
+    move(tree, 102, x=0.88, y=5.26, w=3.25, h=1.76)
+    enables = new_id()
+    items = "".join(para(run_xml(t, "1F2328", False, 1400, font="Calibri"), space_after=300)
+                    for t in ("Concept-based access", "Knowledge graph population", "Cross-system interoperability"))
+    add(tree, simple_box(enables, "What this enables", 1.10, 5.38, 2.85, 1.38,
+                         paras=para(run_xml("WHAT THIS ENABLES", "0B6E4F", True, 1150), space_after=500) + items))
+    sp_by_id(tree, enables).find(".//a:bodyPr", NS).set("anchor", "t")
+
+    # Reveal: diagram + schema lines, then documentation, vocabulary, LLM knowledge, then uses.
+    steps = [[88, 89, 90, 91, 92, 93, 94] + groups["schema"], groups["docs"], groups["vocab"], groups["llm"],
+             [102, enables]]
+    text_ids = {int(e.get("id")) for sp in tree.iter(f"{{{P}}}sp") if sp.find("p:txBody", NS) is not None
+                for e in [sp.find(".//p:cNvPr", NS)]}
+    sld = tree.getroot()
+    old = sld.find("p:timing", NS)
+    if old is not None:
+        sld.remove(old)
+    sld.find("p:clrMapOvr", NS).addnext(reveal_timing(steps, text_ids))
 
 
 def edit_slide7(tree):
