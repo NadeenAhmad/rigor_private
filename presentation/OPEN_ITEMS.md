@@ -23,8 +23,17 @@ author's edits.
    "Knowledge graph population", "Semantic data integration".
 3. **Slide 5, "+ justified axioms / links":** replace with
    "+ logical axioms (hierarchy, disjointness)  + links to standard vocabularies".
-4. **Slide 9 provenance prefix:** slide 9 uses `src:ecog_stage`, while slide 3 now uses
-   `admission:`. Use `admission:` on both.
+4. **Slide 8, retrieval strip:** add the running example, e.g.
+   "(e.g., for admission table → query: admission + patient_id, BM_DEP, ecog_stage + PatientData)".
+5. **Slide 8, middle card:** "Disease Ontology: bone marrow disease" as the external-ontology hit.
+6. **Slide 9 speech:** "We prompt the Gen-LLM with the seed, the retrieved context and our
+   enrichment instructions." (already in the generated notes).
+
+## Resolved
+
+- Slide 9 AFTER panel matches the slide 3 example, with `admission:` provenance
+  (`RIGOR_slide9_generate.pptx`; paste it over the author's slide 9). When the PK fix (item 1)
+  is applied, add the `admission_id` line to slide 9's BEFORE seed too.
 
 ## Decided: keep as is
 

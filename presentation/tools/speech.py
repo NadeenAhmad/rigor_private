@@ -106,14 +106,15 @@ SLIDES = [
          cut="One query per table, built from its name, columns and foreign keys, retrieves the top three "
              "matches per source."),
     dict(title="Step 4: generate",
-         say="Step four: generate. One prompt combines the seed, the retrieved context and our enrichment "
-             "instructions. The Gen-LLM returns a delta ontology. Read the code from top to bottom. The foreign "
-             "key is now a named relation, hasPatientData, from the schema. BM_DEP gets its label, and ECOG its "
-             "scale, both from the documentation. And provenance links ecog_stage back to its source column. The "
-             "tags on the right show which evidence informed each part.",
-         cue="Top to bottom through the code; touch each evidence tag.",
+         say="Step four: generate. We prompt the Gen-LLM with the seed, the retrieved context and our "
+             "enrichment instructions. What comes back is the fragment we set as our target on slide three. The "
+             "tags on the right show where each part came from. The relation hasPatientData and the provenance "
+             "links come from the schema. The labels come from the documentation. The link to bone marrow "
+             "disease comes from the Disease Ontology. And the disjointness and the ECOG scale come from the "
+             "model's own knowledge.",
+         cue="Point at the tags from top to bottom: schema, docs, ontology, LLM.",
          takeaway="The LLM enriches a grounded draft, and every addition is traceable.",
-         source="Paper Sections 3.3-3.4. Illustrative fragment, verified with the OWL API."),
+         source="Paper Sections 3.3-3.4. Same fragment as slide 3, verified with the OWL API."),
     dict(title="Step 5: validate",
          say="A capable LLM rarely gets syntax wrong. The real risk is a fragment that looks right but clashes "
              "with the ontology built so far. So step five validates every delta before it is merged. On the "

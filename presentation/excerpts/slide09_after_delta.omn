@@ -3,19 +3,28 @@ Prefix: rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 Prefix: xsd: <http://www.w3.org/2001/XMLSchema#>
 Prefix: prov: <http://www.w3.org/ns/prov#>
 Prefix: src: <http://example.org/provenance/admission/>
+Prefix: skos: <http://www.w3.org/2004/02/skos/core#>
+Prefix: obo: <http://purl.obolibrary.org/obo/>
+Prefix: admission: <http://example.org/provenance/admission/>
 Ontology: <http://example.org/rigor>
 AnnotationProperty: prov:wasDerivedFrom
 Class: PatientData
 Individual: src:ecog_stage
-Class: Admission
+AnnotationProperty: skos:relatedMatch
 ObjectProperty: hasPatientData
-  Domain: Admission  Range: PatientData
+Individual: admission:BM_DEP
+Individual: admission:ecog_stage
+Individual: obo:DOID_4961
+Class: Admission
+  SubClassOf: hasPatientData some PatientData
+  DisjointWith: PatientData
 DataProperty: BM_DEP
-  Annotations: rdfs:label "Bone Marrow Depression"@en
+  Annotations:
+    rdfs:label "Bone Marrow Depression"@en,
+    skos:relatedMatch obo:DOID_4961,
+    prov:wasDerivedFrom admission:BM_DEP
 DataProperty: ecog_stage
   Annotations:
-    rdfs:comment "ECOG 0 = fully active,
-      1 = restricted, 2 = ambulatory,
-      3 = limited self-care,
-      4 = completely disabled, 5 = dead"@en,
-    prov:wasDerivedFrom src:ecog_stage
+    rdfs:label "ECOG Performance Status"@en,
+    rdfs:comment "0 = fully active … 5 = dead"@en,
+    prov:wasDerivedFrom admission:ecog_stage

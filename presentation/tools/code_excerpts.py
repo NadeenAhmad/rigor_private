@@ -95,18 +95,6 @@ def target_state(upto):
         out.append(line.rstrip(",") + ("," if line.startswith("    ") and continues else ""))
     return "\n".join(out)
 
-DELTA = """ObjectProperty: hasPatientData
-  Domain: Admission  Range: PatientData
-DataProperty: BM_DEP
-  Annotations: rdfs:label "Bone Marrow Depression"@en
-DataProperty: ecog_stage
-  Annotations:
-    rdfs:comment "ECOG 0 = fully active,
-      1 = restricted, 2 = ambulatory,
-      3 = limited self-care,
-      4 = completely disabled, 5 = dead"@en,
-    prov:wasDerivedFrom src:ecog_stage"""
-
 # Future work (slide 22): instance pattern + drug label -> a reviewable candidate, no causal axiom.
 FUTURE = """Individual: cisplatin_bmdep
   Types: CandidateAssociation
@@ -154,7 +142,7 @@ CHECKS = {
                      + code_only(SEED), True),
     "slide09_before_seed": (HEADER + "ObjectProperty: patient_id\nDataProperty: BM_DEP\nDataProperty: ecog_stage\n"
                             + SEED_COMPACT, True),
-    "slide09_after_delta": (HEADER + "Class: Admission\n" + DELTA, True),
+    "slide09_after_delta": (TARGET_HEADER + TARGET, True),  # slide 9 shows the slide-3 fragment
     "slide10_duplicate_concept": (HEADER + "Class: Patient\n" + DUP_WRONG, True),
     "slide10_second_domain_merged": (HEADER + "Class: Admission\nClass: LabResult\n" + CORE_LINK + "\n"
                                      + DOMAIN_WRONG, True, {"hasPatientData": 2}),
@@ -474,20 +462,43 @@ def edit_slide7(tree):
     add(tree, code_block(next_id(tree), 6.27, 2.95, 5.76, 2.14, SEED, 1400, 1600, tab_in=3.55))
 
 
+TAG_LABELS = {"schema": "SCHEMA", "docs": "DOCS", "vocab": "ONTOLOGY", "llm": "LLM"}
+
+
 def edit_slide9(tree):
+    # Header text as edited by the author.
+    size = sp_by_id(tree, 302).find(".//a:rPr", NS).get("sz", "1600")
+    replace_runs(tree, 302, "".join(run_xml(t, "3A434C", b, int(size), font="Calibri", italic=i) for t, b, i in (
+        ("We prompt the ", False, False), ("Gen-LLM", True, True), (" with the ", False, False),
+        ("direct mapping", True, False), (", the ", False, False), ("retrieved context", True, False),
+        (", and ", False, False), ("semantic enrichment instructions", True, False), (".", False, False))))
+    set_text(tree, 335, "BEFORE")
+    set_text(tree, 364, "AFTER  /  ENRICHED \u0394O\u1d63")
+    # Panels run down to just above the step tracker; the old caption goes (tags explain the evidence).
+    delete(tree, 362, 363)
+    move(tree, 334, h=3.79)
+    move(tree, 343, h=3.79)
     # Left: the seed (same text as slide 7, compact).
     delete(tree, 336, 337, 338, 339)
     add(tree, code_block(next_id(tree), 1.04, 3.30, 2.92, 1.20, SEED_COMPACT, 1100, 1350, inset=0.08))
     move(tree, 340, y=4.72)
-    # Right: the enriched delta as code; evidence tags re-aligned to the lines they support.
-    delete(tree, 365, 366, 367, 368, 369, 370, 371, 373, 374, 375, 377, 378, 379, 381, 382, 383)
-    top, line_in, pad = 2.98, 1450 / 100 / 72, 0.08
-    add(tree, code_block(next_id(tree), 5.40, top, 6.75, 11 * line_in + 0.22, DELTA, 1300, 1450))
-    for tag, line in ((372, 0), (376, 3), (380, 6), (384, 10)):
-        centre = top + pad + (line + 0.5) * line_in
-        move(tree, tag, x=11.05, y=centre - 0.11, w=1.0, h=0.22)
-        sp = sp_by_id(tree, tag)  # bring the tag in front of the code block
-        sp.getparent().append(sp)
+    # Right: the same fragment as slide 3, one fixed text box per line (cannot overflow), with an
+    # evidence tag beside each enriched line in the slide-3 colours.
+    delete(tree, 365, 366, 367, 368, 369, 370, 371, 372, 373, 374, 375, 376, 377, 378, 379, 380, 381, 382, 383, 384)
+    px, py, pw, ph = 5.40, 2.92, 6.75, 3.10
+    add(tree, simple_box(next_id(tree), "Code panel", px, py, pw, ph, fill="F6F8FA", line="D0D7DE", geom="roundRect"))
+    gap, pad = 0.10, 0.12
+    pitch = (ph - 2 * pad - gap * len(TARGET_GROUP_BREAKS)) / len(TARGET_LINES)
+    y = py + pad
+    for k, (code, gloss, group) in enumerate(TARGET_LINES):
+        add(tree, code_line(next_id(tree), px, y, 5.45, pitch, code, "", group))
+        if gloss:
+            color = GLOSS_COLORS[group]
+            tag = simple_box(next_id(tree), "Evidence tag", 10.98, y + (pitch - 0.19) / 2, 1.08, 0.19,
+                             fill="FFFFFF", line=color, geom="roundRect",
+                             paras=para(run_xml(TAG_LABELS[group], color, True, 850), algn="ctr"))
+            add(tree, tag)
+        y += pitch + (gap if k in TARGET_GROUP_BREAKS else 0)
 
 
 def edit_slide10(tree):

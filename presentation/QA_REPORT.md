@@ -93,3 +93,8 @@ share one white background. Title and closing slides changed to white at the aut
 - Slide 4 now cites the approaches it calls limited (all from paper Section 2), author-year, under
   each card (`presentation/tools/references.py`). BURR is deliberately not cited there. Standalone
   copy: `presentation/RIGOR_slide4_gap.pptx`.
+- Slide 9 AFTER panel now shows the same 13-line fragment as slide 3, one fixed text box per
+  line (no overflow in PowerPoint), with an evidence tag beside each enriched line (SCHEMA, DOCS,
+  ONTOLOGY, LLM; slide-3 colours). Header and labels follow the author's edits; the old caption is
+  gone; provenance uses `admission:`. Verified with the OWL API; contrast 0 pairs below 4.5:1.
+  Standalone copy: `presentation/RIGOR_slide9_generate.pptx`; preview: `presentation/slide9_preview.jpg`.
