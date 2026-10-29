@@ -250,21 +250,22 @@ SLIDES = [
          extra=["IF ASKED HOW MANY: the judge ranked RIGOR first on 58 of 58 tables (16 Liver Cancer, 31 eICU-CRD, 11 "
                 "Chinook); the experts in 28 of 40 rankings (10 experts x 4 tables)."]),
     dict(title="Future work",
-         say="Where next? Let the data speak. Remember BM_DEP? Without documentation, the name alone is a guess: "
-             "BM could be bone metastasis, or bowel movement. The data gives two clues: it is only ever zero or "
-             "one, so it is a flag; and it is one exactly when the patient received cisplatin, a chemotherapy known "
-             "to suppress the bone marrow. So RIGOR can propose: bone marrow depression, with provenance to both "
-             "columns, the flag and the drug, for an expert to confirm.",
-         cue="The '?' on BM_DEP, then the two clues, then the reveal.",
-         takeaway="When documentation is missing, instance data can explain cryptic columns.",
-         source="Paper Sec. 5 (instance-level signals for cryptic columns when documentation is unavailable). Rows "
-                "are synthetic. OWL verified (presentation/excerpts/slide22_future_candidate.omn).",
-         cut="BM could be bone metastasis, or bowel movement.",
-         extra=["IF ASKED 'WHY NOT JUST ASK THE LLM WHAT BM_DEP MEANS?': from the name alone it is a guess. The data "
-                "narrows it down: a 0/1 flag that switches on with cisplatin. That is evidence, and we keep "
-                "provenance to both columns.",
-                "IF ASKED ABOUT PRIVACY: only aggregate statistics (value ranges, co-occurrence) need to leave the "
-                "database, not patient rows."]),
+         say="Where next? Let the data speak. Today RIGOR reads schemas and documentation, but the data can show "
+             "links the documentation does not contain. Here, the treatment table says which admissions received "
+             "cisplatin, and the admission table records bone marrow depression. Joined on the admission id, every "
+             "cisplatin admission has bone marrow depression. That link is not in the documentation, so RIGOR can "
+             "propose it as candidate knowledge, with provenance to both columns. A pattern, not a cause: an "
+             "expert reviews it before it joins the ontology.",
+         cue="A1 and A3 in both tables; then the pattern bars; then the candidate code and its badge.",
+         takeaway="Instance data can propose new, reviewable knowledge that the documentation does not contain.",
+         source="Rows are synthetic. OWL verified (presentation/excerpts/slide22_future_candidate.omn): a typed "
+                "individual with provenance, no causal axiom.",
+         cut="Today RIGOR reads schemas and documentation, but",
+         extra=["IF ASKED WHY NOT AN OWL CAUSAL AXIOM: OWL reasoning is deductive and open-world; it cannot derive "
+                "causation from statistics, and 'Cisplatin SubClassOf causes some BoneMarrowDepression' would "
+                "wrongly claim it for every case. Other treatments or conditions could explain the pattern.",
+                "IF ASKED ABOUT PRIVACY: only aggregate statistics (co-occurrence counts) need to leave the database, "
+                "not patient rows."]),
     dict(title="Thank you",
          say="To conclude. RIGOR anchors LLM generation in the database itself, grounds it in retrieved knowledge, "
              "and checks every step before the ontology grows. The result: meaning without losing structure, the "

@@ -1,6 +1,6 @@
 # Rehearsal card
 
-Target: finish by **13:30**. Planned end: **13:22** (1386 words).
+Target: finish by **13:30**. Planned end: **13:25** (1391 words).
 
 | Slide | Starts at | Ends at | Words |
 |---|---|---|---|
@@ -27,8 +27,8 @@ Target: finish by **13:30**. Planned end: **13:22** (1386 words).
 | 21. Result 3: adds meaning | 9:57 | 10:21 | 39 |
 | 22. Result 4: BURR | 10:21 | 11:07 | 81 |
 | 23. Result 5: LLM judge and experts | 11:07 | 12:03 | 91 |
-| 24. Future work | 12:03 | 12:49 | 81 |
-| 25. Thank you | 12:49 | 13:22 | 57 |
+| 24. Future work | 12:03 | 12:52 | 86 |
+| 25. Thank you | 12:52 | 13:25 | 57 |
 
 ## Checkpoints
 
@@ -49,7 +49,7 @@ Glance at the clock when these slides come up. More than 30 s behind: apply the 
 - Slide 21 (Result 3: adds meaning): drop "Non-Iterative RAG adds labels, but no provenance and no class hierarchy." (saves ~6 s)
 - Slide 22 (Result 4: BURR): drop "scored with F1 against a gold mapping" (saves ~4 s)
 - Slide 23 (Result 5: LLM judge and experts): drop "with the highest average score on both databases" (saves ~5 s)
-- Slide 24 (Future work): drop "BM could be bone metastasis, or bowel movement." (saves ~5 s)
+- Slide 24 (Future work): drop "Today RIGOR reads schemas and documentation, but" (saves ~4 s)
 
 All cuts together save about 43 s.
 

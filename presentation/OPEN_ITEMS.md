@@ -57,10 +57,10 @@ author's edits.
   OntoMetrics refs), Direct Mapping and LLM baseline shown as 'none in any run', shading within each database, R4 BURR (one
   Claude run), R5 LLM judge + experts per database with competency questions (Tables 1, 6, 12).
   Ablation stays in backup (one database, one LLM, tiny overall difference). Talk ends at 13:53.
-- Future work (`tools/future_v3.py`, output `RIGOR_future_work.pptx`): only about instance data (the author
-  moved the evaluation-loop step to its own slide). "Next: let the data speak." Data -> clues -> answer: with
-  no documentation, BM_DEP is a 0/1 flag that is 1 exactly with cisplatin -> "Bone marrow depression",
-  candidate for expert review (paper Sec. 5). The loop slide's speech is not in speech.py yet.
+- Future work (`tools/future_v3.py`, output `RIGOR_future_work.pptx`): instance data proposes new knowledge.
+  Data (treatment + admission, joined on admission_id) -> pattern (every cisplatin admission has bone marrow
+  depression; not in the documentation) -> candidate association with provenance to both columns, "a
+  pattern, not a cause", reviewed by an expert. The evaluation-loop step is on the author's own slide.
 
 ## Author's decisions to carry into the next revision
 
@@ -81,3 +81,5 @@ author's edits.
 - The paper cites "Ontometrics [32]" for its structural metrics, but [32] is Lozano-Tello & Gomez-Perez,
   "Ontometric: A method to choose the appropriate ontology" (JDM 2004), a different work. The metrics
   tool is OntoMetrics (Lantow, KEOD 2016); the slides cite that.
+- The paper cites the seven judging dimensions to "[44, 58, 53]", but [44] is Pollard et al. (the eICU-CRD
+  dataset paper). The six classic criteria come from Vrandecic 2009 [58]; domain enrichment is the paper's own.
