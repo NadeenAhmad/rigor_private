@@ -51,12 +51,14 @@ author's edits.
   five slides inserted before 6/6: `RIGOR_ISWC2026_author_v3_arch.pptx`; the six slides alone:
   `RIGOR_architecture_steps.pptx`.
 
-- Results rebuilt as a six-rung ladder plus a breakdown (`tools/results_ladder.py`, output
-  `RIGOR_results.pptx`): R1 valid + keeps the schema, R2 adds meaning + fewer errors, R3 BURR
-  (+ relations 0.67 vs 0.11), R4 LLM judge 58/58 + experts 28/40, R5 where the gains come from
-  (Mistral 24B coverage 17% -> 98% with RIGOR, $0.12 vs $33; judge lead +1.9 / +1.5 / +0.6 by domain).
-  R1, R2 and R4 break every result down by database and LLM (heat tables from Tables 9, 7, 1).
-  Replace the author's three result slides with these five. Talk ends at 13:50.
+- Results rebuilt as five single-topic slides, each broken down by database x LLM where the paper has the
+  data (`tools/results_ladder.py`, output `RIGOR_results.pptx`): R1 validity sentence + OOPS! pitfalls
+  (Table 7), R2 column coverage (Table 9), R3 labels / provenance / hierarchy (Table 8), R4 BURR (one
+  Claude run), R5 LLM judge + experts per database with competency questions (Tables 1, 6, 12).
+  Ablation stays in backup (one database, one LLM, tiny overall difference). Talk ends at 13:53.
+- Future work (`tools/future_v2.py`, output `RIGOR_future_work.pptx`): validators in the loop first
+  (NeOn-GPT ESWC 2024, Extended NeOn-GPT SWJ 2026, RIGOR App ISWC 2026 Demos: Fathallah, Nayyeri,
+  Staab), then the instance-data story, then the privacy line.
 
 ## Author's decisions to carry into the next revision
 

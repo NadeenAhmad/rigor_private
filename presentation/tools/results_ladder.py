@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
-"""Results as a ladder of six questions, easiest check first, on the author's edited deck.
+"""Results as a ladder of five questions, easiest check first, on the author's edited deck.
 
-    1 VALID  2 KEEPS THE SCHEMA  3 ADDS MEANING  4 FEWER ERRORS  5 GOLD MAPPINGS  6 JUDGES
+    1 VALID, FEWER ERRORS  2 KEEPS THE SCHEMA  3 ADDS MEANING  4 GOLD MAPPINGS  5 JUDGES
 
-  A  RESULT 1  rungs 1-2  validity (Sec. 4.7) and column coverage (Table 9), averaged per ontology
-  B  RESULT 2  rungs 3-4  added meaning (Table 8) and OOPS! pitfalls (Table 7), averaged per ontology
-  C  RESULT 3  rung 5     the author's BURR slide, shifted down for the tracker, plus the relations line
-  D  RESULT 4  rung 6     LLM judge and human experts (Tables 1, 10, 12), plus the closing sentence
-  E  RESULT 5  (ladder done)  where the gains come from: across LLMs (Mistral Small, Tables 9 and 15)
-                         and across domains (LLM-judge lead per database, Table 1)
+  A  RESULT 1  validity in one sentence (Sec. 4.7), then OOPS! pitfalls per run (Table 7)
+  B  RESULT 2  column coverage per run (Table 9)
+  C  RESULT 3  labels, provenance and hierarchy per run (Table 8)
+  D  RESULT 4  the author's BURR slide (one Claude run), shifted down for the tracker, plus the relations line
+  E  RESULT 5  LLM judge and experts per database, both against competency questions (Tables 1, 6, 12)
 
-A-D average over all 30 ontologies (each method's own runs); E breaks them down by LLM and domain.
-A is a copy of the author's Result 1 slide and E a copy of Result 3; the output deck holds only these
-five slides, with speaker notes from speech.py.
+Runs are shown per database x LLM (Direct Mapping: one ontology per database) with each method's
+average. A and C are copies of the author's Result 1 slide; the output deck holds only these five
+slides, with speaker notes from speech.py.
 
 Usage: python3 results_ladder.py <in.pptx> <out.pptx>
 """
@@ -37,24 +36,11 @@ LINE, PANEL, MINT, STRIP = "D9DEDB", "F3F5F4", "E8F6EF", "E6F2EC"
 EMU = 914400
 HEADER = {"eyebrow": (0.88, 0.56, 11.76, 0.34), "title": (0.88, 1.00, 11.77, 0.73),
           "subtitle": (0.90, 1.80, 11.68, 0.36)}
-LADDER = ("VALID", "KEEPS THE SCHEMA", "ADDS MEANING", "FEWER ERRORS", "GOLD MAPPINGS", "JUDGES")
+LADDER = ("VALID, FEWER ERRORS", "KEEPS THE SCHEMA", "ADDS MEANING", "GOLD MAPPINGS", "JUDGES")
 TOP = 2.85  # content starts below the ladder
 
-METHODS = ("Direct Mapping", "LLM baseline", "Non-Iterative", "RIGOR")
 COVERAGE = (91, 74, 34, 93)            # Table 9: mean column coverage per ontology, %
-ADDED = {"Labels & comments": (0, 0, 389, 777),   # Table 8: mean per ontology
-         "Provenance links": (0, 0, 0, 196),
-         "Subclass axioms": (0, 0, 0, 59)}
 PITFALLS = (499, 307, 52, 8)           # Table 7: mean OOPS! pitfalls per ontology
-JUDGE = (("Liver Cancer", 16), ("eICU-CRD", 31), ("Chinook", 11))
-EXPERT_FIRST = (5, 5, 2, 28)           # Table 1: first places of 40
-# E, across LLMs: Mistral Small 24B, mean column coverage over the three databases (Table 9), %.
-MISTRAL = (("LLM baseline", 50), ("Non-Iterative", 17), ("RIGOR", 98))
-CLAUDE_RIGOR, COST_MISTRAL, COST_CLAUDE = 95, "$0.12", "$33"   # Table 9; Table 15, all three databases
-# E, across domains: LLM-judge average score, RIGOR minus the best other method (Table 1).
-LEAD = (("Liver Cancer", 1.9, "private registry, unseen by any LLM"),
-        ("eICU-CRD", 1.5, "large ICU schema, 559 columns"),
-        ("Chinook", 0.6, "music store, a familiar domain"))
 
 
 def r(t, color=INK, size=1400, bold=False, font="Calibri", italic=False):
@@ -104,7 +90,8 @@ def reset(tree, eyebrow_text, title_text, subtitle_text):
 
 def ladder(tree, ids, current):
     """Six-rung tracker under the subtitle: done = mint, current = emerald, upcoming = outlined."""
-    x, y, w, gap = 0.88, 2.30, 1.86, 0.10
+    gap = 0.10
+    x, y, w = 0.88, 2.30, (11.57 - gap * (len(LADDER) - 1)) / len(LADDER)
     for k, label in enumerate(LADDER, 1):
         if k in current:
             fill, line, color = EMERALD, None, "FFFFFF"
@@ -133,23 +120,6 @@ def source(tree, ids, line, y=6.98):
     add(tree, text(ids, 0.90, y, 11.6, 0.26, r(line, MUTED, 1000), name="Source"))
 
 
-def bars(tree, ids, x, y, w, values, unit, maximum, colors, pitch=0.48, label_w=1.75, labels=METHODS):
-    """Horizontal bars, one row per label, value label after the bar."""
-    track = w - label_w - 0.85
-    for k, (method, v) in enumerate(zip(labels, values)):
-        ry = y + k * pitch
-        rigor = method == "RIGOR"
-        add(tree, text(ids, x, ry, label_w, 0.32, r(method, EMERALD if rigor else INK, 1400, rigor), anchor="ctr",
-                       name="Method"))
-        add(tree, shape(ids(), "Track", x + label_w, ry + 0.08, track, 0.16, fill="EEF1EF"))
-        if v:
-            add(tree, shape(ids(), "Bar", x + label_w, ry + 0.08, max(track * v / maximum, 0.03), 0.16,
-                            fill=colors[k]))
-        add(tree, text(ids, x + label_w + track + 0.08, ry, 0.80, 0.32,
-                       r(f"{v}{unit}", colors[k] if rigor or colors[k] == RED else BODY, 1500, True), anchor="ctr",
-                       name="Value"))
-
-
 # Per-run data for the heat tables: databases in talk order, LLMs Claude, Mistral, DeepSeek.
 DBS = ("Liver Cancer", "eICU-CRD", "Chinook")
 LLMS = ("Claude", "Mistral", "DeepSeek")
@@ -176,21 +146,22 @@ def shade(v, bands):
 
 
 def heat_table(tree, ids, x, y, label_w, col_w, row_h, runs, fill_for, fmt, averages=None, avg_fmt=str,
-               cols=DBS, sub=LLMS):
-    """Rows = methods; columns = databases, each split by LLM (unless a row has one value per database)."""
+               cols=DBS, sub=LLMS, header=True):
+    """Rows = methods; columns = databases, each split by LLM (unless a row has one value per database).
+    Returns the y below the last row."""
     n = len(sub) if sub else 1
     gx = x + label_w
-    for g, db in enumerate(cols):
+    for g, db in enumerate(cols if header else ()):
         add(tree, text(ids, gx + g * n * col_w, y, n * col_w, 0.24, r(db, INK, 1100, True), align="ctr",
                        anchor="ctr", name="Database"))
         if sub:
             for k, llm in enumerate(sub):
                 add(tree, text(ids, gx + (g * n + k) * col_w, y + 0.25, col_w, 0.20, r(llm, MUTED, 850),
                                align="ctr", anchor="ctr", name="LLM"))
-    if averages:
+    if averages and header:
         add(tree, text(ids, gx + len(cols) * n * col_w + 0.05, y + 0.12, 0.75, 0.26, r("Avg", MUTED, 1000, True),
                        align="ctr", anchor="ctr", name="Avg head"))
-    top = y + (0.50 if sub else 0.28)
+    top = y + ((0.50 if sub else 0.28) if header else 0)
     for k, (method, values) in enumerate(runs.items()):
         ry = top + k * row_h
         rigor = method == "RIGOR"
@@ -203,71 +174,75 @@ def heat_table(tree, ids, x, y, label_w, col_w, row_h, runs, fill_for, fmt, aver
                             r(fmt(v), INK, 1100, rigor), fill=fill_for(v), align="ctr", anchor="ctr"))
         if averages:
             add(tree, text(ids, gx + len(cols) * n * col_w + 0.05, ry, 0.75, row_h,
-                           r(avg_fmt(averages[k]), EMERALD if rigor else INK, 1250, True), align="ctr",
+                           r(avg_fmt(averages[k]), EMERALD if rigor else INK, 1250, rigor), align="ctr",
                            anchor="ctr", name="Avg"))
+    return top + len(runs) * row_h
+
+
+# Table 8 per run: annotation assertions, prov:wasDerivedFrom, SubClassOf (Direct Mapping, LLM baseline: 0).
+ANN_RUNS = {"Non-Iterative": (680, 134, 736, 877, 157, 743, 98, 14, 64),
+            "RIGOR": (1029, 1137, 341, 1291, 1684, 435, 357, 362, 359)}
+PROV_RUNS = {"Non-Iterative": (0,) * 9, "RIGOR": (336, 308, 22, 423, 335, 99, 81, 83, 75)}
+SUB_RUNS = {"Non-Iterative": (0,) * 9, "RIGOR": (14, 12, 2, 21, 59, 3, 157, 147, 114)}
 
 
 def build_a(tree):
-    ids = reset(tree, "RESULT 1  /  NOTHING IS LOST", "First, nothing is lost: RIGOR keeps the schema.",
-                "Every LLM, every database. We climb from the easiest check to the hardest.")
-    ladder(tree, ids, {1, 2})
-    y, h = TOP, 3.45
-    card(tree, ids, 0.88, y, 2.45, h, "1  VALID")
-    add(tree, text(ids, 1.13, y + 0.70, 2.1, 0.9, r("30 / 30", INK, 4000, True, "Cambria"), name="Big"))
-    add(tree, text(ids, 1.13, y + 1.60, 2.0, 1.6,
-                   r("ontologies are valid OWL 2 DL and logically consistent, for every method and LLM.", BODY,
-                     1350), name="Claim"))
-    card(tree, ids, 3.48, y, 8.97, h, "2  KEEPS THE SCHEMA", "share of database columns covered, per ontology (%)")
-    heat_table(tree, ids, 3.73, y + 0.85, 1.45, 0.70, 0.50, COV_RUNS,
-               lambda v: shade(v, (20, 50, 75, 90)), str, averages=COVERAGE, avg_fmt=lambda v: f"{v}%")
-    strip(tree, ids, 6.43, r("Without the seed, coverage swings with the LLM: ", BODY, 1400)
-          + r("Non-Iterative 6–78%.", RED, 1400, True)
-          + r("  With RIGOR, every LLM keeps ≥ 77% in every database.", EMERALD, 1400, True))
-    source(tree, ids, "Validity: RDFLib; consistency: HermiT. Coverage: a column counts as covered when an ontology "
-                      "class or property name is similar to it (embedding similarity ≥ 0.55). Paper Sec. "
-                      "4.6–4.7, Table 9.")
+    ids = reset(tree, "RESULT 1  /  VALID, WITH FEWER ERRORS",
+                "Every ontology is valid. RIGOR's have far fewer modeling errors.",
+                "All 30 ontologies are valid OWL 2 DL (RDFLib) and logically consistent (HermiT). So we look deeper.")
+    ladder(tree, ids, {1})
+    card(tree, ids, 0.88, TOP, 11.57, 3.45, "MODELING ERRORS FOUND BY OOPS!", "pitfalls per ontology, fewer is better")
+    heat_table(tree, ids, 1.18, TOP + 0.85, 1.75, 0.92, 0.50, PIT_RUNS,
+               lambda v: shade(-v, (-300, -100, -30, -10)), str, averages=PITFALLS)
+    strip(tree, ids, 6.43, r("Same LLM, same database: ", BODY, 1400)
+          + r("Mistral on eICU, 220 without RIGOR", RED, 1400, True) + r(", ", BODY, 1400)
+          + r("2 with it.", EMERALD, 1400, True) + r("  On Chinook, RIGOR has zero with every LLM.", BODY, 1400))
+    source(tree, ids, "Validity: RDFLib; consistency: HermiT (paper Sec. 4.7). Pitfalls: OOPS!, paper Table 7; 72% of "
+                      "the other methods' pitfalls are missing annotations (P08).")
 
 
 def build_b(tree):
-    ids = reset(tree, "RESULT 2  /  MEANING AND ERRORS", "Then, meaning is added, with far fewer errors.",
-                "What each method adds, and the modeling errors per ontology, for every LLM and database.")
-    ladder(tree, ids, {3, 4})
-    y, h = TOP, 3.45
-    x, w = 0.88, 3.80
-    card(tree, ids, x, y, w, h, "3  ADDS MEANING", "elements per ontology (avg)")
-    cols = (("Labels", "Labels & comments"), ("Provenance", "Provenance links"), ("Hierarchy", "Subclass axioms"))
-    col_x = [x + 1.40 + k * 0.78 for k in range(3)]
-    for cx, (short, _) in zip(col_x, cols):
-        add(tree, text(ids, cx - 0.06, y + 0.95, 0.90, 0.26, r(short, MUTED, 1000), align="ctr", name="Column"))
-    add(tree, shape(ids(), "Rule", x + 0.25, y + 1.25, w - 0.5, 0.012, fill="C5CCD0"))
-    for k, method in enumerate(METHODS):
-        ry = y + 1.35 + k * 0.44
-        rigor = method == "RIGOR"
-        if rigor:
-            add(tree, shape(ids(), "RIGOR band", x + 0.15, ry - 0.03, w - 0.30, 0.40, geom="roundRect", fill=MINT))
-        add(tree, text(ids, x + 0.25, ry, 1.2, 0.34, r(method, EMERALD if rigor else INK, 1150, rigor),
-                       anchor="ctr", name="Method"))
-        for cx, (_, key) in zip(col_x, cols):
-            v = ADDED[key][k]
-            color = EMERALD if rigor else (INK if v else "6B747B")
-            add(tree, text(ids, cx - 0.06, ry, 0.90, 0.34, r(f"{v:,}", color, 1300, rigor or bool(v)),
-                           align="ctr", anchor="ctr", name="Value"))
-    add(tree, text(ids, x + 0.25, y + 3.12, w - 0.5, 0.28, r("Same pattern for every LLM and database.",
-                                                            MUTED, 1000, italic=True), name="Note"))
-    x2, w2 = 4.83, 7.62
-    card(tree, ids, x2, y, w2, h, "4  FEWER ERRORS", "OOPS! modeling pitfalls per ontology")
-    heat_table(tree, ids, x2 + 0.22, y + 0.85, 1.30, 0.58, 0.50, PIT_RUNS,
-               lambda v: shade(-v, (-300, -100, -30, -10)), str, averages=PITFALLS)
-    strip(tree, ids, 6.43, r("Without validation, the smaller LLM fails hardest: ", BODY, 1400)
-          + r("Mistral on eICU, 220.", RED, 1400, True) + r("  With RIGOR: ", BODY, 1400)
-          + r("2, and zero on Chinook for every LLM.", EMERALD, 1400, True))
-    source(tree, ids, "Paper Table 8 (annotations, prov:wasDerivedFrom, SubClassOf) and Table 7 (OOPS! totals). 72% "
-                      "of the other methods' pitfalls are missing annotations (P08).")
+    ids = reset(tree, "RESULT 2  /  NOTHING IS LOST", "Nothing is lost: RIGOR keeps the schema.",
+                "Share of database columns covered, for every LLM and database.")
+    ladder(tree, ids, {2})
+    card(tree, ids, 0.88, TOP, 11.57, 3.45, "KEEPS THE SCHEMA", "columns covered, per ontology (%)")
+    heat_table(tree, ids, 1.18, TOP + 0.85, 1.75, 0.92, 0.50, COV_RUNS,
+               lambda v: shade(v, (20, 50, 75, 90)), str, averages=COVERAGE, avg_fmt=lambda v: f"{v}%")
+    strip(tree, ids, 6.43, r("Same context, no seed: ", BODY, 1400) + r("Non-Iterative 6–78%", RED, 1400, True)
+          + r(", depending on the LLM.  With RIGOR: ", BODY, 1400)
+          + r("≥ 77% for every LLM, in every database.", EMERALD, 1400, True))
+    source(tree, ids, "Coverage: a column counts as covered when an ontology class or property name is similar to it "
+                      "(embedding similarity ≥ 0.55). Paper Sec. 4.6, Table 9.")
+
+
+def build_meaning(tree):
+    ids = reset(tree, "RESULT 3  /  MEANING IS ADDED", "Meaning is added: labels, provenance and hierarchy.",
+                "Elements per ontology, for every LLM and database. Direct Mapping and LLM baseline add none, in any run.")
+    ladder(tree, ids, {3})
+    card(tree, ids, 0.88, TOP, 11.57, 3.45, "ADDS MEANING")
+    y = TOP + 0.45
+    first = True
+    for metric, runs, bands in (("Labels & comments", ANN_RUNS, (1, 100, 300, 800)),
+                                ("Provenance links", PROV_RUNS, (1, 25, 80, 250)),
+                                ("Subclass axioms", SUB_RUNS, (1, 5, 15, 100))):
+        top = y + (0.50 if first else 0.04)
+        add(tree, text(ids, 1.18, top, 1.55, 0.72, r(metric, TEAL, 1150, True), anchor="ctr", name="Metric"))
+        avgs = [round(sum(v) / len(v)) for v in runs.values()]
+        y = heat_table(tree, ids, 2.75, y if first else y + 0.04, 1.40, 0.82, 0.36, runs,
+                       lambda v, b=bands: shade(v, b), lambda v: f"{v:,}", averages=avgs,
+                       avg_fmt=lambda v: f"{v:,}", header=first)
+        first = False
+    strip(tree, ids, 6.43, r("Hierarchies follow what the LLM knows: ", BODY, 1400)
+          + r("114–157 subclass axioms for the music store", EMERALD, 1400, True)
+          + r(", 2–59 for the clinical schemas.", BODY, 1400))
+    source(tree, ids, "Paper Table 8: annotation assertions (labels and comments), prov:wasDerivedFrom assertions, "
+                      "rdfs:subClassOf axioms.")
+
 
 def build_c(tree):
     """The author's BURR slide: renumber, cite, shift down for the ladder, add the relations line."""
     root, shapes, eyebrow, title = header_shapes(tree)
-    set_text(eyebrow, "RESULT 3  /  EXTERNAL BENCHMARK")
+    set_text(eyebrow, "RESULT 4  /  EXTERNAL BENCHMARK")
     subtitle = next(sp for sp in shapes if sp_text(sp).startswith("BURR benchmark"))
     set_text(subtitle, "BURR [Laskowski et al., PACMMOD 2025]  ·  ISWC scenario  ·  highest F1 among "
                        "ontology-learning systems")
@@ -278,75 +253,42 @@ def build_c(tree):
             place(sp, y=g[1] + 0.42)
     place(footer, y=6.98)
     ids = Ids(tree)
-    ladder(tree, ids, {5})
+    ladder(tree, ids, {4})
     strip(tree, ids, 6.43, r("Relations: 0.67 vs 0.11", INK, 1400, True)
           + r(" for W3C-Mapper / Ontop. Foreign keys become named relations, like hasPatientData.", BODY, 1400))
 
 
 def build_d(tree):
-    ids = reset(tree, "RESULT 4  /  LLM JUDGE AND HUMAN EXPERTS",
+    ids = reset(tree, "RESULT 5  /  LLM JUDGE AND HUMAN EXPERTS",
                 "An LLM judge and human experts both rank RIGOR first.",
-                "Blind rankings of four anonymized ontologies per table, broken down by database.")
-    ladder(tree, ids, {6})
-    y, h = TOP, 3.45
+                "Both ranked four anonymized ontologies per table, judged against that table's competency questions.")
+    ladder(tree, ids, {5})
+    add(tree, shape(ids(), "CQ strip", 0.88, TOP, 11.57, 0.52,
+                    r("COMPETENCY QUESTIONS  ", TEAL, 1150, True, "Consolas")
+                    + r("what the ontology must answer. 5 per table, 290 in total, expert-verified.  ",
+                        BODY, 1150)
+                    + r("e.g. “Which patients had abnormal physical exam findings?”",
+                        INK, 1150, italic=True),
+                    geom="roundRect", fill="FFFFFF", line=LINE, anchor="ctr", inset=0.22))
+    y, h = TOP + 0.62, 2.83
     x, w = 0.88, 6.30
     card(tree, ids, x, y, w, h, "LLM-AS-A-JUDGE  ·  GPT-5.4", fill=PANEL)
-    add(tree, text(ids, x + 0.3, y + 0.50, 2.6, 0.75, r("58 / 58", INK, 4000, True, "Cambria"), name="Big"))
-    add(tree, text(ids, x + 2.85, y + 0.62, w - 3.1, 0.55, r("tables with RIGOR ranked first", EMERALD, 1600, True),
+    add(tree, text(ids, x + 0.3, y + 0.42, 2.4, 0.62, r("58 / 58", INK, 3400, True, "Cambria"), name="Big"))
+    add(tree, text(ids, x + 2.55, y + 0.45, w - 2.8, 0.55, r("tables with RIGOR ranked first", EMERALD, 1500, True),
                    anchor="ctr", name="Claim"))
-    add(tree, text(ids, x + 0.3, y + 1.28, w - 0.6, 0.24, r("average score, 0–5 (Claude ontologies)", MUTED, 1050,
-                                                           italic=True), name="Note"))
-    heat_table(tree, ids, x + 0.25, y + 1.52, 1.45, 1.42, 0.38, JUDGE_SCORE,
+    heat_table(tree, ids, x + 0.25, y + 1.08, 1.45, 1.42, 0.34, JUDGE_SCORE,
                lambda v: shade(v, (1.0, 2.0, 3.0, 3.5)), lambda v: f"{v:.2f}", sub=None)
     x2, w2 = 7.33, 5.12
     card(tree, ids, x2, y, w2, h, "10 ONTOLOGY EXPERTS", fill=PANEL)
-    add(tree, text(ids, x2 + 0.3, y + 0.50, 2.6, 0.75, r("28 / 40", INK, 4000, True, "Cambria"), name="Big"))
-    add(tree, text(ids, x2 + 2.80, y + 0.62, w2 - 3.0, 0.55, r("rankings with RIGOR first (70%)", EMERALD, 1600, True),
-                   anchor="ctr", name="Claim"))
-    add(tree, text(ids, x2 + 0.3, y + 1.28, w2 - 0.6, 0.24, r("first places, of 20 per database", MUTED, 1050,
-                                                             italic=True), name="Note"))
-    heat_table(tree, ids, x2 + 0.25, y + 1.52, 1.45, 1.55, 0.38, EXPERT_DB,
+    add(tree, text(ids, x2 + 0.3, y + 0.42, 2.4, 0.62, r("28 / 40", INK, 3400, True, "Cambria"), name="Big"))
+    add(tree, text(ids, x2 + 2.45, y + 0.45, w2 - 2.6, 0.55, r("rankings with RIGOR first (70%)", EMERALD, 1500,
+                                                              True), anchor="ctr", name="Claim"))
+    heat_table(tree, ids, x2 + 0.25, y + 1.08, 1.45, 1.55, 0.34, EXPERT_DB,
                lambda v: shade(v, (1, 3, 6, 10)), str, cols=DBS[:2], sub=None)
     strip(tree, ids, 6.43, r("Direct Mapping: structure without meaning.  LLMs alone: meaning without structure.  ",
                              BODY, 1400) + r("RIGOR: both, and checked.", EMERALD, 1400, True))
-    source(tree, ids, "Paper Table 1 (scores, rankings; judge: 58 tables, 290 competency questions) and Table 12 "
-                      "(expert agreement, Kendall's W 0.39–0.72; 4 medical tables).")
-
-
-def build_e(tree):
-    ids = reset(tree, "RESULT 5  /  WHERE THE GAINS COME FROM",
-                "RIGOR's gains do not depend on model size or memorized data.",
-                "Is it just a strong LLM? Is it memorized data? We broke the results down by LLM and by domain.")
-    ladder(tree, ids, set())
-    y, h, w = TOP, 3.45, 5.70
-    x = 0.88
-    card(tree, ids, x, y, w, h, "ACROSS LLMs  \u00b7  MISTRAL SMALL (24B)",
-         "column coverage, average over the three databases")
-    bars(tree, ids, x + 0.30, y + 1.00, w - 0.40, [v for _, v in MISTRAL], "%", 100, ("9AA3A9", RED, EMERALD),
-         pitch=0.52, label_w=1.60, labels=[m for m, _ in MISTRAL])
-    add(tree, text(ids, x + 0.30, y + 2.65, w - 0.6, 0.62,
-                   r("On par with Claude under RIGOR (", BODY, 1350) + r(f"{CLAUDE_RIGOR}%", INK, 1350, True)
-                   + r("), for ", BODY, 1350) + r(COST_MISTRAL, EMERALD, 1350, True)
-                   + r(f" instead of {COST_CLAUDE} for all three databases.", BODY, 1350), name="Claim"))
-    x = 6.75
-    card(tree, ids, x, y, w, h, "ACROSS DOMAINS  \u00b7  LLM JUDGE",
-         "RIGOR's lead over the best other method (score 0\u20135)")
-    track = 2.30
-    for k, (db, lead, note) in enumerate(LEAD):
-        ry = y + 1.00 + k * 0.72
-        top = k == 0
-        add(tree, text(ids, x + 0.30, ry, 1.75, 0.30, r(db, EMERALD if top else INK, 1400, True), anchor="ctr",
-                       name="Database"))
-        add(tree, text(ids, x + 0.30, ry + 0.30, 2.6, 0.26, r(note, MUTED, 1100, italic=True), name="Note"))
-        add(tree, shape(ids(), "Track", x + 2.55, ry + 0.08, track, 0.16, fill="EEF1EF"))
-        add(tree, shape(ids(), "Bar", x + 2.55, ry + 0.08, track * lead / 2.0, 0.16,
-                        fill=EMERALD if top else "6FA88F"))
-        add(tree, text(ids, x + 2.55 + track + 0.08, ry, 0.70, 0.32, r(f"+{lead}", EMERALD, 1500, True),
-                       anchor="ctr", name="Lead"))
-    strip(tree, ids, 6.43, r("A small open model catches up, and the lead grows where the LLM knows least: ", BODY, 1400)
-          + r("grounding and validation make the difference.", EMERALD, 1400, True))
-    source(tree, ids, "Coverage: paper Table 9 (Claude 95%, DeepSeek 86% with RIGOR). Cost: Table 15. Judge scores: "
-                      "Table 1 (Claude ontologies; best other: Direct Mapping, Direct Mapping, Non-Iterative).")
+    source(tree, ids, "Judge: average score 0–5 per database, Claude ontologies, 58 tables. Experts: first places of "
+                      "20 per database, 4 medical tables, Kendall's W 0.39–0.72. Paper Tables 1, 6, 12.")
 
 
 def add_notes(work, slide_name, title):
@@ -393,26 +335,25 @@ def main(src, dst):
         return next(n for n in order() if tag in (work / "ppt/slides" / n).read_text(encoding="utf-8"))
 
     r1, r2, r3 = find("RESULT 1"), find("RESULT 2"), find("RESULT 3")
-    # Slide A: a copy of Result 1, inserted before it.
-    prev = order()[order().index(r1) - 1]
-    out = subprocess.run([sys.executable, str(PPTX_SCRIPTS / "add_slide.py"), str(work), r1, "--after", prev],
-                         capture_output=True, text=True, cwd=PPTX_SCRIPTS, check=True)
-    a = re.findall(r"(slide\d+\.xml)", out.stdout)[0]
-    # Slide E: a copy of Result 3 (the judge slide), inserted after it.
-    out = subprocess.run([sys.executable, str(PPTX_SCRIPTS / "add_slide.py"), str(work), r3, "--after", r3],
-                         capture_output=True, text=True, cwd=PPTX_SCRIPTS, check=True)
-    e = re.findall(r"(slide\d+\.xml)", out.stdout)[0]
-    plan = ((a, build_a, "Result 1: nothing is lost"), (r1, build_b, "Result 2: meaning and errors"),
-            (r2, build_c, "Result 3: BURR"), (r3, build_d, "Result 4: LLM judge and experts"),
-            (e, build_e, "Result 5: where the gains come from"))
+
+    def copy(src, after):
+        out = subprocess.run([sys.executable, str(PPTX_SCRIPTS / "add_slide.py"), str(work), src, "--after", after],
+                             capture_output=True, text=True, cwd=PPTX_SCRIPTS, check=True)
+        return re.findall(r"(slide\d+\.xml)", out.stdout)[0]
+
+    a = copy(r1, order()[order().index(r1) - 1])   # errors, before coverage
+    c = copy(r1, r1)                               # meaning, after coverage
+    plan = ((a, build_a, "Result 1: valid, fewer errors"), (r1, build_b, "Result 2: keeps the schema"),
+            (c, build_meaning, "Result 3: adds meaning"), (r2, build_c, "Result 4: BURR"),
+            (r3, build_d, "Result 5: LLM judge and experts"))
     for name, build, title in plan:
         path = work / "ppt/slides" / name
         tree = etree.parse(str(path))
         build(tree)
         tree.write(str(path), xml_declaration=True, encoding="UTF-8", standalone=True)
         add_notes(work, name, title)
-    # Keep only the four result slides.
-    keep = {a, r1, r2, r3, e}
+    # Keep only the five result slides.
+    keep = {a, r1, c, r2, r3}
     pres_path = work / "ppt/presentation.xml"
     pres = etree.parse(str(pres_path))
     rels = dict(re.findall(r'Id="(rId\d+)"[^>]*Target="slides/(slide\d+\.xml)"',

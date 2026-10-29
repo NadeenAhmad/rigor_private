@@ -24,6 +24,7 @@ from results import BODY, EMERALD, INK, MUTED, RED, Ids, add, shape  # noqa: E40
 from slide9_diff import geometry, shape_id, text  # noqa: E402
 
 CARD_TOP, CARD_BOTTOM = 2.40, 5.92
+SHIFT = 0.62  # everything in the cards moves down to make room for the validation strip
 # Synthetic rows over two tables joined by admission_id (no names; patients P1-P3, admissions A1-A3).
 TABLES = [
     ("treatment", ("admission_id", "drug"), (1.15, 1.65),
@@ -133,6 +134,35 @@ def edit(tree):
     move(tree, shape_id(note), y=py + ph + 0.10, h=0.42)
     set_runs(note, r("No causal claim: ", RED, 1100, True)
              + r("gemcitabine, radiotherapy or cirrhosis can also suppress the marrow.", BODY, 1100))
+
+    # Next steps in order: validation first (strip under the title), then the data (the three cards).
+    for sp in tree.find(".//p:spTree", NS):
+        g = geometry(sp) if sp.tag in (f"{{{P}}}sp", f"{{{P}}}cxnSp") else None
+        if g and 2.3 <= g[1] < 6.0 and sp is not strip:
+            move(tree, shape_id(sp), y=g[1] + SHIFT)
+    title = by_text(shapes, "Next:")
+    ts = list(title.iter(f"{{{NS['a']}}}t"))
+    ts[0].text = "Next: check inside the loop, then let the data speak."
+    for t in ts[1:]:
+        t.getparent().getparent().remove(t.getparent())
+    move(tree, shape_id(strip), y=1.82, h=0.60)
+    set_runs(strip, r("FIRST, VALIDATORS IN THE LOOP   ", EMERALD, 1250, True)
+             + r("Syntax, consistency and pitfall checks feed back to the Gen-LLM, as in ", BODY, 1250)
+             + r("NeOn-GPT", INK, 1250, True) + r(" [Fathallah et al., ESWC 2024] and ", MUTED, 1250)
+             + r("Extended NeOn-GPT", INK, 1250, True) + r(" [Fathallah et al., SWJ 2026]. ", MUTED, 1250)
+             + r("Now running in the ", BODY, 1250)
+             + r("RIGOR App", INK, 1250, True) + r(" [Fathallah, Nayyeri & Staab, ISWC 2026 Demos].", MUTED, 1250))
+    move(tree, shape_id(subtitle), y=2.55)
+    set_runs(subtitle, r("THEN, LET THE DATA SPEAK   ", EMERALD, 1300, True)
+             + "".join(r(t, "3A434C" if b else MUTED, 1500, b, italic=i) for t, b, i in (
+                 ("Today ", False, False), ("RIGOR", True, True), (" reads ", False, False), ("schemas", True, False),
+                 (" and ", False, False), ("documentation", True, False), (". ", False, False),
+                 ("Instance data", True, False), (" could propose ", False, False), ("new knowledge", True, False),
+                 (".", False, False))))
+    add(tree, shape(ids(), "Privacy", 0.90, CARD_BOTTOM + SHIFT + 0.08, 11.5, 0.28,
+                    r("Only aggregate statistics would leave the hospital: ", EMERALD, 1300, True)
+                    + r("patient data stays where it is.", BODY, 1300), anchor="ctr"))
+    move(tree, shape_id(footer), y=7.02)
 
 
 def main(src, dst):
