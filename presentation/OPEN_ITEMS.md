@@ -83,3 +83,13 @@ author's edits.
   tool is OntoMetrics (Lantow, KEOD 2016); the slides cite that.
 - The paper cites the seven judging dimensions to "[44, 58, 53]", but [44] is Pollard et al. (the eICU-CRD
   dataset paper). The six classic criteria come from Vrandecic 2009 [58]; domain enrichment is the paper's own.
+
+## Backup slides (B0-B14), final deck
+
+- Built by tools/backups_final.py on top of tools/polish_final.py (author deck -> polish -> backups).
+- Judge position bias: the A-D order was fixed for the LLM judge and the experts (RIGOR always D;
+  expert_survey/METHOD_KEY.json, paper Fig. 7). Backup B1 says so. A shuffled-order re-run of the
+  GPT-5.4 judge (eval.py, ENABLE_CQ_JUDGE) would close this before the talk.
+- B5's "current code merges the direct mapping first" refers to app.py in the RIGOR repository; the
+  paper's Algorithm 1 merges only the validated delta.
+- Schema file schema_chinook.json has 64 columns; the paper says 67.
