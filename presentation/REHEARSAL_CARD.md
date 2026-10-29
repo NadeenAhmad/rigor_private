@@ -1,56 +1,27 @@
 # Rehearsal card
 
-Target: finish by **13:30**. Planned end: **13:22** (1386 words).
-
-| Slide | Starts at | Ends at | Words |
+| # | Slide | Starts | Takeaway |
 |---|---|---|---|
-| 1. Title | 0:00 | 0:25 | 43 |
-| 2. Motivation | 0:25 | 1:07 | 74 |
-| 3. What we want to build | 1:07 | 1:59 | 91 |
-| 4. Research gap | 1:59 | 2:37 | 66 |
-| 5. Our answer: RIGOR | 2:37 | 3:01 | 42 |
-| 6. Step 1: order | 3:01 | 3:33 | 56 |
-| 7. Step 2: seed | 3:33 | 4:10 | 66 |
-| 8. Step 3: retrieve | 4:10 | 4:52 | 73 |
-| 9. Step 4: generate | 4:52 | 5:48 | 98 |
-| 10. Step 5: validate | 5:48 | 6:51 | 110 |
-| 11. Step 6: merge | 6:51 | 7:19 | 49 |
-| 12. Architecture 1/6 | 7:19 | 7:29 | 18 |
-| 13. Architecture 2/6 | 7:29 | 7:37 | 14 |
-| 14. Architecture 3/6 | 7:37 | 7:46 | 15 |
-| 15. Architecture 4/6 | 7:46 | 7:51 | 10 |
-| 16. Architecture 5/6 | 7:51 | 7:58 | 12 |
-| 17. Architecture 6/6 | 7:58 | 8:10 | 20 |
-| 18. Experimental setup | 8:10 | 8:45 | 62 |
-| 19. Result 1: valid, fewer errors | 8:45 | 9:23 | 63 |
-| 20. Result 2: keeps the schema | 9:23 | 9:57 | 55 |
-| 21. Result 3: adds meaning | 9:57 | 10:21 | 39 |
-| 22. Result 4: BURR | 10:21 | 11:07 | 81 |
-| 23. Result 5: LLM judge and experts | 11:07 | 12:00 | 86 |
-| 24. Future work | 12:00 | 12:49 | 86 |
-| 25. Thank you | 12:49 | 13:22 | 57 |
+| 1 | Title | 0:00 | Schemas store data, not meaning. |
+| 2 | Motivation | 0:25 | The schema knows storage and links, not domain meaning. |
+| 3 | What we want to build | 0:55 | A usable model combines schema, documentation and standard vocabularies, with provenance. |
+| 4 | The research gap | 1:48 | Rules keep structure; LLMs suggest meaning; we need both. |
+| 5 | Our answer: RIGOR | 2:21 | Six steps, one table at a time. |
+| 6 | Step 1: order | 2:37 | Parents first, so later tables reuse known classes. |
+| 7 | Step 2: seed | 3:05 | A deterministic seed guarantees coverage before the LLM starts. |
+| 8 | Step 3: retrieve | 3:41 | Three sources supply meaning; the growing core is unique to RIGOR. |
+| 9 | Step 4: generate | 4:24 | The LLM enriches a grounded draft, and every addition is traceable. |
+| 10 | Step 5: validate | 5:15 | Rules catch clashes in structure; the Judge catches clashes in meaning. |
+| 11 | Step 6: merge | 6:18 | The ontology is both the output and the next input. |
+| 12 | Reassembling the architecture | 6:43 | Order, seed, retrieve, generate, validate, merge, loop. |
+| 13 | Evaluation setup | 7:22 | Three databases, three LLMs, four methods, four kinds of evidence. |
+| 14 | Result 1: valid, fewer errors | 8:20 | Every ontology is valid; RIGOR's have far fewer modeling errors, with every LLM. |
+| 15 | Result 2: keeps the schema | 8:53 | RIGOR keeps the schema as well as Direct Mapping, with every LLM. |
+| 16 | Result 3: adds meaning | 9:27 | Only RIGOR adds labels, provenance and a class hierarchy, with every LLM. |
+| 17 | Result 4: BURR | 9:53 | Semantic enrichment did not break the correspondence that OBDA and KG population need. |
+| 18 | Result 5: LLM judge and experts | 10:36 | Judged blind against competency questions, an LLM judge and human experts both rank RIGOR first. |
+| 19 | Future work: validators in the loop | 11:28 | The evaluation checks move inside generation; the RIGOR App already does this. |
+| 20 | Future work: let the data speak | 12:07 | Instance data can propose new, reviewable knowledge that the documentation does not contain. |
+| 21 | Thank you | 12:53 | Grounded, retrieved, validated. |
 
-## Checkpoints
-
-Glance at the clock when these slides come up. More than 30 s behind: apply the cuts below for the slides that follow.
-
-- **Slide 6** should come up at **3:01** (the method starts).
-- **Slide 12** should come up at **7:19** (the architecture recap starts).
-- **Slide 19** should come up at **8:45** (the results start).
-- **Slide 22** should come up at **10:21** (future work starts).
-- **Slide 23** should come up at **11:07** (the close starts).
-
-## Cuts if running late
-
-- Slide 7 (Step 2: seed): drop "So the LLM's job is to enrich, not to invent." (saves ~6 s)
-- Slide 8 (Step 3: retrieve): drop "One query per table, built from its name, columns and foreign keys, retrieves the top three matches per source." (saves ~11 s)
-- Slide 19 (Result 1: valid, fewer errors): drop "for every method" (saves ~2 s)
-- Slide 20 (Result 2: keeps the schema): drop "and swings with the LLM, from six to seventy-eight percent" (saves ~6 s)
-- Slide 21 (Result 3: adds meaning): drop "Non-Iterative RAG adds labels, but no provenance and no class hierarchy." (saves ~6 s)
-- Slide 22 (Result 4: BURR): drop "scored with F1 against a gold mapping" (saves ~4 s)
-- Slide 23 (Result 5: LLM judge and experts): drop "with the highest average score" (saves ~3 s)
-- Slide 24 (Future work): drop "Today RIGOR reads schemas and documentation, but" (saves ~4 s)
-
-All cuts together save about 41 s.
-
-Slides 12–17 are quick clicks (about 5–10 s each). If very late, say only the first and last sentences and click through the middle four.
+Finish by 13:25; the slot is 15:00.
