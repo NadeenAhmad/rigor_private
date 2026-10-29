@@ -201,13 +201,19 @@ SLIDES = [
                 "for about $0.12 across the three databases, against about $33 with Claude (Tables 9, 15)."]),
     dict(title="Result 3: adds meaning",
          say="Nothing is lost. Is meaning added? Direct mapping and the LLM baseline add none, in any run. "
-             "Non-Iterative adds labels, but no provenance and no hierarchy. Only RIGOR adds all three, with "
-             "every LLM, in every database. [pause] And the hierarchies follow what the LLM knows: over a hundred "
-             "subclass axioms for the music store, only a few for the clinical schemas.",
-         cue="Labels row pair, then provenance, then hierarchy; land on the Chinook hierarchy cells.",
-         takeaway="Only RIGOR adds labels, provenance and hierarchy, with every LLM.",
-         source="Paper Table 8 (annotation assertions, prov:wasDerivedFrom, SubClassOf per run).",
-         cut="Non-Iterative adds labels, but no provenance and no hierarchy."),
+             "Non-Iterative RAG adds labels, but no provenance and no class hierarchy. Only RIGOR adds all three, "
+             "with every LLM, in every database. [pause]",
+         cue="Point at the red block first, then the three RIGOR rows.",
+         takeaway="Only RIGOR adds labels, provenance and a class hierarchy, with every LLM.",
+         source="Paper Table 8. Hierarchy as inheritance richness (subclass axioms per class; OntoQA, Tartir et al. "
+                "2005; OntoMetrics, Lantow 2016), computed from Table 8 counts. Shading is within each database.",
+         cut="Non-Iterative RAG adds labels, but no provenance and no class hierarchy.",
+         extra=["IF ASKED 'DOES CHINOOK NEED SO MANY SUBCLASSES?': Count is not quality, so we report whether a "
+                "hierarchy exists, and only RIGOR builds one. RIGOR's Chinook ontologies have zero OOPS! pitfalls and "
+                "the judge ranks RIGOR first on all 11 Chinook tables; it does score RIGOR's conciseness lower there "
+                "(2.59 vs 3.32 for the baseline, Table 10), so tighter hierarchies are future work.",
+                "DOMAIN PATTERN (notes only): inheritance richness is 0.10-0.70 on the clinical schemas and 2.1-4.1 "
+                "on the music store; the LLM proposes more specializations in a familiar domain."]),
     dict(title="Result 4: BURR",
          say="Meaning is added. But is the link back to the data still correct? BURR, an external benchmark, "
              "checks exactly this: every class, relation and attribute must map back to the right table, foreign "

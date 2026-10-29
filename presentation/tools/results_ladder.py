@@ -146,7 +146,7 @@ def shade(v, bands):
 
 
 def heat_table(tree, ids, x, y, label_w, col_w, row_h, runs, fill_for, fmt, averages=None, avg_fmt=str,
-               cols=DBS, sub=LLMS, header=True):
+               cols=DBS, sub=LLMS, header=True, fill_by_col=None):
     """Rows = methods; columns = databases, each split by LLM (unless a row has one value per database).
     Returns the y below the last row."""
     n = len(sub) if sub else 1
@@ -170,8 +170,9 @@ def heat_table(tree, ids, x, y, label_w, col_w, row_h, runs, fill_for, fmt, aver
         span = n if len(values) == len(cols) else 1
         for j, v in enumerate(values):
             cx = gx + j * span * col_w
+            fill = fill_by_col(v, j * span) if fill_by_col else fill_for(v)
             add(tree, shape(ids(), "Cell", cx + 0.02, ry + 0.02, span * col_w - 0.04, row_h - 0.04,
-                            r(fmt(v), INK, 1100, rigor), fill=fill_for(v), align="ctr", anchor="ctr"))
+                            r(fmt(v), INK, 1100, rigor), fill=fill, align="ctr", anchor="ctr"))
         if averages:
             add(tree, text(ids, gx + len(cols) * n * col_w + 0.05, ry, 0.75, row_h,
                            r(avg_fmt(averages[k]), EMERALD if rigor else INK, 1250, rigor), align="ctr",
@@ -179,11 +180,25 @@ def heat_table(tree, ids, x, y, label_w, col_w, row_h, runs, fill_for, fmt, aver
     return top + len(runs) * row_h
 
 
-# Table 8 per run: annotation assertions, prov:wasDerivedFrom, SubClassOf (Direct Mapping, LLM baseline: 0).
-ANN_RUNS = {"Non-Iterative": (680, 134, 736, 877, 157, 743, 98, 14, 64),
+# Table 8 per run: annotation assertions and prov:wasDerivedFrom assertions; hierarchy as inheritance richness
+# (OntoQA: subclass axioms per class), from Table 8's SubClassOf and class counts. Direct Mapping and the LLM
+# baseline have none of these in any run.
+NI = "Non-Iterative RAG"
+ANN_RUNS = {NI: (680, 134, 736, 877, 157, 743, 98, 14, 64),
             "RIGOR": (1029, 1137, 341, 1291, 1684, 435, 357, 362, 359)}
-PROV_RUNS = {"Non-Iterative": (0,) * 9, "RIGOR": (336, 308, 22, 423, 335, 99, 81, 83, 75)}
-SUB_RUNS = {"Non-Iterative": (0,) * 9, "RIGOR": (14, 12, 2, 21, 59, 3, 157, 147, 114)}
+PROV_RUNS = {NI: (0,) * 9, "RIGOR": (336, 308, 22, 423, 335, 99, 81, 83, 75)}
+IR_RUNS = {NI: (0.0,) * 9, "RIGOR": (0.70, 0.39, 0.13, 0.62, 0.49, 0.10, 2.12, 2.72, 4.07)}
+
+
+def per_database(runs):
+    """Shade each cell against the largest value of the same database (all methods and LLMs)."""
+    peak = [max(max(v[g * 3:g * 3 + 3]) for v in runs.values()) or 1 for g in range(3)]
+
+    def fill(v, j):
+        if not v:
+            return BAD2
+        return (BAD1, MID, GOOD1, GOOD2)[min(3, int(4 * v / peak[j // 3] - 1e-9))]
+    return fill
 
 
 def build_a(tree):
@@ -217,26 +232,42 @@ def build_b(tree):
 
 def build_meaning(tree):
     ids = reset(tree, "RESULT 3  /  MEANING IS ADDED", "Meaning is added: labels, provenance and hierarchy.",
-                "Elements per ontology, for every LLM and database. Direct Mapping and LLM baseline add none, in any run.")
+                "Per ontology, for every LLM and database.")
     ladder(tree, ids, {3})
     card(tree, ids, 0.88, TOP, 11.57, 3.45, "ADDS MEANING")
-    y = TOP + 0.45
-    first = True
-    for metric, runs, bands in (("Labels & comments", ANN_RUNS, (1, 100, 300, 800)),
-                                ("Provenance links", PROV_RUNS, (1, 25, 80, 250)),
-                                ("Subclass axioms", SUB_RUNS, (1, 5, 15, 100))):
-        top = y + (0.50 if first else 0.04)
-        add(tree, text(ids, 1.18, top, 1.55, 0.72, r(metric, TEAL, 1150, True), anchor="ctr", name="Metric"))
-        avgs = [round(sum(v) / len(v)) for v in runs.values()]
-        y = heat_table(tree, ids, 2.75, y if first else y + 0.04, 1.40, 0.82, 0.36, runs,
-                       lambda v, b=bands: shade(v, b), lambda v: f"{v:,}", averages=avgs,
-                       avg_fmt=lambda v: f"{v:,}", header=first)
-        first = False
-    strip(tree, ids, 6.43, r("Hierarchies follow what the LLM knows: ", BODY, 1400)
-          + r("114–157 subclass axioms for the music store", EMERALD, 1400, True)
-          + r(", 2–59 for the clinical schemas.", BODY, 1400))
-    source(tree, ids, "Paper Table 8: annotation assertions (labels and comments), prov:wasDerivedFrom assertions, "
-                      "rdfs:subClassOf axioms.")
+    x_metric, x_table, col_w, row_h = 1.18, 2.75, 0.82, 0.28
+    gx = x_table + 1.40
+    y = TOP + 0.42
+    # Header row (databases and LLMs) via an empty table, then the two methods that add nothing.
+    heat_table(tree, ids, x_table, y, 1.40, col_w, row_h, {}, None, str, averages=[0], avg_fmt=str)
+    y += 0.50
+    for k, method in enumerate(("Direct Mapping", "LLM baseline")):
+        add(tree, text(ids, x_table, y + k * 0.20, 1.40, 0.20, r(method, INK, 1100), anchor="ctr", name="Method"))
+    add(tree, shape(ids(), "None", gx + 0.02, y + 0.01, 9 * col_w - 0.04, 0.38,
+                    r("No labels, provenance or class hierarchy, in any run.", INK, 1150, italic=True),
+                    fill=BAD1, align="ctr", anchor="ctr"))
+    y += 0.46
+    for metric, runs, fmt in (("Labels & comments", ANN_RUNS, lambda v: f"{v:,}"),
+                              ("Provenance links", PROV_RUNS, lambda v: f"{v:,}"),
+                              ("Class hierarchy", IR_RUNS, lambda v: f"{v:.2f}")):
+        if runs is IR_RUNS:
+            add(tree, text(ids, x_metric, y + 0.02, 1.55, 0.26, r(metric, TEAL, 1150, True), anchor="ctr",
+                           name="Metric"))
+            add(tree, text(ids, x_metric, y + row_h, 1.55, 0.24, r("inheritance richness", MUTED, 950, italic=True),
+                           anchor="ctr", name="Metric note"))
+        else:
+            add(tree, text(ids, x_metric, y, 1.55, 2 * row_h, r(metric, TEAL, 1150, True), anchor="ctr",
+                           name="Metric"))
+        avgs = [sum(v) / len(v) for v in runs.values()]
+        avg_fmt = (lambda v: f"{v:.2f}") if runs is IR_RUNS else (lambda v: f"{round(v):,}")
+        y = heat_table(tree, ids, x_table, y, 1.40, col_w, row_h, runs, None, fmt, averages=avgs, avg_fmt=avg_fmt,
+                       header=False, fill_by_col=per_database(runs)) + 0.05
+    strip(tree, ids, 6.43, r("Only RIGOR adds labels, provenance ", BODY, 1400) + r("and", INK, 1400, True)
+          + r(" a class hierarchy: ", BODY, 1400) + r("with every LLM, in every database.", EMERALD, 1400, True))
+    source(tree, ids, "Labels & comments: annotation assertions; provenance: prov:wasDerivedFrom (paper Table 8). "
+                      "Hierarchy: inheritance richness, subclass axioms per class [OntoQA: Tartir et al., KADASH 2005; "
+                      "OntoMetrics: Lantow, KEOD 2016], from Table 8. Shading compares cells within each database.",
+           y=6.94)
 
 
 def build_c(tree):

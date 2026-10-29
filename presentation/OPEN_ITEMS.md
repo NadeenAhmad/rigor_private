@@ -53,7 +53,8 @@ author's edits.
 
 - Results rebuilt as five single-topic slides, each broken down by database x LLM where the paper has the
   data (`tools/results_ladder.py`, output `RIGOR_results.pptx`): R1 validity sentence + OOPS! pitfalls
-  (Table 7), R2 column coverage (Table 9), R3 labels / provenance / hierarchy (Table 8), R4 BURR (one
+  (Table 7), R2 column coverage (Table 9), R3 labels / provenance / class hierarchy as inheritance richness (OntoQA,
+  OntoMetrics refs), Direct Mapping and LLM baseline shown as 'none in any run', shading within each database, R4 BURR (one
   Claude run), R5 LLM judge + experts per database with competency questions (Tables 1, 6, 12).
   Ablation stays in backup (one database, one LLM, tiny overall difference). Talk ends at 13:53.
 - Future work (`tools/future_v2.py`, output `RIGOR_future_work.pptx`): validators in the loop first
@@ -73,3 +74,9 @@ author's edits.
 ## Decided: keep as is
 
 - Slide 7 seed restrictions (`some` / `only`), and their glosses.
+
+## Paper citation issue (for the camera-ready, if still possible)
+
+- The paper cites "Ontometrics [32]" for its structural metrics, but [32] is Lozano-Tello & Gomez-Perez,
+  "Ontometric: A method to choose the appropriate ontology" (JDM 2004), a different work. The metrics
+  tool is OntoMetrics (Lantow, KEOD 2016); the slides cite that.
