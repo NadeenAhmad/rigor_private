@@ -1,6 +1,6 @@
 # Rehearsal card
 
-Target: finish by **13:30**. Planned end: **13:23** (1392 words).
+Target: finish by **13:30**. Planned end: **13:40** (1418 words).
 
 | Slide | Starts at | Ends at | Words |
 |---|---|---|---|
@@ -22,12 +22,13 @@ Target: finish by **13:30**. Planned end: **13:23** (1392 words).
 | 16. Architecture 5/6 | 7:51 | 7:58 | 12 |
 | 17. Architecture 6/6 | 7:58 | 8:10 | 20 |
 | 18. Experimental setup | 8:10 | 8:45 | 62 |
-| 19. Result 1: nothing is lost | 8:45 | 9:23 | 63 |
-| 20. Result 2: meaning and errors | 9:23 | 10:14 | 86 |
-| 21. Result 3: BURR | 10:14 | 11:05 | 88 |
-| 22. Result 4: LLM judge and experts | 11:05 | 11:49 | 70 |
-| 23. Future work | 11:49 | 12:51 | 109 |
-| 24. Thank you | 12:51 | 13:23 | 57 |
+| 19. Result 1: nothing is lost | 8:45 | 9:17 | 53 |
+| 20. Result 2: meaning and errors | 9:17 | 10:03 | 77 |
+| 21. Result 3: BURR | 10:03 | 10:54 | 88 |
+| 22. Result 4: LLM judge and experts | 10:54 | 11:27 | 52 |
+| 23. Result 5: where the gains come from | 11:27 | 12:11 | 73 |
+| 24. Future work | 12:11 | 13:08 | 99 |
+| 25. Thank you | 13:08 | 13:40 | 57 |
 
 ## Checkpoints
 
@@ -36,19 +37,20 @@ Glance at the clock when these slides come up. More than 30 s behind: apply the 
 - **Slide 6** should come up at **3:01** (the method starts).
 - **Slide 12** should come up at **7:19** (the architecture recap starts).
 - **Slide 19** should come up at **8:45** (the results start).
-- **Slide 22** should come up at **11:05** (future work starts).
-- **Slide 23** should come up at **11:49** (the close starts).
+- **Slide 22** should come up at **10:54** (future work starts).
+- **Slide 23** should come up at **11:27** (the close starts).
 
 ## Cuts if running late
 
 - Slide 7 (Step 2: seed): drop "So the LLM's job is to enrich, not to invent." (saves ~6 s)
 - Slide 8 (Step 3: retrieve): drop "One query per table, built from its name, columns and foreign keys, retrieves the top three matches per source." (saves ~11 s)
-- Slide 19 (Result 1: nothing is lost): drop "So context alone loses structure; the direct-mapping seed keeps it." (saves ~6 s)
-- Slide 20 (Result 2: meaning and errors): drop "Most of the others' pitfalls are simply missing annotations." (saves ~5 s)
-- Slide 21 (Result 3: BURR): drop "Two elements match when they map to the same database elements, whatever they are called." (saves ~9 s)
-- Slide 22 (Result 4: LLM judge and experts): drop "with the largest gains in clarity and domain enrichment" (saves ~5 s)
-- Slide 23 (Future work): drop "We also want validator and reasoner feedback inside the loop." (saves ~6 s)
+- Slide 19 (Result 1: nothing is lost): drop "for every method" (saves ~2 s)
+- Slide 20 (Result 2: meaning and errors): drop "Non-Iterative adds labels, but no provenance and no hierarchy." (saves ~5 s)
+- Slide 21 (Result 3: BURR): drop "RIGOR's provenance gives us that mapping directly." (saves ~4 s)
+- Slide 22 (Result 4: LLM judge and experts): drop "seventy percent" (saves ~1 s)
+- Slide 23 (Result 5: where the gains come from): drop "for twelve cents instead of thirty-three dollars" (saves ~4 s)
+- Slide 24 (Future work): drop "Gemcitabine, radiotherapy or cirrhosis could also explain it." (saves ~5 s)
 
-All cuts together save about 47 s.
+All cuts together save about 37 s.
 
 Slides 12–17 are quick clicks (about 5–10 s each). If very late, say only the first and last sentences and click through the middle four.

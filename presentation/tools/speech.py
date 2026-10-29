@@ -172,25 +172,23 @@ SLIDES = [
          say="We climb from the easiest check to the hardest. First: is anything lost? All thirty ontologies are "
              "valid OWL and logically consistent, for every method. On average, RIGOR covers ninety-three percent "
              "of the database columns, as much as direct mapping. Non-Iterative, with the same retrieved context "
-             "but no seed, covers only a third. [pause] So context alone loses structure; the direct-mapping seed "
-             "keeps it.",
+             "but no seed, covers only a third. [pause]",
          cue="Thirty out of thirty, then the bars: RIGOR next to Direct Mapping, then Non-Iterative.",
          takeaway="RIGOR keeps the schema as well as Direct Mapping; context alone does not.",
          source="Paper Sec. 4.7 (validity, consistency) and Table 9 (column coverage, averaged over each method's "
                 "ontologies).",
-         cut="So context alone loses structure; the direct-mapping seed keeps it."),
+         cut="for every method"),
     dict(title="Result 2: meaning and errors",
          say="So nothing is lost. But is meaning added? On the left, per ontology: direct mapping and the LLM "
              "baseline add no labels at all. Non-Iterative adds labels, but no provenance and no hierarchy. Only "
              "RIGOR adds all three. On the right, the modeling pitfalls that OOPS! finds: about five hundred per "
-             "direct-mapping ontology, eight per RIGOR ontology. [pause] Most of the others' pitfalls are simply "
-             "missing annotations. And the one critical pitfall, the second domain from our validation example, "
+             "direct-mapping ontology, eight per RIGOR ontology. [pause] And the one critical pitfall, the second domain from our validation example, "
              "is gone in six of RIGOR's nine ontologies.",
          cue="Left table, land on the RIGOR row; then 499 versus 8; then the strip.",
          takeaway="Only RIGOR adds labels, provenance and hierarchy, with far fewer modeling errors.",
          source="Paper Table 8 (annotations, provenance, SubClassOf) and Table 7 (OOPS! pitfalls), averaged per "
                 "ontology over all 30. 72% of the other methods' pitfalls are P08; P19 is the only critical one.",
-         cut="Most of the others' pitfalls are simply missing annotations."),
+         cut="Non-Iterative adds labels, but no provenance and no hierarchy."),
     dict(title="Result 3: BURR",
          say="Meaning is added. But is the link back to the data still correct? BURR, an external benchmark, "
              "checks exactly this: every class, relation and attribute must map back to the right table, foreign "
@@ -202,7 +200,7 @@ SLIDES = [
          takeaway="Semantic enrichment did not break the correspondence that OBDA and KG population need.",
          source="Paper Table 13. BURR = Laskowski et al., PACMMOD 2025; matching rule from BURR Section 4, Eq. 3. "
                 "Left-card element names are illustrative.",
-         cut="Two elements match when they map to the same database elements, whatever they are called.",
+         cut="RIGOR's provenance gives us that mapping directly.",
          extra=["DO NOT SAY: 'BURR found LLMs trail rule-based systems'. BURR's results show Gemini 2.5 Pro ahead "
                 "of the rule-based systems overall (rule-based systems win only on NPD).",
                 "IF ASKED ABOUT GEMINI 2.5 PRO (BURR Table 3, ISWC .65 / .68 / .56): in BURR it is a "
@@ -212,9 +210,8 @@ SLIDES = [
                 "relations are on par, attributes lower, and RIGOR also produces labels, hierarchy and "
                 "provenance. It is prompted, not fine-tuned."]),
     dict(title="Result 4: LLM judge and experts",
-         say="Automatic checks agree. Do evaluators agree? Both evaluations were blind: four anonymized "
-             "ontologies per table, ranked first to fourth. An LLM judge, GPT-5.4, ranked RIGOR first on all "
-             "fifty-eight tables, with the largest gains in clarity and domain enrichment. [pause] Ten ontology "
+         say="Automatic checks agree. Do evaluators agree? In a blind ranking, an LLM judge, GPT-5.4, ranked "
+             "RIGOR first on all fifty-eight tables. [pause] Ten ontology "
              "experts ranked RIGOR first in twenty-eight of forty rankings, seventy percent. [pause] Direct mapping "
              "gives structure without meaning. LLMs alone give meaning without structure. RIGOR gives both, and "
              "checks them.",
@@ -222,21 +219,31 @@ SLIDES = [
          takeaway="An independent LLM judge and human experts both rank RIGOR first.",
          source="Paper Table 1 (rankings), Table 10 (judge dimensions), Table 12 (Kendall's W 0.39-0.72). LLM judge: "
                 "Claude outputs, 290 competency questions. Experts: 4 tables from the two medical databases.",
-         cut="with the largest gains in clarity and domain enrichment"),
+         cut="seventy percent"),
+    dict(title="Result 5: where the gains come from",
+         say="Is it just a strong model, or memorized data? With RIGOR, the smallest model, Mistral with "
+             "twenty-four billion parameters, covers ninety-eight percent of the columns, up from seventeen "
+             "with single-pass retrieval: on par with Claude, for twelve cents instead of thirty-three dollars. "
+             "[pause] And RIGOR's lead is largest on the liver cancer registry, a private database no LLM has "
+             "seen, and smallest on the familiar music store. The gains come from grounding and validation.",
+         cue="Left: 17 to 98. Right: land on Liver Cancer, then Chinook.",
+         takeaway="RIGOR's gains hold for a small open model and grow on unseen, specialist data.",
+         source="Paper Table 9 (coverage per LLM), Table 15 (cost), Table 1 (judge scores, Claude ontologies). "
+                "Liver Cancer is not public, which rules out training-data leakage (paper Sec. 4.1).",
+         cut="for twelve cents instead of thirty-three dollars"),
     dict(title="Future work",
          say="Where next? Today RIGOR reads schemas and documentation. The next step is to let the data speak. "
              "Here the data sits in two tables: treatment says which admissions received cisplatin, admission "
              "records bone marrow depression. Joined on the admission id, the rows show a pattern. The drug label adds that bone-marrow suppression is a known adverse reaction "
              "of cisplatin. Together, they let RIGOR propose new knowledge: a candidate association between "
              "cisplatin and bone marrow depression, with provenance to both tables and the label. Candidate, not cause. "
-             "Gemcitabine, radiotherapy or cirrhosis could also explain it. So an expert reviews it. We also want "
-             "validator and reasoner feedback inside the loop.",
+             "Gemcitabine, radiotherapy or cirrhosis could also explain it. So an expert reviews it.",
          cue="Point at A1 and A3 in both tables, then the label, then the code. Say 'candidate', never 'caused'.",
          takeaway="Instances plus documentation can propose knowledge; experts confirm it.",
          source="Paper Section 5. Rows are synthetic. OWL verified "
                 "(presentation/excerpts/slide22_future_candidate.omn): a typed individual with provenance, no "
                 "causal axiom.",
-         cut="We also want validator and reasoner feedback inside the loop.",
+         cut="Gemcitabine, radiotherapy or cirrhosis could also explain it.",
          extra=["IF ASKED WHY NOT AN OWL CAUSAL AXIOM: OWL reasoning is deductive and open-world; it cannot derive "
                 "causation from statistics, and 'Cisplatin SubClassOf causes some BoneMarrowDepression' would "
                 "wrongly claim it for every case."]),
