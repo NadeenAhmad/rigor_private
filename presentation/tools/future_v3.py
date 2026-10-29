@@ -115,39 +115,44 @@ def tables(tree, ids, x, w):
 
 
 def clues(tree, ids, x, w):
-    y = CARD_TOP + 0.62
-    for k, (head, body) in enumerate((
-            ("Only 0 and 1", "A yes/no flag, not a score."),
-            ("1 exactly when cisplatin was given", "Cisplatin is a chemotherapy known to suppress the bone marrow."))):
-        cy = y + k * 1.42
-        add(tree, shape(ids(), "Clue", x + 0.15, cy, w - 0.30, 1.30, geom="roundRect", fill="F6F8FA", line=LINE))
+    cy = CARD_TOP + 0.62
+    for k, (head, body, height) in enumerate((
+            ("Only 0 and 1", "A yes/no flag, not a score.", 1.15),
+            ("1 exactly when cisplatin was given",
+             "\u201cBM\u201d could also be bone metastasis or bowel movement. Cisplatin suppresses the bone marrow, "
+             "so it points to the marrow.", 1.58))):
+        add(tree, shape(ids(), "Clue", x + 0.15, cy, w - 0.30, height, geom="roundRect", fill="F6F8FA", line=LINE))
         for el in magnifier(ids, x + 0.28, cy + 0.14):
             add(tree, el)
         add(tree, box(ids, x + 0.72, cy + 0.10, w - 1.0, 0.50, r(head, INK, 1400, True), anchor="ctr", name="Clue head"))
-        add(tree, box(ids, x + 0.30, cy + 0.66, w - 1.25 if k == 0 else w - 0.6, 0.58, r(body, BODY, 1200),
-                      name="Clue body"))
+        add(tree, box(ids, x + 0.30, cy + 0.64, w - 1.25 if k == 0 else w - 0.6, height - 0.72,
+                      r(body, BODY, 1200 if k == 0 else 1150), name="Clue body"))
         if k == 0:   # BM_DEP values in the admission rows: one 0, two 1s
-            base = cy + 1.12
+            base = cy + height - 0.22
             for j, (label, count) in enumerate((("0", 1), ("1", 2))):
                 bx = x + w - 0.85 + j * 0.30
-                add(tree, shape(ids(), "Value bar", bx, base - 0.20 * count, 0.20, 0.20 * count,
+                add(tree, shape(ids(), "Value bar", bx, base - 0.18 * count, 0.20, 0.18 * count,
                                 fill=EMERALD if label == "1" else "9AA3A9"))
                 add(tree, box(ids, bx - 0.05, base + 0.01, 0.30, 0.16, r(label, MUTED, 900, False, "Consolas"),
                               align="ctr", name="Value label"))
+        cy += height + 0.12
 
 
 def answer(tree, ids, x, w):
     add(tree, box(ids, x + 0.25, CARD_TOP + 0.62, w - 0.5, 0.34,
-                  r("BM_DEP", EMERALD, 1700, True, "Consolas") + r("   →", MUTED, 1700), name="Reveal key"))
+                  r("BM_DEP", EMERALD, 1700, True, "Consolas") + r("   \u2192", MUTED, 1700), name="Reveal key"))
     add(tree, box(ids, x + 0.25, CARD_TOP + 0.98, w - 0.5, 0.42, r("Bone marrow depression", INK, 2000, True,
                                                                    "Cambria"), name="Reveal"))
+    add(tree, box(ids, x + 0.25, CARD_TOP + 1.42, w - 0.5, 0.44,
+                  r("because it switches on with ", BODY, 1150, italic=True) + r("cisplatin", INK, 1150, True, italic=True)
+                  + r(", which suppresses the marrow", BODY, 1150, italic=True), name="Because"))
     lines = FUTURE.splitlines()
-    px, py, pw, pitch = x + 0.15, CARD_TOP + 1.55, w - 0.30, 0.19
+    px, py, pw, pitch = x + 0.15, CARD_TOP + 1.90, w - 0.30, 0.19
     add(tree, simple_box(ids(), "Code panel", px, py, pw, len(lines) * pitch + 0.14, fill="F6F8FA", line="D0D7DE",
                          geom="roundRect"))
     for k, line in enumerate(lines):
         add(tree, code_line(ids(), px, py + 0.07 + k * pitch, pw - 0.05, pitch, line, "", None, size=1000))
-    add(tree, shape(ids(), "Candidate", x + 0.15, CARD_TOP + 2.92, w - 0.30, 0.46,
+    add(tree, shape(ids(), "Candidate", x + 0.15, CARD_TOP + 3.22, w - 0.30, 0.32,
                     r("CANDIDATE  ", AMBER, 1150, True, "Consolas") + r("an expert confirms it first", BODY, 1200),
                     geom="roundRect", fill="FFF7E8", align="ctr", anchor="ctr"))
 
