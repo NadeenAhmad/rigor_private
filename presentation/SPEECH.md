@@ -1,6 +1,6 @@
 # RIGOR talk: spoken script (final deck)
 
-Timing model: 105 words per minute (clicks included) plus 2 s per [pause]. Total: 1394 words, ending at 13:27. Each physical slide's notes hold only what is said while it is on screen.
+Timing model: 105 words per minute (clicks included) plus 2 s per [pause]. Total: 1404 words, ending at 13:32. Each physical slide's notes hold only what is said while it is on screen.
 
 ## 1. Title  (0:00–0:25)
 
@@ -52,19 +52,19 @@ Our answer is RIGOR. It builds the ontology one table at a time, in six steps: o
 
 > From 'what we have' to 'what we want', then sweep along the six steps.
 
-## 6. Step 1: order  (2:37–3:05)
+## 6. Step 1: order  (2:37–3:03)
 
-Step one: order. Admission points to PatientData, so we build PatientData first. In general, RIGOR follows the foreign keys breadth-first: a table is processed once the tables it references are done. So when we reach admission, PatientData already exists, and we reuse it instead of inventing a duplicate.
+Step one: order. Admission points to PatientData, so we build PatientData first. RIGOR follows the foreign keys breadth-first: a table waits until the tables it references are done. So when we reach admission, PatientData already exists, and we reuse it instead of inventing a duplicate.
 
 > Follow the FK arrow, then the processing order.
 
-## 7. Step 2: seed  (3:05–3:41)
+## 7. Step 2: seed  (3:03–3:39)
 
 Step two: seed. Before any LLM is involved, a deterministic direct mapping turns the table into OWL. Admission becomes a class. The foreign key becomes an object property, and every admission must have a patient. Each column becomes a data property with its XSD type. So every column is in the seed, by construction. The LLM's job is to enrich, not to invent.
 
 > Read the glosses: 'each has a patient', 'the FK becomes a link'.
 
-## 8. Step 3: retrieve  (3:41–4:24)
+## 8. Step 3: retrieve  (3:39–4:22)
 
 **Reveal 1/4.** The seed is faithful, but it does not say what BM_DEP means. So step three retrieves context from three sources. Documentation defines cryptic names, like BM_DEP.
 
@@ -82,37 +82,37 @@ Step two: seed. Before any LLM is involved, a deterministic direct mapping turns
 
 > The query strip.
 
-## 9. Step 4: generate  (4:24–5:15)
+## 9. Step 4: generate  (4:22–5:09)
 
 **Reveal 1/2.** Step four: generate. We prompt the Gen-LLM with the direct mapping from step two, the retrieved context, and our enrichment instructions.
 
 > The subtitle, then the BEFORE panel.
 
-**Reveal 2/2.** What comes back is a delta ontology: the same lines, with new ones filled into the gaps. The tags show where each addition came from. The foreign key becomes the named relation hasPatientData, and provenance links each property to its column: both from the schema. The labels come from the documentation, the link to bone marrow disease from the Disease Ontology, and the ECOG scale from the LLM itself.
+**Reveal 2/2.** What comes back is a delta ontology: the same lines, with new ones filled into the gaps. The foreign key becomes the named relation hasPatientData, and provenance links each property to its column: both from the schema. The labels come from the documentation, the link to bone marrow disease from the Disease Ontology, and the ECOG scale from the LLM itself.
 
 > Left to right on one row, then down the highlighted lines and their tags.
 
-## 10. Step 5: validate  (5:15–6:18)
+## 10. Step 5: validate  (5:09–6:24)
 
-**Reveal 1/3.** Step five: validate. Plausible fragments can still break the ontology. A later table, lab_result, reuses hasPatientData with a second domain. OWL would then infer that every lab result linked to patient data is an admission. Rule-based graph checks catch this.
+**Reveal 1/3.** Step five: validate. Plausible fragments can still break the ontology. First, a structural error. A later table, lab_result, reuses hasPatientData with a second domain, LabResult, while the core already says Admission. Merged, OWL infers that every lab result with patient data is an admission: OOPS! pitfall P19. Graph checks catch it: one domain per property.
 
-> Structural card: the red line, then the explanation.
+> Structural card: the red line, the existing domain, then 'one domain per property'.
 
-**Reveal 2/3.** Other errors are semantic. Here the model links admission to a new class, Patient, although the core already has PatientData. Valid OWL, but now two classes mean the same thing. The Judge-LLM sees the core and asks to reuse it.
+**Reveal 2/3.** Second, a semantic error. For admission, the model generates hasPatient with range Patient, although the core already has PatientData. Valid OWL, but now two classes mean the same thing, and no rule sees that. The Judge-LLM sees the core and asks to reuse PatientData.
 
-> Semantic card.
+> Semantic card: the red line, then 'two classes, same thing'.
 
-**Reveal 3/3.** Failed fragments go back to the Gen-LLM, with up to two retries. If one still fails, the Judge-LLM picks the better of its last version and the plain direct mapping.
+**Reveal 3/3.** Either way, problems go back to the Gen-LLM, with up to two retries. If it still fails, the Judge-LLM keeps the better of the Gen-LLM's final version and the plain direct mapping.
 
-> The correction strip.
+> The strip.
 
-## 11. Step 6: merge  (6:18–6:43)
+## 11. Step 6: merge  (6:24–6:49)
 
 Step six: merge. The validated delta joins the core ontology. Because RIGOR reuses identifiers, this is a simple union of axioms. And here is the loop: the expanded ontology becomes a retrieval source for the next table. Each table builds on the ones before.
 
 > Core plus delta, then the loop strip.
 
-## 12. Reassembling the architecture  (6:43–7:22)
+## 12. Reassembling the architecture  (6:49–7:27)
 
 **Reveal 1/6.** Let me put the pieces together, as in the paper's Figure 1. First, the schema decides the order.
 
@@ -138,7 +138,7 @@ Step six: merge. The validated delta joins the core ontology. Because RIGOR reus
 
 > Trace the return arrow from (i) back to (e).
 
-## 13. Evaluation setup  (7:22–8:20)
+## 13. Evaluation setup  (7:27–8:26)
 
 **Reveal 1/7.** Does this work beyond one example? We tested two medical databases: a private liver-cancer registry from Leipzig, and the large public eICU intensive-care database.
 
@@ -168,13 +168,13 @@ Step six: merge. The validated delta joins the core ontology. Because RIGOR reus
 
 > The evaluation strip.
 
-## 14. Result 1: valid, fewer errors  (8:20–8:54)
+## 14. Result 1: valid, fewer errors  (8:26–9:00)
 
 We go from the easiest check to the hardest. First, the basics: all thirty ontologies parse without errors and are logically consistent. Modeling errors are another story. Direct mapping averages about five hundred OOPS! pitfalls per ontology, RIGOR eight. Same LLM, same database: Mistral on eICU makes two hundred twenty with Non-Iterative RAG, two with RIGOR. [pause]
 
 > One breath for validity; then the averages; then the Mistral eICU column.
 
-## 15. Result 2: keeps the schema  (8:54–9:29)
+## 15. Result 2: keeps the schema  (9:00–9:34)
 
 **Reveal 1/2.** Fewer errors, but is anything lost? On average, RIGOR covers ninety-three percent of the columns, as much as direct mapping. Non-Iterative RAG, with the same retrieved context but no seed, covers only a third.
 
@@ -184,25 +184,25 @@ We go from the easiest check to the hardest. First, the basics: all thirty ontol
 
 > The outlined Non-Iterative RAG row, then the strip.
 
-## 16. Result 3: adds meaning  (9:29–9:55)
+## 16. Result 3: adds meaning  (9:34–10:00)
 
 Nothing is lost. Is meaning added? Direct mapping and the LLM baseline add no labels, provenance or hierarchy, in any run. Non-Iterative RAG adds labels, but no provenance and no hierarchy. Only RIGOR adds all three, with every LLM, in every database. [pause]
 
 > The red band first, then the three RIGOR rows.
 
-## 17. Result 4: BURR  (9:55–10:37)
+## 17. Result 4: BURR  (10:00–10:43)
 
 Meaning is added. But is the link back to the data still correct? BURR, an external benchmark, checks exactly this: every class, relation and attribute must map back to the right table, foreign key or column, scored with F1 against gold mappings. On BURR's ISWC scenario, RIGOR has the highest F1 on all three, ahead of rule-based and LLM-based systems. Against the LLM-based OntoGenix, relations nearly double, because foreign keys become named relations, like hasPatientData.
 
 > Left card first, then land on the RIGOR row.
 
-## 18. Result 5: LLM judge and experts  (10:37–11:29)
+## 18. Result 5: LLM judge and experts  (10:43–11:35)
 
 Automatic checks agree. Do evaluators agree? For each table, an LLM judge and ten ontology experts saw the schema, five competency questions, the questions the ontology must answer, and four anonymized ontologies. They scored each on seven dimensions and ranked them first to fourth. The LLM judge put RIGOR first in every ranking. [pause] The experts put RIGOR first in seventy percent of their rankings, with the highest average score. [pause] Direct mapping gives structure without meaning. LLMs alone give meaning without structure. RIGOR gives both.
 
 > The 'How they judged' box in one breath; then the two headlines.
 
-## 19. Future work: validators in the loop  (11:29–12:08)
+## 19. Future work: validators in the loop  (11:35–12:13)
 
 **Reveal 1/2.** Where next? First, the validators. RDFLib, the reasoner and OOPS! only checked our final ontologies; NeOn-GPT first proposed this stack of checks for evaluation. Next, they flag each error while RIGOR builds, and their feedback prompts the LLM to repair the ontology.
 
@@ -212,7 +212,7 @@ Automatic checks agree. Do evaluators agree? For each table, an LLM judge and te
 
 > Screenshot, then the two QR codes.
 
-## 20. Future work: let the data speak  (12:08–12:54)
+## 20. Future work: let the data speak  (12:13–13:00)
 
 **Reveal 1/2.** Second, let the data speak. Today RIGOR reads schemas and documentation, but instance data can propose new knowledge. Here, the treatment table says which admissions received cisplatin, and the admission table records bone marrow depression.
 
@@ -222,7 +222,7 @@ Automatic checks agree. Do evaluators agree? For each table, an LLM judge and te
 
 > The pattern bars, then the candidate code and its badge.
 
-## 21. Thank you  (12:54–13:27)
+## 21. Thank you  (13:00–13:32)
 
 To conclude. RIGOR anchors LLM generation in the database itself, grounds it in retrieved knowledge, and checks every step before the ontology grows. The result: meaning without losing structure, the link to the data intact, and ontologies that experts prefer. The paper and code are behind these QR codes. Thank you. I'm happy to take your questions.
 

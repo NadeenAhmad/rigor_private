@@ -80,9 +80,8 @@ TALK = [
          takeaway="Six steps, one table at a time.",
          source="Paper Section 3.1, Fig. 1."),
     dict(title="Step 1: order",
-         builds=[("Step one: order. Admission points to PatientData, so we build PatientData first. In general, "
-                  "RIGOR follows the foreign keys breadth-first: a table is processed once the tables it "
-                  "references are done. So when we reach admission, PatientData already exists, and we reuse "
+         builds=[("Step one: order. Admission points to PatientData, so we build PatientData first. RIGOR follows "
+                  "the foreign keys breadth-first: a table waits until the tables it references are done. So when we reach admission, PatientData already exists, and we reuse "
                   "it instead of inventing a duplicate.",
                   "Follow the FK arrow, then the processing order.")],
          takeaway="Parents first, so later tables reuse known classes.",
@@ -117,8 +116,7 @@ TALK = [
          builds=[("Step four: generate. We prompt the Gen-LLM with the direct mapping from step two, the "
                   "retrieved context, and our enrichment instructions.",
                   "The subtitle, then the BEFORE panel."),
-                 ("What comes back is a delta ontology: the same lines, with new ones filled into the gaps. The "
-                  "tags show where each addition came from. The foreign key becomes the named relation "
+                 ("What comes back is a delta ontology: the same lines, with new ones filled into the gaps. The foreign key becomes the named relation "
                   "hasPatientData, and provenance links each property to its column: both from the schema. The "
                   "labels come from the documentation, the link to bone marrow disease from the Disease "
                   "Ontology, and the ECOG scale from the LLM itself.",
@@ -126,17 +124,18 @@ TALK = [
          takeaway="The LLM enriches a grounded draft, and every addition is traceable.",
          source="Paper Sections 3.2-3.4. Row-aligned BEFORE/AFTER, both verified with the OWL API."),
     dict(title="Step 5: validate",
-         builds=[("Step five: validate. Plausible fragments can still break the ontology. A later table, "
-                  "lab_result, reuses hasPatientData with a second domain. OWL would then infer that every lab "
-                  "result linked to patient data is an admission. Rule-based graph checks catch this.",
-                  "Structural card: the red line, then the explanation."),
-                 ("Other errors are semantic. Here the model links admission to a new class, Patient, although "
-                  "the core already has PatientData. Valid OWL, but now two classes mean the same thing. The "
-                  "Judge-LLM sees the core and asks to reuse it.",
-                  "Semantic card."),
-                 ("Failed fragments go back to the Gen-LLM, with up to two retries. If one still fails, the "
-                  "Judge-LLM picks the better of its last version and the plain direct mapping.",
-                  "The correction strip.")],
+         builds=[("Step five: validate. Plausible fragments can still break the ontology. First, a structural "
+                  "error. A later table, lab_result, reuses hasPatientData with a second domain, LabResult, "
+                  "while the core already says Admission. Merged, OWL infers that every lab result with patient "
+                  "data is an admission: OOPS! pitfall P19. Graph checks catch it: one domain per property.",
+                  "Structural card: the red line, the existing domain, then 'one domain per property'."),
+                 ("Second, a semantic error. For admission, the model generates hasPatient with range Patient, "
+                  "although the core already has PatientData. Valid OWL, but now two classes mean the same "
+                  "thing, and no rule sees that. The Judge-LLM sees the core and asks to reuse PatientData.",
+                  "Semantic card: the red line, then 'two classes, same thing'."),
+                 ("Either way, problems go back to the Gen-LLM, with up to two retries. If it still fails, the "
+                  "Judge-LLM keeps the better of the Gen-LLM's final version and the plain direct mapping.",
+                  "The strip.")],
          takeaway="Rules catch clashes in structure; the Judge catches clashes in meaning.",
          source="Paper Section 3.5 (Judge criterion 9: core ontology consistency; graph check: domain/range "
                 "cardinality; retry budget k = 2). Two domains = OOPS! pitfall P19, still reported in 3 of 9 RIGOR "
