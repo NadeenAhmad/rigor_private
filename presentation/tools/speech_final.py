@@ -125,23 +125,25 @@ TALK = [
          source="Paper Sections 3.2-3.4. Row-aligned BEFORE/AFTER, both verified with the OWL API."),
     dict(title="Step 5: validate",
          builds=[("Step five: validate. Plausible fragments can still break the ontology. First, a structural "
-                  "error. A later table, lab_result, reuses hasPatientData with a second domain, LabResult, "
-                  "while the core already says Admission. Merged, OWL infers that every lab result with patient "
-                  "data is an admission: OOPS! pitfall P19. Graph checks catch it: one domain per property.",
-                  "Structural card: the red line, the existing domain, then 'one domain per property'."),
-                 ("Second, a semantic error. For admission, the model generates hasPatient with range Patient, "
-                  "although the core already has PatientData. Valid OWL, but now two classes mean the same "
-                  "thing, and no rule sees that. The Judge-LLM sees the core and asks to reuse PatientData.",
-                  "Semantic card: the red line, then 'two classes, same thing'."),
+                  "error. Inspired by the Disease Ontology, the LLM turns BM_DEP into a link to a disease. But the "
+                  "seed already has BM_DEP as a yes/no number. One property can't be both a number and a link: "
+                  "OWL 2 DL forbids it. Our graph checks reject it before merging.",
+                  "Structural card: the red line, then 'a number and a link'."),
+                 ("Second, an error in meaning. The LLM invents a new class, Patient, but the core already has "
+                  "PatientData: two names for the same thing. That's valid OWL, so no rule complains. The "
+                  "Judge-LLM sees the core and asks to reuse PatientData.",
+                  "Semantic card: the red line, then 'two names for the same thing'."),
                  ("Either way, problems go back to the Gen-LLM, with up to two retries. If it still fails, the "
                   "Judge-LLM keeps the better of the Gen-LLM's final version and the plain direct mapping.",
                   "The strip.")],
          takeaway="Rules catch clashes in structure; the Judge catches clashes in meaning.",
-         source="Paper Section 3.5 (Judge criterion 9: core ontology consistency; graph check: domain/range "
-                "cardinality; retry budget k = 2). Two domains = OOPS! pitfall P19, still reported in 3 of 9 RIGOR "
-                "runs (Table 7). Examples verified with the OWL API (presentation/excerpts/slide10_*.omn).",
-         extra=["IF ASKED: P19 is exactly the error that sometimes still slips through (3 of 9 runs); putting "
-                "the validators inside the generation loop is our next step (slide 19)."]),
+         source="Paper Section 3.5 (graph check: type consistency, no URI both object and data property; Judge "
+                "criterion: reuse core concepts; retry budget k = 2). Punning an object and a data property violates "
+                "the OWL 2 DL structural restrictions. Examples are illustrative.",
+         extra=["IF ASKED WHAT ELSE THE GRAPH CHECKS CATCH: exactly one domain and one range per property, XSD-only "
+                "data ranges, and full schema coverage (backup B10). A second domain on a reused property is OOPS! "
+                "pitfall P19, which still slips through in 3 of 9 RIGOR runs; validators inside the loop are our next "
+                "step (slide 19)."]),
     dict(title="Step 6: merge",
          builds=[("Step six: merge. The validated delta joins the core ontology. Because RIGOR reuses "
                   "identifiers, this is a simple union of axioms. And here is the loop: the expanded ontology "
@@ -189,7 +191,7 @@ TALK = [
          source="Paper Sec. 4.6-4.7 (RDFLib, HermiT) and Table 7 (OOPS! totals per run). 72% of the other "
                 "methods' pitfalls are P08, missing annotations.",
          extra=["IF ASKED ABOUT CRITICAL ERRORS: P19 (multiple domains or ranges) is the only pitfall OOPS! rates "
-                "critical, and it is the second-domain error from the validation slide. Per ontology: Direct "
+                "critical, for example a property reused by a later table with a second domain. Per ontology: Direct "
                 "Mapping 15, LLM baseline 17, Non-Iterative RAG 5.4, RIGOR 2.8; zero in 6 of RIGOR's 9 "
                 "ontologies (Table 7). RIGOR's prompt allows one domain and one range, and the graph check "
                 "rejects a second."]),

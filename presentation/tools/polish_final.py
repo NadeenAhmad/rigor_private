@@ -226,9 +226,11 @@ def burr(tree):
 
 
 def validate_cards(tree):
-    """Step 5: the corrected P19 sentence runs to four lines; both cards grow by 0.2 in."""
+    """Step 5: the explanations run to four lines; both cards grow by 0.2 in, the code line widens."""
     for el in shapes(tree):
         g = geom(el)
+        if text(el).startswith("ObjectProperty: BM_DEP"):
+            set_geom(el, w=4.80)
         if g and abs(g[1] - 1.93) < 0.02 and abs(g[3] - 2.70) < 0.02:
             set_geom(el, h=2.90)
         elif g and abs(g[1] - 3.775) < 0.02 and abs(g[3] - 0.71) < 0.02:
@@ -263,11 +265,23 @@ FIXES = [
     (range(36, 37), "OPPS!", {"OPPS!": "OOPS!"}),
     (range(36, 37), "220 without RIGOR", {"Mistral on eICU, 220 without RIGOR": "Mistral on eICU, 220 with Non-Iterative RAG",
                                            "2 with it.": "2 with RIGOR."}),
+    # Step 5, structural card: the LLM turns BM_DEP into a link, but the seed has it as a number (punning).
+    (range(19, 22), "reuses a core property", {"Later table ": "The LLM links ", "lab_result": "BM_DEP",
+                                               "reuses": "to a disease", " a core property:": ":"}),
+    (range(19, 22), "hasPatientData  Domain: LabResult", {" hasPatientData  ": " BM_DEP  ", "Domain:": "Range:",
+                                                          " LabResult": " BoneMarrowDepression"}),
     (range(19, 22), "Merged with PatientData", {
-        "PatientData Domain: Admission": "hasPatientData Domain: Admission",
+        "Merged with ": "But the seed already has ",
+        "PatientData Domain: Admission": "DataProperty: BM_DEP",
         ", OWL infers that every lab result is an admission (pitfall P19). Graph checks allow ":
-            ", OWL infers that every lab result with patient data is an admission (pitfall P19). Graph checks allow "}),
-    (range(20, 22), "already has PatientData, now", {", now ": "; now "}),
+            ", a number. One property can’t be both a number and a link: OWL 2 DL forbids it. Graph checks ",
+        "one domain per property": "reject it"}),
+    (range(21, 22), "CORRECTION", ["CORRECTION   ", "DataProperty:", " BM_DEP  ", "Range:", " xsd:integer", "    |    ",
+                                   "ObjectProperty:", " hasPatientData  ", "Range:", " PatientData"]),
+    # Step 5, semantic card: duplicate class, said plainly.
+    (range(20, 22), "already has PatientData, now", {"Valid OWL, but the ": "A new class, but the ", ", now ": ": ",
+                                                    "two classes": "two names", " mean the ": " for the ",
+                                                    ". The ": ". Valid OWL, so no rule complains. The "}),
     (range(16, 17), "patient_id,BM_DEP", {"admission → query: admission + patient_id,BM_DEP, ecog_stage+ PatientData":
                                           "admission → query: admission + patient_id, BM_DEP, ecog_stage + PatientData"}),
     (range(41, 42), "Quality dimensions", {
@@ -293,6 +307,11 @@ def fix(tree, phys):
             if where not in "".join(r.findtext("a:t", namespaces=NS) or "" for r in rs):
                 continue
             hit = True
+            if isinstance(runs, list):  # positional replacement
+                assert len(runs) == len(rs), (phys, where)
+                for r, new in zip(rs, runs):
+                    r.find("a:t", NS).text = new
+                continue
             for i, r in enumerate(rs):
                 t = r.find("a:t", NS)
                 if t.text in runs and not (t.text == "LLM" and i == 1):  # keep the first 'LLM' of '3 LLM METHOD'
