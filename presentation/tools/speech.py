@@ -234,17 +234,21 @@ SLIDES = [
                 "relations are on par, attributes lower, and RIGOR also produces labels, hierarchy and "
                 "provenance. It is prompted, not fine-tuned."]),
     dict(title="Result 5: LLM judge and experts",
-         say="Automatic checks agree. Do evaluators agree? Both judged each table against its competency "
-             "questions: what the ontology must be able to answer, five per table, verified by a domain expert. "
-             "An LLM judge ranked RIGOR first on all fifty-eight tables, with its largest lead on the liver "
-             "registry that no LLM has seen. [pause] Ten ontology experts ranked RIGOR first in twenty-eight of "
-             "forty rankings. [pause] Direct mapping gives structure without meaning. LLMs alone give meaning "
-             "without structure. RIGOR gives both, and checks them.",
-         cue="Read the competency question aloud; then 58 of 58; then 28 of 40; then the closing strip.",
-         takeaway="Judged against competency questions, an LLM judge and human experts both rank RIGOR first.",
-         source="Paper Sec. 4.2 (5 CQs per table, LLM-generated, expert-verified; 290 in total), Table 6 (example), "
-                "Table 1 (scores, rankings), Table 12 (Kendall's W 0.39-0.72). Judge: Claude ontologies.",
-         cut="with its largest lead on the liver registry that no LLM has seen"),
+         say="Automatic checks agree. Do evaluators agree? For each table, an LLM judge and ten ontology experts "
+             "saw the schema, five competency questions, the questions the ontology must answer, and four "
+             "anonymized ontologies. They scored each on seven quality dimensions and ranked them. The LLM judge "
+             "put RIGOR first on every table, in all three databases. [pause] The experts put RIGOR first in seven "
+             "of ten rankings, with the highest average score on both databases. [pause] Direct mapping gives "
+             "structure without meaning. LLMs alone give meaning without structure. RIGOR gives both, and checks "
+             "them.",
+         cue="The 'How they judged' box in one breath; then the two claims; then the closing strip.",
+         takeaway="Judged blind against competency questions, an LLM judge and human experts both rank RIGOR first.",
+         source="Paper Sec. 4.2 and 4.6 (5 expert-verified CQs per table, 7 dimensions, ranking), Table 1 (judge "
+                "scores and first places: 58 of 58 tables), Table 11 (expert scores), Table 12 (Kendall's W "
+                "0.39-0.72). Judge evaluated the Claude ontologies; experts 4 medical tables, 28 of 40 first places.",
+         cut="with the highest average score on both databases",
+         extra=["IF ASKED HOW MANY: the judge ranked RIGOR first on 58 of 58 tables (16 Liver Cancer, 31 eICU-CRD, 11 "
+                "Chinook); the experts in 28 of 40 rankings (10 experts x 4 tables)."]),
     dict(title="Future work",
          say="Where next? Let the data speak. Remember BM_DEP? Without documentation, the name alone is a guess. "
              "The data gives two clues: it is only ever zero or one, so it is a flag; and it is one exactly when "

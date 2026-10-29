@@ -1,6 +1,6 @@
 # Rehearsal card
 
-Target: finish by **13:30**. Planned end: **13:09** (1364 words).
+Target: finish by **13:30**. Planned end: **13:15** (1373 words).
 
 | Slide | Starts at | Ends at | Words |
 |---|---|---|---|
@@ -26,9 +26,9 @@ Target: finish by **13:30**. Planned end: **13:09** (1364 words).
 | 20. Result 2: keeps the schema | 9:23 | 9:57 | 55 |
 | 21. Result 3: adds meaning | 9:57 | 10:21 | 39 |
 | 22. Result 4: BURR | 10:21 | 11:07 | 81 |
-| 23. Result 5: LLM judge and experts | 11:07 | 11:58 | 82 |
-| 24. Future work | 11:58 | 12:37 | 68 |
-| 25. Thank you | 12:37 | 13:09 | 57 |
+| 23. Result 5: LLM judge and experts | 11:07 | 12:03 | 91 |
+| 24. Future work | 12:03 | 12:42 | 68 |
+| 25. Thank you | 12:42 | 13:15 | 57 |
 
 ## Checkpoints
 
@@ -48,9 +48,9 @@ Glance at the clock when these slides come up. More than 30 s behind: apply the 
 - Slide 20 (Result 2: keeps the schema): drop "and swings with the LLM, from six to seventy-eight percent" (saves ~6 s)
 - Slide 21 (Result 3: adds meaning): drop "Non-Iterative RAG adds labels, but no provenance and no class hierarchy." (saves ~6 s)
 - Slide 22 (Result 4: BURR): drop "scored with F1 against a gold mapping" (saves ~4 s)
-- Slide 23 (Result 5: LLM judge and experts): drop "with its largest lead on the liver registry that no LLM has seen" (saves ~7 s)
+- Slide 23 (Result 5: LLM judge and experts): drop "with the highest average score on both databases" (saves ~5 s)
 - Slide 24 (Future work): drop "Without documentation, the name alone is a guess." (saves ~5 s)
 
-All cuts together save about 46 s.
+All cuts together save about 43 s.
 
 Slides 12–17 are quick clicks (about 5–10 s each). If very late, say only the first and last sentences and click through the middle four.

@@ -135,8 +135,10 @@ PIT_RUNS = {"Direct Mapping": (731, 665, 102),
             "RIGOR": (20, 23, 3, 2, 2, 26, 0, 0, 0)}
 # Table 1: LLM-judge average score (0-5, Claude ontologies) and expert first places (of 20).
 JUDGE_SCORE = {"Direct Mapping": (2.05, 2.13, 0.13), "LLM baseline": (1.38, 0.28, 1.48),
-               "Non-Iterative": (1.89, 0.67, 2.77), "RIGOR": (3.93, 3.64, 3.32)}
-EXPERT_DB = {"Direct Mapping": (3, 2), "LLM baseline": (1, 4), "Non-Iterative": (2, 0), "RIGOR": (14, 14)}
+               "Non-Iterative RAG": (1.89, 0.67, 2.77), "RIGOR": (3.93, 3.64, 3.32)}
+# Table 11: expert average score (0-5) per medical database (Claude ontologies).
+EXPERT_SCORE = {"Direct Mapping": (2.95, 2.59), "LLM baseline": (2.74, 3.01), "Non-Iterative RAG": (2.39, 1.24),
+                "RIGOR": (3.44, 3.53)}
 GOOD2, GOOD1, MID, BAD1, BAD2 = "BFE3CF", "DDF0E5", "F1F3F2", "F6DAD3", "EDB8AC"
 
 
@@ -292,34 +294,32 @@ def build_c(tree):
 def build_d(tree):
     ids = reset(tree, "RESULT 5  /  LLM JUDGE AND HUMAN EXPERTS",
                 "An LLM judge and human experts both rank RIGOR first.",
-                "Both ranked four anonymized ontologies per table, judged against that table's competency questions.")
+                "Blind evaluation: nobody knew which ontology came from which method.")
     ladder(tree, ids, {5})
-    add(tree, shape(ids(), "CQ strip", 0.88, TOP, 11.57, 0.52,
-                    r("COMPETENCY QUESTIONS  ", TEAL, 1150, True, "Consolas")
-                    + r("what the ontology must answer. 5 per table, 290 in total, expert-verified.  ",
-                        BODY, 1150)
-                    + r("e.g. “Which patients had abnormal physical exam findings?”",
-                        INK, 1150, italic=True),
+    add(tree, shape(ids(), "How", 0.88, TOP, 11.57, 0.72,
+                    r("HOW THEY JUDGED   ", TEAL, 1150, True, "Consolas")
+                    + r("For each table: its schema, its 5 competency questions (what the ontology must answer) and "
+                        "four anonymized ontologies. Each scored 0\u20135 on accuracy, completeness, conciseness, "
+                        "adaptability, clarity, consistency and domain enrichment, then ranked 1st\u20134th.", BODY, 1200),
                     geom="roundRect", fill="FFFFFF", line=LINE, anchor="ctr", inset=0.22))
-    y, h = TOP + 0.62, 2.83
+    y, h = TOP + 0.82, 2.63
     x, w = 0.88, 6.30
-    card(tree, ids, x, y, w, h, "LLM-AS-A-JUDGE  ·  GPT-5.4", fill=PANEL)
-    add(tree, text(ids, x + 0.3, y + 0.42, 2.4, 0.62, r("58 / 58", INK, 3400, True, "Cambria"), name="Big"))
-    add(tree, text(ids, x + 2.55, y + 0.45, w - 2.8, 0.55, r("tables with RIGOR ranked first", EMERALD, 1500, True),
+    card(tree, ids, x, y, w, h, "LLM-AS-A-JUDGE  \u00b7  GPT-5.4", fill=PANEL)
+    add(tree, text(ids, x + 0.3, y + 0.48, w - 0.6, 0.40,
+                   r("First on every table", EMERALD, 1800, True) + r(", in all three databases", BODY, 1500),
                    anchor="ctr", name="Claim"))
-    heat_table(tree, ids, x + 0.25, y + 1.08, 1.45, 1.42, 0.34, JUDGE_SCORE,
+    heat_table(tree, ids, x + 0.25, y + 0.98, 1.65, 1.36, 0.32, JUDGE_SCORE,
                lambda v: shade(v, (1.0, 2.0, 3.0, 3.5)), lambda v: f"{v:.2f}", sub=None)
     x2, w2 = 7.33, 5.12
     card(tree, ids, x2, y, w2, h, "10 ONTOLOGY EXPERTS", fill=PANEL)
-    add(tree, text(ids, x2 + 0.3, y + 0.42, 2.4, 0.62, r("28 / 40", INK, 3400, True, "Cambria"), name="Big"))
-    add(tree, text(ids, x2 + 2.45, y + 0.45, w2 - 2.6, 0.55, r("rankings with RIGOR first (70%)", EMERALD, 1500,
-                                                              True), anchor="ctr", name="Claim"))
-    heat_table(tree, ids, x2 + 0.25, y + 1.08, 1.45, 1.55, 0.34, EXPERT_DB,
-               lambda v: shade(v, (1, 3, 6, 10)), str, cols=DBS[:2], sub=None)
+    add(tree, text(ids, x2 + 0.3, y + 0.48, w2 - 0.6, 0.40,
+                   r("First in 7 of 10 rankings", EMERALD, 1800, True), anchor="ctr", name="Claim"))
+    heat_table(tree, ids, x2 + 0.25, y + 0.98, 1.65, 1.48, 0.32, EXPERT_SCORE,
+               lambda v: shade(v, (1.0, 2.0, 3.0, 3.5)), lambda v: f"{v:.2f}", cols=DBS[:2], sub=None)
     strip(tree, ids, 6.43, r("Direct Mapping: structure without meaning.  LLMs alone: meaning without structure.  ",
                              BODY, 1400) + r("RIGOR: both, and checked.", EMERALD, 1400, True))
-    source(tree, ids, "Judge: average score 0–5 per database, Claude ontologies, 58 tables. Experts: first places of "
-                      "20 per database, 4 medical tables, Kendall's W 0.39–0.72. Paper Tables 1, 6, 12.")
+    source(tree, ids, "Average scores (0\u20135) per database. Judge: all 58 tables, ontologies generated with Claude. "
+                      "Experts: 4 medical tables, significant agreement (Kendall's W). Paper Sec. 4.6, Tables 1, 10\u201312.")
 
 
 def add_notes(work, slide_name, title):
