@@ -131,26 +131,16 @@ def target_state(upto):
         out.append(line.rstrip(",") + ("," if line.startswith("    ") and continues else ""))
     return "\n".join(out)
 
-# Future work (slide 22): instance pattern + drug label -> a reviewable candidate, no causal axiom.
-FUTURE = """Individual: cisplatin_bmdep
-  Types: CandidateAssociation
-  Facts:
-    hasDrug Cisplatin,
-    hasCondition BoneMarrowDepression,
-    status "needs expert review"
+# Future work: no documentation, so instance data explains a cryptic column (paper Sec. 5). The data shows
+# BM_DEP is a 0/1 flag that is 1 exactly when cisplatin was given; RIGOR proposes a label for expert review.
+FUTURE = """DataProperty: BM_DEP
   Annotations:
+    rdfs:label "Bone marrow depression"@en,
+    rdfs:comment "1 = yes, 0 = no"@en,
     prov:wasDerivedFrom admission:BM_DEP,
-    prov:wasDerivedFrom treatment:drug,
-    prov:wasDerivedFrom doc:cisplatin_label"""
+    prov:wasDerivedFrom treatment:drug"""
 
-FUTURE_SUPPORT = """Class: CandidateAssociation
-ObjectProperty: hasDrug
-ObjectProperty: hasCondition
-DataProperty: status
-Individual: Cisplatin
-Individual: BoneMarrowDepression
-Individual: doc:cisplatin_label
-Individual: treatment:drug
+FUTURE_SUPPORT = """Individual: treatment:drug
 """
 
 # Slide 10: errors a capable LLM still makes, which the paper's checks target.

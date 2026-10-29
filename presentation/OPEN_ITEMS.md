@@ -57,9 +57,11 @@ author's edits.
   OntoMetrics refs), Direct Mapping and LLM baseline shown as 'none in any run', shading within each database, R4 BURR (one
   Claude run), R5 LLM judge + experts per database with competency questions (Tables 1, 6, 12).
   Ablation stays in backup (one database, one LLM, tiny overall difference). Talk ends at 13:53.
-- Future work (`tools/future_v2.py`, output `RIGOR_future_work.pptx`): validators in the loop first
-  (NeOn-GPT ESWC 2024, Extended NeOn-GPT SWJ 2026, RIGOR App ISWC 2026 Demos: Fathallah, Nayyeri,
-  Staab), then the instance-data story, then the privacy line.
+- Future work (`tools/future_v3.py`, output `RIGOR_future_work.pptx`): "Next: close the loop, and let the
+  data speak." Strip: the evaluation tools (OOPS!, reasoner) move into the loop, live in the RIGOR App demo.
+  Then data -> clues -> answer: with no documentation, instance data explains the cryptic column BM_DEP
+  (a 0/1 flag that is 1 exactly with cisplatin -> "Bone marrow depression", candidate for expert review),
+  matching the paper's Sec. 5. Citations (NeOn-GPT, Extended NeOn-GPT, RIGOR App) in the footer.
 
 ## Author's decisions to carry into the next revision
 

@@ -17,21 +17,10 @@ ObjectProperty: hasPatientData
 Individual: admission:BM_DEP
 Individual: admission:ecog_stage
 Individual: obo:DOID_4961
-Class: CandidateAssociation
-ObjectProperty: hasDrug
-ObjectProperty: hasCondition
-DataProperty: status
-Individual: Cisplatin
-Individual: BoneMarrowDepression
-Individual: doc:cisplatin_label
 Individual: treatment:drug
-Individual: cisplatin_bmdep
-  Types: CandidateAssociation
-  Facts:
-    hasDrug Cisplatin,
-    hasCondition BoneMarrowDepression,
-    status "needs expert review"
+DataProperty: BM_DEP
   Annotations:
+    rdfs:label "Bone marrow depression"@en,
+    rdfs:comment "1 = yes, 0 = no"@en,
     prov:wasDerivedFrom admission:BM_DEP,
-    prov:wasDerivedFrom treatment:drug,
-    prov:wasDerivedFrom doc:cisplatin_label
+    prov:wasDerivedFrom treatment:drug
