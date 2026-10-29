@@ -1,6 +1,6 @@
 # RIGOR talk: spoken script (final deck)
 
-Timing model: 105 words per minute (clicks included) plus 2 s per [pause]. Total: 1392 words, ending at 13:25. Each physical slide's notes hold only what is said while it is on screen.
+Timing model: 105 words per minute (clicks included) plus 2 s per [pause]. Total: 1394 words, ending at 13:27. Each physical slide's notes hold only what is said while it is on screen.
 
 ## 1. Title  (0:00–0:25)
 
@@ -168,13 +168,13 @@ Step six: merge. The validated delta joins the core ontology. Because RIGOR reus
 
 > The evaluation strip.
 
-## 14. Result 1: valid, fewer errors  (8:20–8:53)
+## 14. Result 1: valid, fewer errors  (8:20–8:54)
 
-We go from the easiest check to the hardest. First, the basics: all thirty ontologies are valid and logically consistent. Modeling errors are another story. Direct mapping averages about five hundred OOPS! pitfalls per ontology, RIGOR eight. Same LLM, same database: Mistral on eICU makes two hundred twenty with Non-Iterative RAG, two with RIGOR. [pause]
+We go from the easiest check to the hardest. First, the basics: all thirty ontologies parse without errors and are logically consistent. Modeling errors are another story. Direct mapping averages about five hundred OOPS! pitfalls per ontology, RIGOR eight. Same LLM, same database: Mistral on eICU makes two hundred twenty with Non-Iterative RAG, two with RIGOR. [pause]
 
 > One breath for validity; then the averages; then the Mistral eICU column.
 
-## 15. Result 2: keeps the schema  (8:53–9:27)
+## 15. Result 2: keeps the schema  (8:54–9:29)
 
 **Reveal 1/2.** Fewer errors, but is anything lost? On average, RIGOR covers ninety-three percent of the columns, as much as direct mapping. Non-Iterative RAG, with the same retrieved context but no seed, covers only a third.
 
@@ -184,25 +184,25 @@ We go from the easiest check to the hardest. First, the basics: all thirty ontol
 
 > The outlined Non-Iterative RAG row, then the strip.
 
-## 16. Result 3: adds meaning  (9:27–9:53)
+## 16. Result 3: adds meaning  (9:29–9:55)
 
 Nothing is lost. Is meaning added? Direct mapping and the LLM baseline add no labels, provenance or hierarchy, in any run. Non-Iterative RAG adds labels, but no provenance and no hierarchy. Only RIGOR adds all three, with every LLM, in every database. [pause]
 
 > The red band first, then the three RIGOR rows.
 
-## 17. Result 4: BURR  (9:53–10:36)
+## 17. Result 4: BURR  (9:55–10:37)
 
 Meaning is added. But is the link back to the data still correct? BURR, an external benchmark, checks exactly this: every class, relation and attribute must map back to the right table, foreign key or column, scored with F1 against gold mappings. On BURR's ISWC scenario, RIGOR has the highest F1 on all three, ahead of rule-based and LLM-based systems. Against the LLM-based OntoGenix, relations nearly double, because foreign keys become named relations, like hasPatientData.
 
 > Left card first, then land on the RIGOR row.
 
-## 18. Result 5: LLM judge and experts  (10:36–11:28)
+## 18. Result 5: LLM judge and experts  (10:37–11:29)
 
 Automatic checks agree. Do evaluators agree? For each table, an LLM judge and ten ontology experts saw the schema, five competency questions, the questions the ontology must answer, and four anonymized ontologies. They scored each on seven dimensions and ranked them first to fourth. The LLM judge put RIGOR first in every ranking. [pause] The experts put RIGOR first in seventy percent of their rankings, with the highest average score. [pause] Direct mapping gives structure without meaning. LLMs alone give meaning without structure. RIGOR gives both.
 
 > The 'How they judged' box in one breath; then the two headlines.
 
-## 19. Future work: validators in the loop  (11:28–12:07)
+## 19. Future work: validators in the loop  (11:29–12:08)
 
 **Reveal 1/2.** Where next? First, the validators. RDFLib, the reasoner and OOPS! only checked our final ontologies; NeOn-GPT first proposed this stack of checks for evaluation. Next, they flag each error while RIGOR builds, and their feedback prompts the LLM to repair the ontology.
 
@@ -212,7 +212,7 @@ Automatic checks agree. Do evaluators agree? For each table, an LLM judge and te
 
 > Screenshot, then the two QR codes.
 
-## 20. Future work: let the data speak  (12:07–12:53)
+## 20. Future work: let the data speak  (12:08–12:54)
 
 **Reveal 1/2.** Second, let the data speak. Today RIGOR reads schemas and documentation, but instance data can propose new knowledge. Here, the treatment table says which admissions received cisplatin, and the admission table records bone marrow depression.
 
@@ -222,7 +222,7 @@ Automatic checks agree. Do evaluators agree? For each table, an LLM judge and te
 
 > The pattern bars, then the candidate code and its badge.
 
-## 21. Thank you  (12:53–13:25)
+## 21. Thank you  (12:54–13:27)
 
 To conclude. RIGOR anchors LLM generation in the database itself, grounds it in retrieved knowledge, and checks every step before the ontology grows. The result: meaning without losing structure, the link to the data intact, and ontologies that experts prefer. The paper and code are behind these QR codes. Thank you. I'm happy to take your questions.
 

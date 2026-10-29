@@ -181,8 +181,8 @@ TALK = [
          source="Paper Sections 4.1-4.6. 30 ontologies = 3 LLM methods x 3 databases x 3 LLMs + 3 direct "
                 "mappings. Models: Claude Opus 4.6, Mistral Small 24B, DeepSeek-Chat (paper footnotes 9-11)."),
     dict(title="Result 1: valid, fewer errors",
-         builds=[("We go from the easiest check to the hardest. First, the basics: all thirty ontologies are "
-                  "valid and logically consistent. Modeling errors are another story. Direct mapping averages "
+         builds=[("We go from the easiest check to the hardest. First, the basics: all thirty ontologies "
+                  "parse without errors and are logically consistent. Modeling errors are another story. Direct mapping averages "
                   "about five hundred OOPS! pitfalls per ontology, RIGOR eight. Same LLM, same database: Mistral "
                   "on eICU makes two hundred twenty with Non-Iterative RAG, two with RIGOR. [pause]",
                   "One breath for validity; then the averages; then the Mistral eICU column.")],

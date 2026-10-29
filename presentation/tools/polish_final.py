@@ -225,6 +225,23 @@ def burr(tree):
             resize(el, {1130: 1200})  # mapping boxes are full at 10.5 pt
 
 
+def validate_cards(tree):
+    """Step 5: the corrected P19 sentence runs to four lines; both cards grow by 0.2 in."""
+    for el in shapes(tree):
+        g = geom(el)
+        if g and abs(g[1] - 1.93) < 0.02 and abs(g[3] - 2.70) < 0.02:
+            set_geom(el, h=2.90)
+        elif g and abs(g[1] - 3.775) < 0.02 and abs(g[3] - 0.71) < 0.02:
+            set_geom(el, h=0.90)
+
+
+def judges_footer(tree):
+    """Result 5: the corrected citation wraps to two lines; keep it clear of the slide number."""
+    for el in shapes(tree):
+        if text(el).startswith("Quality dimensions"):
+            set_geom(el, y=6.95, w=11.40)
+
+
 def ladder_only(tree):
     for el in shapes(tree):
         if re.match(r"^\d  [A-Z ,]+$", text(el)):
@@ -233,6 +250,54 @@ def ladder_only(tree):
 
 def future_data(tree):
     resize(tree.getroot(), {950: 1100, 1150: 1200})
+
+
+# ---- corrections the author approved ---------------------------------------------------------
+
+# (physical slides, paragraph must contain, {exact run text: new run text})
+FIXES = [
+    (range(31, 36), "Direct Mapping [Goldberger", {"[Goldberger et al. 2000]  ": "[Sequeda et al., WWW 2012]  "}),
+    (range(29, 36), "PhysioNet [Goldberger", {"[Goldberger et al. 2000]  ": "[Pollard et al., Sci. Data 2018]  "}),
+    (range(36, 37), "valid OWL2DL", {"All 30 ontologies are": "All 30 ontologies", " valid OW": " parse without errors ",
+                                      "L": "", "2DL ": "", "(RDFLib) and ": "(RDFLib) and are "}),
+    (range(36, 37), "OPPS!", {"OPPS!": "OOPS!"}),
+    (range(36, 37), "220 without RIGOR", {"Mistral on eICU, 220 without RIGOR": "Mistral on eICU, 220 with Non-Iterative RAG",
+                                           "2 with it.": "2 with RIGOR."}),
+    (range(19, 22), "Merged with PatientData", {
+        "PatientData Domain: Admission": "hasPatientData Domain: Admission",
+        ", OWL infers that every lab result is an admission (pitfall P19). Graph checks allow ":
+            ", OWL infers that every lab result with patient data is an admission (pitfall P19). Graph checks allow "}),
+    (range(20, 22), "already has PatientData, now", {", now ": "; now "}),
+    (range(16, 17), "patient_id,BM_DEP", {"admission → query: admission + patient_id,BM_DEP, ecog_stage+ PatientData":
+                                          "admission → query: admission + patient_id, BM_DEP, ecog_stage + PatientData"}),
+    (range(41, 42), "Quality dimensions", {
+        "Quality dimensions: accuracy, completeness, conciseness, adaptability, clarity, consistency, ":
+            "Quality dimensions: accuracy, completeness, conciseness, adaptability, clarity, consistency "
+            "[Vrandečić, Handbook on Ontologies 2009]; ",
+        "domain enrichment ": "domain enrichment, adapted from ontology enrichment ",
+        "[Vrandečić, Handbook on Ontologies 2009; OntoQA: Tartir et al., KADASH 2005].": "[Petasis et al., LNCS 2011]."}),
+    (range(32, 35), "3 LLM METHOD × 3 DATABASE × 3 LLM", {"METHOD": "METHODS", "DATABASE": "DATABASES", "LLM": "LLMS"}),
+    (range(33, 35), "1 METHOD × 3 DATABASE =", {"DATABASE": "DATABASES"}),
+    (range(42, 44), "tools in the loop", {"Next: Move the evaluation tools in the loop ":
+                                          "Next: Move the evaluation tools into the loop"}),
+]
+
+
+def fix(tree, phys):
+    for span, where, runs in FIXES:
+        if phys not in span:
+            continue
+        hit = False
+        for p in tree.iter(f"{{{A}}}p"):
+            rs = p.findall(".//a:r", NS)
+            if where not in "".join(r.findtext("a:t", namespaces=NS) or "" for r in rs):
+                continue
+            hit = True
+            for i, r in enumerate(rs):
+                t = r.find("a:t", NS)
+                if t.text in runs and not (t.text == "LLM" and i == 1):  # keep the first 'LLM' of '3 LLM METHOD'
+                    t.text = runs[t.text]
+        assert hit, (phys, where)
 
 
 # ---- slide numbers -----------------------------------------------------------------------------
@@ -255,7 +320,7 @@ def number(tree, n, arch=False):
 
 EDITS = {range(3, 9): slides_3_to_8, range(17, 19): slides_17_18, range(12, 13): slide_12,
          range(36, 40): results_tables, range(41, 42): results_tables, range(40, 41): burr,
-         range(44, 46): future_data}
+         range(44, 46): future_data, range(19, 22): validate_cards}
 
 
 def main(src, dst):
@@ -267,11 +332,14 @@ def main(src, dst):
     last = talk_no[-1]
     for phys, (path, n) in enumerate(zip(order, talk_no), 1):
         tree = etree.parse(str(path))
+        fix(tree, phys)
         for span, fn in EDITS.items():
             if phys in span:
                 fn(tree)
         if phys in range(40, 41):
             ladder_only(tree)
+        if phys == 41:
+            judges_footer(tree)
         if 1 < n < last:
             number(tree, n, arch=speech_final.TALK[n - 1]["title"].startswith("Reassembling"))
         tree.write(str(path), xml_declaration=True, encoding="UTF-8", standalone=True)

@@ -16,12 +16,12 @@
 | 12 | Reassembling the architecture | 6:43 | Order, seed, retrieve, generate, validate, merge, loop. |
 | 13 | Evaluation setup | 7:22 | Three databases, three LLMs, four methods, four kinds of evidence. |
 | 14 | Result 1: valid, fewer errors | 8:20 | Every ontology is valid; RIGOR's have far fewer modeling errors, with every LLM. |
-| 15 | Result 2: keeps the schema | 8:53 | RIGOR keeps the schema as well as Direct Mapping, with every LLM. |
-| 16 | Result 3: adds meaning | 9:27 | Only RIGOR adds labels, provenance and a class hierarchy, with every LLM. |
-| 17 | Result 4: BURR | 9:53 | Semantic enrichment did not break the correspondence that OBDA and KG population need. |
-| 18 | Result 5: LLM judge and experts | 10:36 | Judged blind against competency questions, an LLM judge and human experts both rank RIGOR first. |
-| 19 | Future work: validators in the loop | 11:28 | The evaluation checks move inside generation; the RIGOR App already does this. |
-| 20 | Future work: let the data speak | 12:07 | Instance data can propose new, reviewable knowledge that the documentation does not contain. |
-| 21 | Thank you | 12:53 | Grounded, retrieved, validated. |
+| 15 | Result 2: keeps the schema | 8:54 | RIGOR keeps the schema as well as Direct Mapping, with every LLM. |
+| 16 | Result 3: adds meaning | 9:29 | Only RIGOR adds labels, provenance and a class hierarchy, with every LLM. |
+| 17 | Result 4: BURR | 9:55 | Semantic enrichment did not break the correspondence that OBDA and KG population need. |
+| 18 | Result 5: LLM judge and experts | 10:37 | Judged blind against competency questions, an LLM judge and human experts both rank RIGOR first. |
+| 19 | Future work: validators in the loop | 11:29 | The evaluation checks move inside generation; the RIGOR App already does this. |
+| 20 | Future work: let the data speak | 12:08 | Instance data can propose new, reviewable knowledge that the documentation does not contain. |
+| 21 | Thank you | 12:54 | Grounded, retrieved, validated. |
 
-Finish by 13:25; the slot is 15:00.
+Finish by 13:27; the slot is 15:00.
