@@ -55,7 +55,8 @@ author's edits.
   `RIGOR_results.pptx`): R1 valid + keeps the schema, R2 adds meaning + fewer errors, R3 BURR
   (+ relations 0.67 vs 0.11), R4 LLM judge 58/58 + experts 28/40, R5 where the gains come from
   (Mistral 24B coverage 17% -> 98% with RIGOR, $0.12 vs $33; judge lead +1.9 / +1.5 / +0.6 by domain).
-  Replace the author's three result slides with these five. Talk ends at 13:40.
+  R1, R2 and R4 break every result down by database and LLM (heat tables from Tables 9, 7, 1).
+  Replace the author's three result slides with these five. Talk ends at 13:50.
 
 ## Author's decisions to carry into the next revision
 

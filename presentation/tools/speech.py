@@ -172,7 +172,8 @@ SLIDES = [
          say="We climb from the easiest check to the hardest. First: is anything lost? All thirty ontologies are "
              "valid OWL and logically consistent, for every method. On average, RIGOR covers ninety-three percent "
              "of the database columns, as much as direct mapping. Non-Iterative, with the same retrieved context "
-             "but no seed, covers only a third. [pause]",
+             "but no seed, covers only a third, and swings with the LLM, from six to seventy-eight percent. With "
+             "RIGOR, every LLM keeps at least seventy-seven percent, in every database. [pause]",
          cue="Thirty out of thirty, then the bars: RIGOR next to Direct Mapping, then Non-Iterative.",
          takeaway="RIGOR keeps the schema as well as Direct Mapping; context alone does not.",
          source="Paper Sec. 4.7 (validity, consistency) and Table 9 (column coverage, averaged over each method's "
@@ -182,13 +183,17 @@ SLIDES = [
          say="So nothing is lost. But is meaning added? On the left, per ontology: direct mapping and the LLM "
              "baseline add no labels at all. Non-Iterative adds labels, but no provenance and no hierarchy. Only "
              "RIGOR adds all three. On the right, the modeling pitfalls that OOPS! finds: about five hundred per "
-             "direct-mapping ontology, eight per RIGOR ontology. [pause] And the one critical pitfall, the second domain from our validation example, "
-             "is gone in six of RIGOR's nine ontologies.",
+             "direct-mapping ontology, eight per RIGOR ontology. Without validation, the small Mistral model "
+             "reaches two hundred twenty on eICU; with RIGOR, two. [pause]",
          cue="Left table, land on the RIGOR row; then 499 versus 8; then the strip.",
          takeaway="Only RIGOR adds labels, provenance and hierarchy, with far fewer modeling errors.",
          source="Paper Table 8 (annotations, provenance, SubClassOf) and Table 7 (OOPS! pitfalls), averaged per "
                 "ontology over all 30. 72% of the other methods' pitfalls are P08; P19 is the only critical one.",
-         cut="Non-Iterative adds labels, but no provenance and no hierarchy."),
+         cut="Non-Iterative adds labels, but no provenance and no hierarchy.",
+         extra=["IF ASKED ABOUT CRITICAL ERRORS: P19 (multiple domains or ranges) is the only pitfall OOPS! rates "
+                "critical, and it is the second-domain error from the validation slide. Per ontology: Direct "
+                "Mapping 15, LLM baseline 17, Non-Iterative 5.4, RIGOR 2.8; zero in 6 of RIGOR's 9 ontologies "
+                "(Table 7). RIGOR's prompt allows one domain and one range, and the graph check rejects a second."]),
     dict(title="Result 3: BURR",
          say="Meaning is added. But is the link back to the data still correct? BURR, an external benchmark, "
              "checks exactly this: every class, relation and attribute must map back to the right table, foreign "

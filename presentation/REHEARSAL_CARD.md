@@ -1,6 +1,6 @@
 # Rehearsal card
 
-Target: finish by **13:30**. Planned end: **13:40** (1418 words).
+Target: finish by **13:30**. Planned end: **13:50** (1435 words).
 
 | Slide | Starts at | Ends at | Words |
 |---|---|---|---|
@@ -22,13 +22,13 @@ Target: finish by **13:30**. Planned end: **13:40** (1418 words).
 | 16. Architecture 5/6 | 7:51 | 7:58 | 12 |
 | 17. Architecture 6/6 | 7:58 | 8:10 | 20 |
 | 18. Experimental setup | 8:10 | 8:45 | 62 |
-| 19. Result 1: nothing is lost | 8:45 | 9:17 | 53 |
-| 20. Result 2: meaning and errors | 9:17 | 10:03 | 77 |
-| 21. Result 3: BURR | 10:03 | 10:54 | 88 |
-| 22. Result 4: LLM judge and experts | 10:54 | 11:27 | 52 |
-| 23. Result 5: where the gains come from | 11:27 | 12:11 | 73 |
-| 24. Future work | 12:11 | 13:08 | 99 |
-| 25. Thank you | 13:08 | 13:40 | 57 |
+| 19. Result 1: nothing is lost | 8:45 | 9:30 | 75 |
+| 20. Result 2: meaning and errors | 9:30 | 10:13 | 72 |
+| 21. Result 3: BURR | 10:13 | 11:03 | 88 |
+| 22. Result 4: LLM judge and experts | 11:03 | 11:37 | 52 |
+| 23. Result 5: where the gains come from | 11:37 | 12:21 | 73 |
+| 24. Future work | 12:21 | 13:17 | 99 |
+| 25. Thank you | 13:17 | 13:50 | 57 |
 
 ## Checkpoints
 
@@ -37,8 +37,8 @@ Glance at the clock when these slides come up. More than 30 s behind: apply the 
 - **Slide 6** should come up at **3:01** (the method starts).
 - **Slide 12** should come up at **7:19** (the architecture recap starts).
 - **Slide 19** should come up at **8:45** (the results start).
-- **Slide 22** should come up at **10:54** (future work starts).
-- **Slide 23** should come up at **11:27** (the close starts).
+- **Slide 22** should come up at **11:03** (future work starts).
+- **Slide 23** should come up at **11:37** (the close starts).
 
 ## Cuts if running late
 
