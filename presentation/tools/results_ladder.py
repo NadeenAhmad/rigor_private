@@ -306,20 +306,20 @@ def build_d(tree):
     x, w = 0.88, 6.30
     card(tree, ids, x, y, w, h, "LLM-AS-A-JUDGE  \u00b7  GPT-5.4", fill=PANEL)
     add(tree, text(ids, x + 0.3, y + 0.48, w - 0.6, 0.40,
-                   r("First on every table", EMERALD, 1800, True) + r(", in all three databases", BODY, 1500),
+                   r("Ranked RIGOR first every time", EMERALD, 1800, True),
                    anchor="ctr", name="Claim"))
     heat_table(tree, ids, x + 0.25, y + 0.98, 1.65, 1.36, 0.32, JUDGE_SCORE,
                lambda v: shade(v, (1.0, 2.0, 3.0, 3.5)), lambda v: f"{v:.2f}", sub=None)
     x2, w2 = 7.33, 5.12
     card(tree, ids, x2, y, w2, h, "10 ONTOLOGY EXPERTS", fill=PANEL)
     add(tree, text(ids, x2 + 0.3, y + 0.48, w2 - 0.6, 0.40,
-                   r("First in 7 of 10 rankings", EMERALD, 1800, True), anchor="ctr", name="Claim"))
+                   r("Ranked RIGOR first 70% of the time", EMERALD, 1800, True), anchor="ctr", name="Claim"))
     heat_table(tree, ids, x2 + 0.25, y + 0.98, 1.65, 1.48, 0.32, EXPERT_SCORE,
                lambda v: shade(v, (1.0, 2.0, 3.0, 3.5)), lambda v: f"{v:.2f}", cols=DBS[:2], sub=None)
     strip(tree, ids, 6.43, r("Direct Mapping: structure without meaning.  LLMs alone: meaning without structure.  ",
                              BODY, 1400) + r("RIGOR: both, and checked.", EMERALD, 1400, True))
-    source(tree, ids, "Average scores (0\u20135) per database. Judge: all 58 tables, ontologies generated with Claude. "
-                      "Experts: 4 medical tables, significant agreement (Kendall's W). Paper Sec. 4.6, Tables 1, 10\u201312.")
+    source(tree, ids, "Average scores (0\u20135) per database. Judge: ontologies generated with Claude. Experts: "
+                      "significant agreement (Kendall's W). Paper Sec. 4.6, Tables 1, 10\u201312.")
 
 
 def add_notes(work, slide_name, title):

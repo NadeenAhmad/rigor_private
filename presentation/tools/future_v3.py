@@ -34,8 +34,8 @@ TABLES = [
      [("A1", "P1", "1"), ("A2", "P2", "0"), ("A3", "P3", "1")], None),
 ]
 JOINED = {"A1", "A3"}
-CARDS = ((0.88, 3.55), (4.79, 3.45), (8.60, 3.85))   # x, width
-CARD_TOP, CARD_H = 2.62, 3.68
+CARDS = ((0.88, 3.55), (4.79, 3.30), (8.45, 4.00))   # x, width
+CARD_TOP, CARD_H = 2.52, 3.90
 
 
 def r(t, color=INK, size=1200, bold=False, font="Calibri", italic=False):
@@ -73,61 +73,61 @@ def card(tree, ids, x, w, label, note=""):
 def tables(tree, ids, x, w):
     bx, bw, y = x + 0.15, w - 0.30, CARD_TOP + 0.82
     for name, cols, widths, rows, fk in TABLES:
-        h = 0.32 + 0.22 + len(rows) * 0.205 + 0.07
+        h = 0.36 + 0.26 + len(rows) * 0.245 + 0.08
         add(tree, simple_box(ids(), f"Table {name}", bx, y, bw, h, fill=TABLE_FILL, geom="roundRect", shadow=True))
-        add(tree, shape(ids(), "Table name", bx + 0.15, y + 0.03, bw - 0.3, 0.27, r(name, INK, 1450, True),
+        add(tree, shape(ids(), "Table name", bx + 0.15, y + 0.03, bw - 0.3, 0.30, r(name, INK, 1600, True),
                         anchor="ctr"))
-        add(tree, shape(ids(), "Rule", bx + 0.15, y + 0.32, bw - 0.30, 0.012, fill="9AA3A9"))
+        add(tree, shape(ids(), "Rule", bx + 0.15, y + 0.36, bw - 0.30, 0.012, fill="9AA3A9"))
         cx = bx + 0.15
         for col, cw in zip(cols, widths):
-            label = r(col, EMERALD, 1050, True) + (r("  FK", MUTED, 900) if col == fk else "")
-            add(tree, shape(ids(), "Column", cx, y + 0.35, cw, 0.20, label, anchor="ctr"))
+            label = r(col, EMERALD, 1150, True) + (r(" FK", MUTED, 950) if col == fk else "")
+            add(tree, shape(ids(), "Column", cx, y + 0.39, cw, 0.24, label, anchor="ctr"))
             cx += cw
         for k, row in enumerate(rows):
-            ry = y + 0.56 + k * 0.205
+            ry = y + 0.64 + k * 0.245
             if row[0] in JOINED:
-                add(tree, shape(ids(), "Row band", bx + 0.08, ry, bw - 0.16, 0.19, fill=BAND))
+                add(tree, shape(ids(), "Row band", bx + 0.08, ry, bw - 0.16, 0.225, fill=BAND))
             cx = bx + 0.15
             for cell, cw in zip(row, widths):
-                add(tree, shape(ids(), "Cell", cx, ry, cw, 0.19, r(cell, INK, 1050, False, "Consolas"), anchor="ctr"))
+                add(tree, shape(ids(), "Cell", cx, ry, cw, 0.225, r(cell, INK, 1250, False, "Consolas"), anchor="ctr"))
                 cx += cw
         y += h + 0.10
 
 
 def pattern(tree, ids, x, w):
     y = CARD_TOP + 0.85
-    add(tree, box(ids, x + 0.25, y, w - 0.5, 0.62,
-                  r("Every cisplatin admission has bone marrow depression.", INK, 1400, True), name="Pattern"))
-    y += 0.78
+    add(tree, box(ids, x + 0.25, y, w - 0.5, 0.80,
+                  r("Every cisplatin admission has bone marrow depression.", INK, 1600, True), name="Pattern"))
+    y += 1.00
     for label, hits, total in (("cisplatin", 2, 2), ("other drugs", 0, 1)):
-        add(tree, box(ids, x + 0.25, y, 1.25, 0.30, r(label, INK, 1150, False, "Consolas"), anchor="ctr",
+        add(tree, box(ids, x + 0.25, y, 1.30, 0.34, r(label, INK, 1300, False, "Consolas"), anchor="ctr",
                       name="Group"))
-        add(tree, shape(ids(), "Track", x + 1.50, y + 0.08, 1.05, 0.14, fill="E1E6E3"))
+        add(tree, shape(ids(), "Track", x + 1.55, y + 0.10, 0.85, 0.15, fill="E1E6E3"))
         if hits:
-            add(tree, shape(ids(), "Bar", x + 1.50, y + 0.08, 1.05 * hits / total, 0.14, fill=EMERALD))
-        add(tree, box(ids, x + 2.62, y, 0.65, 0.30, r(f"{hits} of {total}", EMERALD if hits else BODY, 1150, True),
+            add(tree, shape(ids(), "Bar", x + 1.55, y + 0.10, 0.85 * hits / total, 0.15, fill=EMERALD))
+        add(tree, box(ids, x + 2.45, y, 0.75, 0.34, r(f"{hits} of {total}", EMERALD if hits else BODY, 1300, True),
                       anchor="ctr", name="Count"))
-        y += 0.38
-    add(tree, box(ids, x + 0.25, y - 0.02, w - 0.5, 0.22, r("admissions with BM_DEP = 1", MUTED, 950, italic=True),
+        y += 0.44
+    add(tree, box(ids, x + 0.25, y, w - 0.5, 0.26, r("admissions with BM_DEP = 1", MUTED, 1100, italic=True),
                   name="Axis note"))
-    add(tree, shape(ids(), "Not documented", x + 0.15, CARD_TOP + 2.78, w - 0.30, 0.70,
-                    r("Not in the documentation: ", EMERALD, 1200, True)
-                    + r("a candidate for new knowledge.", BODY, 1200),
+    add(tree, shape(ids(), "Not documented", x + 0.15, CARD_TOP + 3.06, w - 0.30, 0.70,
+                    r("Not in the documentation: ", EMERALD, 1300, True)
+                    + r("a candidate for new knowledge.", BODY, 1300),
                     geom="roundRect", fill="E8F6EF", align="ctr", anchor="ctr", inset=0.12))
 
 
 def candidate(tree, ids, x, w):
-    add(tree, box(ids, x + 0.25, CARD_TOP + 0.48, w - 0.5, 0.28, r("A reviewable hypothesis, not a fact", MUTED, 1150,
+    add(tree, box(ids, x + 0.25, CARD_TOP + 0.48, w - 0.5, 0.28, r("A reviewable hypothesis, not a fact", MUTED, 1250,
                                                                    italic=True), name="Note"))
     lines = FUTURE.splitlines()
-    px, py, pw, pitch = x + 0.15, CARD_TOP + 0.88, w - 0.30, 0.19
+    px, py, pw, pitch = x + 0.15, CARD_TOP + 0.88, w - 0.30, 0.225
     add(tree, simple_box(ids(), "Code panel", px, py, pw, len(lines) * pitch + 0.14, fill="F6F8FA", line="D0D7DE",
                          geom="roundRect"))
     for k, line in enumerate(lines):
-        add(tree, code_line(ids(), px, py + 0.07 + k * pitch, pw - 0.05, pitch, line, "", None, size=1000))
-    add(tree, shape(ids(), "Candidate", x + 0.15, CARD_TOP + 2.92, w - 0.30, 0.56,
-                    r("A PATTERN, NOT A CAUSE  ", AMBER, 1100, True, "Consolas")
-                    + r("an expert reviews it before it joins the ontology", BODY, 1150),
+        add(tree, code_line(ids(), px, py + 0.07 + k * pitch, pw - 0.05, pitch, line, "", None, size=1100))
+    add(tree, shape(ids(), "Candidate", x + 0.15, CARD_TOP + 3.16, w - 0.30, 0.60,
+                    r("A PATTERN, NOT A CAUSE  ", AMBER, 1200, True, "Consolas")
+                    + r("an expert reviews it before it joins the ontology", BODY, 1250),
                     geom="roundRect", fill="FFF7E8", align="ctr", anchor="ctr", inset=0.10))
 
 
@@ -162,7 +162,7 @@ def edit(tree):
     mid = CARD_TOP + CARD_H / 2 - 0.18
     add(tree, arrow(ids, x1 + w1 + 0.03, mid))
     add(tree, arrow(ids, x2 + w2 + 0.03, mid))
-    add(tree, box(ids, 0.90, 6.52, 11.6, 0.26,
+    add(tree, box(ids, 0.90, 6.56, 11.6, 0.26,
                   r("Rows are synthetic. In practice, RIGOR would use aggregate statistics only, so patient data stays "
                     "in the hospital.", MUTED, 1000), name="Source"))
 

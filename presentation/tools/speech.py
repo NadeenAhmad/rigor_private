@@ -236,9 +236,9 @@ SLIDES = [
     dict(title="Result 5: LLM judge and experts",
          say="Automatic checks agree. Do evaluators agree? For each table, an LLM judge and ten ontology experts "
              "saw the schema, five competency questions, the questions the ontology must answer, and four "
-             "anonymized ontologies. They scored each on seven quality dimensions and ranked them. The LLM judge "
-             "put RIGOR first on every table, in all three databases. [pause] The experts put RIGOR first in seven "
-             "of ten rankings, with the highest average score on both databases. [pause] Direct mapping gives "
+             "anonymized ontologies. They scored each on seven quality dimensions and ranked them first to fourth. "
+             "The LLM judge ranked RIGOR first every time. [pause] The experts ranked RIGOR first seventy percent of "
+             "the time, with the highest average score. [pause] Direct mapping gives "
              "structure without meaning. LLMs alone give meaning without structure. RIGOR gives both, and checks "
              "them.",
          cue="The 'How they judged' box in one breath; then the two claims; then the closing strip.",
@@ -246,7 +246,7 @@ SLIDES = [
          source="Paper Sec. 4.2 and 4.6 (5 expert-verified CQs per table, 7 dimensions, ranking), Table 1 (judge "
                 "scores and first places: 58 of 58 tables), Table 11 (expert scores), Table 12 (Kendall's W "
                 "0.39-0.72). Judge evaluated the Claude ontologies; experts 4 medical tables, 28 of 40 first places.",
-         cut="with the highest average score on both databases",
+         cut="with the highest average score",
          extra=["IF ASKED HOW MANY: the judge ranked RIGOR first on 58 of 58 tables (16 Liver Cancer, 31 eICU-CRD, 11 "
                 "Chinook); the experts in 28 of 40 rankings (10 experts x 4 tables)."]),
     dict(title="Future work",
