@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Future-work slide: close the loop, then let the data explain a cryptic column.
+"""Future-work slide: let the instance data explain a cryptic column (paper Sec. 5).
 
-On the author's edited deck (the slide whose eyebrow starts with FUTURE WORK):
-  - title "Next: close the loop, and let the data speak.";
-  - strip: the evaluation tools (OOPS!, the reasoner) move into the loop, live in the RIGOR App demo;
+On the author's edited deck (the slide whose eyebrow starts with FUTURE WORK; the evaluation-loop
+step has its own slide in the author's deck):
+  - title "Next: let the data speak.", with the lead line as subtitle;
   - three cards, data -> clues -> answer: the two instance tables with a "?" on BM_DEP (the question
     from the motivation slide), two clues read from the data (a 0/1 flag; 1 exactly with cisplatin),
     and the proposed label with provenance (code_excerpts.FUTURE, verified with the OWL API);
-  - citations in the footer (paper Sec. 5; NeOn-GPT, Extended NeOn-GPT, RIGOR App).
+  - source line in the footer (synthetic rows; paper Sec. 5).
 Speaker notes come from speech.py. Writes a deck with only this slide.
 
 Usage: python3 future_v3.py <in.pptx> <out.pptx>
@@ -29,8 +29,7 @@ from speech import notes_for, timeline  # noqa: E402
 
 EMU = 914400
 R_NS = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-LINE, STRIP, BAND, TABLE_FILL, AMBER = "D9DEDB", "E6F2EC", "D7EDE2", "E9EEEB", "93600F"
-ICON = "image3.png"   # the graph-validation icon from the author's architecture figure
+LINE, BAND, TABLE_FILL, AMBER = "D9DEDB", "D7EDE2", "E9EEEB", "93600F"
 TABLES = [
     ("treatment", ("admission_id", "drug"), (1.15, 1.60),
      [("A1", "cisplatin"), ("A2", "nivolumab"), ("A3", "cisplatin")], "admission_id"),
@@ -39,7 +38,7 @@ TABLES = [
 ]
 JOINED = {"A1", "A3"}
 CARDS = ((0.88, 3.55), (4.79, 3.45), (8.60, 3.85))   # x, width
-CARD_TOP, CARD_H = 3.00, 3.55
+CARD_TOP, CARD_H = 2.62, 3.68
 
 
 def r(t, color=INK, size=1200, bold=False, font="Calibri", italic=False):
@@ -72,13 +71,6 @@ def magnifier(ids, x, y, size=0.34):
                  f'<a:avLst/></a:prstGeom><a:solidFill><a:srgbClr val="{EMERALD}"/></a:solidFill><a:ln><a:noFill/>'
                  f'</a:ln></p:spPr></p:sp>')
     return [ring, handle]
-
-
-def picture(ids, rid, x, y, w, h, descr):
-    return raw(f'<p:pic><p:nvPicPr><p:cNvPr id="{ids()}" name="Icon" descr="{descr}"/><p:cNvPicPr>'
-               f'<a:picLocks noChangeAspect="1"/></p:cNvPicPr><p:nvPr/></p:nvPicPr><p:blipFill>'
-               f'<a:blip r:embed="{rid}"/><a:stretch><a:fillRect/></a:stretch></p:blipFill><p:spPr>{xfrm(x, y, w, h)}'
-               f'<a:prstGeom prst="rect"><a:avLst/></a:prstGeom></p:spPr></p:pic>')
 
 
 def arrow(ids, x, y):
@@ -160,7 +152,7 @@ def answer(tree, ids, x, w):
                     geom="roundRect", fill="FFF7E8", align="ctr", anchor="ctr"))
 
 
-def edit(tree, icon_rid):
+def edit(tree):
     root = tree.find(".//p:spTree", NS)
     shapes = [el for el in root if el.tag in (f"{{{P}}}sp", f"{{{P}}}cxnSp", f"{{{P}}}pic", f"{{{P}}}grpSp")]
     eyebrow = next(sp for sp in shapes if text(sp).startswith("FUTURE WORK"))
@@ -172,24 +164,15 @@ def edit(tree, icon_rid):
         t.getparent().getparent().remove(t.getparent())
     list(eyebrow.iter(f"{{{A}}}t"))[0].text = "FUTURE WORK"
     ts = list(title.iter(f"{{{A}}}t"))
-    ts[0].text = "Next: close the loop, and let the data speak."
+    ts[0].text = "Next: let the data speak."
     for t in ts[1:]:
         t.getparent().getparent().remove(t.getparent())
     ids = Ids(tree)
-
-    # First: the evaluation tools move into the loop.
-    add(tree, shape(ids(), "Loop strip", 0.88, 1.80, 11.57, 0.62, geom="roundRect", fill=STRIP))
-    add(tree, picture(ids, icon_rid, 1.02, 1.86, 0.50, 0.50, "Graph validation icon"))
-    add(tree, shape(ids(), "Loop text", 1.62, 1.80, 10.70, 0.62,
-                    r("FIRST, MOVE THE EVALUATION TOOLS INTO THE LOOP   ", EMERALD, 1250, True)
-                    + r("OOPS! and the reasoner only checked our final ontologies. Next, they flag each error while "
-                        "RIGOR builds, so the generator fixes it before merging.  ", BODY, 1250)
-                    + r("Live in our RIGOR App demo.", INK, 1250, True, italic=True), anchor="ctr"))
-    # Then: the data explains a cryptic column.
-    add(tree, box(ids, 0.90, 2.56, 11.5, 0.34,
-                  r("THEN, LET THE DATA SPEAK   ", EMERALD, 1300, True)
-                  + r("When documentation is missing, instance data can explain ", BODY, 1450)
-                  + r("cryptic columns", INK, 1450, True) + r(".", BODY, 1450), anchor="ctr", name="Data lead"))
+    add(tree, box(ids, 0.90, 1.84, 11.5, 0.40, "".join(r(t, "3A434C" if b else MUTED, 1650, b, italic=i) for t, b, i in (
+        ("Today ", False, False), ("RIGOR", True, True), (" reads ", False, False), ("schemas", True, False),
+        (" and ", False, False), ("documentation", True, False), (". When documentation is missing, ", False, False),
+        ("instance data", True, False), (" can explain ", False, False), ("cryptic columns", True, False),
+        (".", False, False))), anchor="ctr", name="Subtitle"))
     (x1, w1), (x2, w2), (x3, w3) = CARDS
     card(tree, ids, x1, w1, "1  THE DATA")
     add(tree, box(ids, x1 + 0.25, CARD_TOP + 0.48, w1 - 0.5, 0.28,
@@ -203,10 +186,9 @@ def edit(tree, icon_rid):
     mid = CARD_TOP + CARD_H / 2 - 0.18
     add(tree, arrow(ids, x1 + w1 + 0.03, mid))
     add(tree, arrow(ids, x2 + w2 + 0.03, mid))
-    add(tree, box(ids, 0.90, 6.66, 11.6, 0.42,
-                  r("Rows are synthetic. Instance-level signals for cryptic columns: paper Sec. 5. Tool feedback in the "
-                    "loop: NeOn-GPT [Fathallah et al., ESWC 2024]; Extended NeOn-GPT [Fathallah et al., SWJ 2026]; "
-                    "RIGOR App [Fathallah, Nayyeri & Staab, ISWC 2026 Demos].", MUTED, 1000), name="Source"))
+    add(tree, box(ids, 0.90, 6.52, 11.6, 0.26,
+                  r("Rows are synthetic. Instance-level signals to disambiguate cryptic columns when documentation is "
+                    "unavailable: paper Sec. 5.", MUTED, 1000), name="Source"))
 
 
 def main(src, dst):
@@ -228,18 +210,10 @@ def main(src, dst):
     for sec in pres.iter("{http://schemas.microsoft.com/office/powerpoint/2010/main}sectionLst"):
         sec.getparent().remove(sec)
     pres.write(str(pres_path), xml_declaration=True, encoding="UTF-8", standalone=True)
-    if not (work / "ppt/media" / ICON).exists():
-        raise SystemExit(f"icon {ICON} not found in the deck")
-    rels_path = work / "ppt/slides/_rels" / f"{target}.rels"
-    rels_xml = rels_path.read_text(encoding="utf-8")
-    if "rIdIcon" not in rels_xml:
-        rels_xml = rels_xml.replace("</Relationships>", '<Relationship Id="rIdIcon" Type="http://schemas.openxmlformats'
-                                    f'.org/officeDocument/2006/relationships/image" Target="../media/{ICON}"/>'
-                                    "</Relationships>")
-        rels_path.write_text(rels_xml, encoding="utf-8")
+    rels_xml = (work / "ppt/slides/_rels" / f"{target}.rels").read_text(encoding="utf-8")
     path = work / "ppt/slides" / target
     tree = etree.parse(str(path))
-    edit(tree, "rIdIcon")
+    edit(tree)
     tree.write(str(path), xml_declaration=True, encoding="UTF-8", standalone=True)
     notes = re.search(r"notesSlides/(notesSlide\d+\.xml)", rels_xml)
     if notes:

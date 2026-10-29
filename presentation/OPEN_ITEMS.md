@@ -57,11 +57,10 @@ author's edits.
   OntoMetrics refs), Direct Mapping and LLM baseline shown as 'none in any run', shading within each database, R4 BURR (one
   Claude run), R5 LLM judge + experts per database with competency questions (Tables 1, 6, 12).
   Ablation stays in backup (one database, one LLM, tiny overall difference). Talk ends at 13:53.
-- Future work (`tools/future_v3.py`, output `RIGOR_future_work.pptx`): "Next: close the loop, and let the
-  data speak." Strip: the evaluation tools (OOPS!, reasoner) move into the loop, live in the RIGOR App demo.
-  Then data -> clues -> answer: with no documentation, instance data explains the cryptic column BM_DEP
-  (a 0/1 flag that is 1 exactly with cisplatin -> "Bone marrow depression", candidate for expert review),
-  matching the paper's Sec. 5. Citations (NeOn-GPT, Extended NeOn-GPT, RIGOR App) in the footer.
+- Future work (`tools/future_v3.py`, output `RIGOR_future_work.pptx`): only about instance data (the author
+  moved the evaluation-loop step to its own slide). "Next: let the data speak." Data -> clues -> answer: with
+  no documentation, BM_DEP is a 0/1 flag that is 1 exactly with cisplatin -> "Bone marrow depression",
+  candidate for expert review (paper Sec. 5). The loop slide's speech is not in speech.py yet.
 
 ## Author's decisions to carry into the next revision
 

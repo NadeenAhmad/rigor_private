@@ -246,19 +246,15 @@ SLIDES = [
                 "Table 1 (scores, rankings), Table 12 (Kendall's W 0.39-0.72). Judge: Claude ontologies.",
          cut="with its largest lead on the liver registry that no LLM has seen"),
     dict(title="Future work",
-         say="Where next? First, close the loop. The tools we evaluated with, OOPS! and the reasoner, only looked at "
-             "the final ontologies, which is why a few pitfalls slipped through. Next, they flag each error while "
-             "RIGOR builds. We started this in NeOn-GPT, and it is already live in our RIGOR App demo. [pause] Then, "
-             "let the data speak. Remember BM_DEP? Without documentation, the name alone is a guess. The data gives "
-             "two clues: it is only ever zero or one, so it is a flag; and it is one exactly when the patient "
-             "received cisplatin, a chemotherapy known to suppress the bone marrow. So RIGOR can propose: bone "
-             "marrow depression, with provenance to both columns, for an expert to confirm.",
-         cue="Strip first; then the '?' on BM_DEP, the two clues, and the reveal.",
-         takeaway="Close the loop with tool feedback; let instance data explain cryptic columns.",
-         source="Paper Sec. 5 (tool feedback in the loop; instance-level signals for cryptic columns when "
-                "documentation is missing). NeOn-GPT (ESWC 2024), Extended NeOn-GPT (SWJ 2026), RIGOR App (ISWC 2026 "
-                "Demos). Rows are synthetic. OWL verified (presentation/excerpts/slide22_future_candidate.omn).",
-         cut="which is why a few pitfalls slipped through",
+         say="Where next? Let the data speak. Remember BM_DEP? Without documentation, the name alone is a guess. "
+             "The data gives two clues: it is only ever zero or one, so it is a flag; and it is one exactly when "
+             "the patient received cisplatin, a chemotherapy known to suppress the bone marrow. So RIGOR can "
+             "propose: bone marrow depression, with provenance to both columns, for an expert to confirm.",
+         cue="The '?' on BM_DEP, then the two clues, then the reveal.",
+         takeaway="When documentation is missing, instance data can explain cryptic columns.",
+         source="Paper Sec. 5 (instance-level signals for cryptic columns when documentation is unavailable). Rows "
+                "are synthetic. OWL verified (presentation/excerpts/slide22_future_candidate.omn).",
+         cut="Without documentation, the name alone is a guess.",
          extra=["IF ASKED 'WHY NOT JUST ASK THE LLM WHAT BM_DEP MEANS?': from the name alone it is a guess. The data "
                 "narrows it down: a 0/1 flag that switches on with cisplatin. That is evidence, and we keep "
                 "provenance to both columns.",
